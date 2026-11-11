@@ -1,0 +1,20 @@
+# Python & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large exported videos (preserve 10s preview for sample)
+*.mp4
+!Esco_AV_Interview_Preview_10s.mp4

@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mô Phỏng Phòng Phỏng Vấn Esco AV - Thái Đỗ Thịnh</title>
+  <!-- Inline Podcast Favicon (Prevents /favicon.ico 404) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Be Vietnam Pro & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #050811;
+      color: #f1f5f9;
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 0px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.7);
+    }
+    /* Glassmorphism */
+    .glass-panel {
+      background: rgba(10, 16, 30, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .active-chapter-card {
+      background: linear-gradient(135deg, rgba(14, 28, 54, 0.95), rgba(8, 16, 32, 0.95)) !important;
+      border: 1px solid rgba(6, 182, 212, 0.45) !important;
+      box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.15) !important;
+    }
+    /* Tooltip */
+    #progressTooltip {
+      pointer-events: none;
+      transform: translate(-50%, -120%);
+      transition: opacity 0.15s ease-out;
+    }
+  </style>
+</head>
+<body class="h-screen max-h-screen flex flex-col justify-between overflow-hidden bg-[#050811] text-slate-100 select-none">
+
+  <!-- 1. Top Navigation Bar (Fixed 56px, clean & balanced) -->
+  <header class="h-14 flex-shrink-0 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 flex items-center justify-between z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 p-0.5 shadow-md flex items-center justify-center">
+        <div class="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center">
+          <i data-lucide="video" class="w-4 h-4 text-cyan-400"></i>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xs sm:text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
+            ESCO AV <span class="text-[11px] px-2 py-0.2 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Smart Room 302</span>
+          </h1>
+          <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Podcast
+          </span>
+        </div>
+        <p class="text-[11px] text-slate-400 hidden sm:block">IT Support & AV Systems Fresher • Thái Đỗ Thịnh</p>
+      </div>
+    </div>
+
+    <!-- Quick action buttons -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Camera Angle Switcher (Góc quay) -->
+      <div class="hidden md:flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800 text-xs">
+        <span class="text-[11px] text-slate-400 pl-2 pr-1 font-medium flex items-center gap-1">
+          <i data-lucide="camera" class="w-3.5 h-3.5 text-cyan-400"></i> Góc quay:
+        </span>
+        <button id="viewAuto" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('auto')">
+          Tự động zoom
+        </button>
+        <button id="viewWide" class="px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm" onclick="setCameraView('wide')">
+          Toàn cảnh
+        </button>
+        <button id="viewThinh" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('thinh')">
+          Thái Đỗ Thịnh
+        </button>
+        <button id="viewInterviewer" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('interviewer')">
+          Người phỏng vấn
+        </button>
+      </div>
+
+      <!-- Subtitle Mode Switcher (Unified active style) -->
+      <div class="flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800 text-xs">
+        <button id="subBilingual" class="px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm" onclick="setSubMode('bilingual')">
+          Song ngữ
+        </button>
+        <button id="subEn" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setSubMode('en')">
+          EN
+        </button>
+        <button id="subVi" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setSubMode('vi')">
+          VI
+        </button>
+      </div>
+
+      <!-- Ghi & Xuất MP4 Button -->
+      <button id="btnRecord" onclick="toggleRecording()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900/80 text-slate-200 hover:text-white hover:border-rose-500/60 shadow-sm transition active:scale-95">
+        <span id="recDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
+        <span id="recText">Ghi & xuất MP4</span>
+      </button>
+
+      <!-- Toggle Chapters Panel Button -->
+      <button onclick="toggleChapterDrawer()" title="Danh sách câu hỏi" class="p-2 rounded-lg bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition">
+        <i data-lucide="list-ordered" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. Main Workspace (Video Podcast Layout with Embedded Subtitles) -->
+  <main class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden w-full relative">
+
+    <!-- Center Stage Container (Expansive, clean, video podcast stage) -->
+    <div class="flex-1 min-h-0 flex flex-col items-center justify-between p-2 sm:p-3 overflow-hidden relative">
+      
+      <!-- Video Stage 16:9 Canvas (Fills viewport comfortably) -->
+      <div class="relative w-full flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+        <div class="relative w-full max-w-[1240px] h-full max-h-[calc(100vh-140px)] aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-800/80 bg-[#060b14] group">
+          
+          <!-- HTML5 Canvas for 60fps 3-Card Stage with Embedded Podcast Subtitles -->
+          <canvas id="stageCanvas" width="1280" height="720" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+
+          <!-- Big Center Play Button Overlay (when paused) -->
+          <div id="playOverlay" onclick="togglePlay()" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/45 backdrop-blur-sm transition-opacity duration-300 cursor-pointer">
+            <div class="w-16 h-16 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-xl shadow-blue-500/40 hover:scale-105 transition group-hover:bg-blue-500 border border-white/20">
+              <i data-lucide="play" class="w-8 h-8 ml-1"></i>
+            </div>
+            <span class="mt-3 px-3.5 py-1 rounded-full bg-slate-900/90 text-xs font-medium text-slate-200 border border-slate-700/60 shadow-lg">
+              Bấm để bắt đầu xem video podcast
+            </span>
+          </div>
+
+          <!-- Recording Indicator Badge -->
+          <div id="recIndicator" class="hidden absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-bold tracking-wider shadow-lg animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-white"></span>
+            RECORDING MP4 <span id="recTimer" class="font-mono ml-1 font-normal">00:00</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Playback Control Bar (Compact, fits right below video) -->
+      <div class="w-full max-w-[1240px] h-14 flex-shrink-0 mt-2 glass-panel rounded-xl px-4 py-2 flex flex-col justify-between">
+        
+        <!-- Progress Scrubber Track with Hover Tooltip -->
+        <div class="relative flex items-center gap-3">
+          <span id="curTime" class="text-xs font-mono text-cyan-400 w-11 text-right">00:00</span>
+          
+          <div class="relative flex-1 h-2 bg-slate-800/90 rounded-full cursor-pointer group" id="progressTrack" onclick="seekByClick(event)" onmousemove="onTrackHover(event)" onmouseleave="onTrackLeave()">
+            <!-- Floating Hover Tooltip -->
+            <div id="progressTooltip" class="absolute top-0 opacity-0 z-30 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono text-white shadow-lg whitespace-nowrap">
+              00:00 - Chapter
+            </div>
+            <!-- Chapter Markers -->
+            <div id="chapterMarkers" class="absolute inset-0 pointer-events-none"></div>
+            <!-- Progress Fill -->
+            <div id="progressFill" class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full w-0"></div>
+            <!-- Thumb -->
+            <div id="progressThumb" class="absolute top-1/2 -mt-1.5 -ml-1.5 w-3 h-3 rounded-full bg-white shadow-md border-2 border-cyan-400 scale-0 group-hover:scale-100 transition-transform"></div>
+          </div>
+
+          <span id="totTime" class="text-xs font-mono text-slate-400 w-11">08:38</span>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="flex items-center justify-between text-xs">
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- Play / Pause -->
+            <button onclick="togglePlay()" class="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition shadow-sm active:scale-95" title="Phát / Tạm dừng (Space)">
+              <i id="playIcon" data-lucide="play" class="w-3.5 h-3.5 ml-0.5"></i>
+            </button>
+            
+            <!-- -10s Button with clear badge -->
+            <button onclick="skipSeconds(-10)" title="Lùi 10 giây (Phím mũi tên trái)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 10
+            </button>
+
+            <!-- +10s Button with clear badge -->
+            <button onclick="skipSeconds(10)" title="Tới 10 giây (Phím mũi tên phải)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
+              10 <i data-lucide="rotate-cw" class="w-3 h-3"></i>
+            </button>
+
+            <!-- Prev Question -->
+            <button onclick="prevChapter()" title="Câu hỏi trước" class="p-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition">
+              <i data-lucide="skip-back" class="w-3.5 h-3.5"></i>
+            </button>
+
+            <!-- Next Question -->
+            <button onclick="nextChapter()" title="Câu hỏi kế tiếp" class="p-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition">
+              <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Current Chapter Name in Toolbar -->
+          <div class="hidden sm:flex items-center gap-2 px-2.5 py-0.5 rounded-lg bg-slate-900/60 border border-slate-800/60 text-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            <span id="currentChapterTitle" class="font-medium text-slate-200 truncate max-w-[280px] lg:max-w-[340px]">1. Introduction & Background</span>
+          </div>
+
+          <!-- Shortcuts Hint & Audio Controls -->
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] text-slate-500 font-mono hidden xl:inline">Phím tắt: Space (Dừng/Phát) • ←/→ (±10s)</span>
+
+            <!-- Speed Switcher -->
+            <div class="flex items-center gap-0.5 bg-slate-900/80 rounded-lg p-0.5 border border-slate-800 text-[11px] font-mono">
+              <button onclick="setSpeed(1.0)" id="speed10" class="px-1.5 py-0.2 rounded text-white bg-blue-600 font-medium">1.0x</button>
+              <button onclick="setSpeed(1.25)" id="speed125" class="px-1.5 py-0.2 rounded text-slate-400 hover:text-white">1.25x</button>
+              <button onclick="setSpeed(1.5)" id="speed15" class="px-1.5 py-0.2 rounded text-slate-400 hover:text-white">1.5x</button>
+            </div>
+
+            <!-- Volume Mute -->
+            <div class="flex items-center gap-1">
+              <button onclick="toggleMute()" class="p-1 text-slate-400 hover:text-white transition" title="Tắt / Bật tiếng (M)">
+                <i id="volIcon" data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+              </button>
+              <input type="range" min="0" max="1" step="0.05" value="1" id="volumeSlider" oninput="changeVolume(this.value)" class="w-14 h-1 bg-slate-700 rounded-lg accent-blue-500 cursor-pointer">
+            </div>
+
+            <!-- Fullscreen -->
+            <button onclick="toggleFullscreen()" title="Toàn màn hình" class="p-1 text-slate-400 hover:text-white transition">
+              <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 3. Right Sidebar: Redesigned matching reference image -->
+    <aside id="chapterDrawer" class="w-full lg:w-80 xl:w-96 flex-shrink-0 h-full flex flex-col justify-between border-l border-slate-800/80 bg-slate-950/95 backdrop-blur-xl p-3 overflow-x-hidden transition-all duration-300 z-30">
+      
+      <!-- Top Title Bar -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 flex-shrink-0">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <h2 class="text-xs sm:text-sm font-bold text-white tracking-wide">14 câu hỏi & phân cảnh</h2>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-0.5">Phỏng vấn Kỹ sư Fresher Esco AV</p>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 font-mono font-medium">08:38</span>
+      </div>
+
+      <!-- Live Search Input (Real-time filtering!) -->
+      <div class="my-2.5 flex-shrink-0 relative">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="chapterSearch" oninput="filterChapters(this.value)" placeholder="Tìm câu hỏi, từ khóa, kỹ năng..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
+      </div>
+
+      <!-- Scrollable Chapters List (High-contrast card items matching image) -->
+      <div id="chaptersList" class="flex-1 min-h-0 flex flex-col gap-2 my-1 overflow-y-auto overflow-x-hidden pr-1">
+        <!-- Dynamically populated via JS -->
+      </div>
+
+      <!-- Live Smart Board Dossier Info (Matching reference bottom card) -->
+      <div class="pt-2 border-t border-slate-800/80 flex-shrink-0">
+        <div class="glass-panel rounded-lg p-2.5 border border-blue-500/20 bg-blue-950/20">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[9px] font-bold text-blue-400 tracking-wider uppercase flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i> Smart Display Sync
+            </span>
+            <span id="slideBadge" class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-cyan-300 font-mono font-semibold">TOPIC 1</span>
+          </div>
+          <h3 id="slideHeadline" class="text-xs font-bold text-white truncate">Thái Đỗ Thịnh</h3>
+          <p id="slideSubline" class="text-[10px] text-slate-300 line-clamp-1">Computer Science Graduate • HCMC Open University</p>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- Audio Element -->
+  <audio id="audioPlayer" src="interview_audio.mp3" preload="auto"></audio>
+
+  <!-- Application Script -->
+  <script>
+    // Global State
+    let interviewData = null;
+    let audio = null;
+    let audioCtx = null;
+    let analyser = null;
+    let audioSource = null;
+    let dataArray = null;
+    let isPlaying = false;
+    let subMode = 'bilingual'; // 'bilingual', 'en', 'vi', 'off'
+    let cameraMode = 'wide'; // 'auto', 'wide', 'thinh', 'interviewer'
+    let activeSpeaker = 'none'; // 'interviewer', 'thinh', 'both', 'none'
+    let currentChapterIndex = 0;
+    let currentDialogue = null;
+    let searchQuery = '';
+
+    // MediaRecorder for Exporting MP4/WebM
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let recStartTime = 0;
+    let recTimerInterval = null;
+
+    // Canvas & Stage
+    const canvas = document.getElementById('stageCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Smooth Camera Transform State
+    let cam = {
+      x: 0,
+      y: 0,
+      scale: 1.0,
+      targetX: 0,
+      targetY: 0,
+      targetScale: 1.0
+    };
+
+    // Characters Animation State
+    let interviewer = {
+      mouthOpen: 0,
+      glow: 0.1
+    };
+
+    let thinh = {
+      mouthOpen: 0,
+      glow: 0.8
+    };
+
+    // DOM Ready Initialization
+    window.addEventListener('DOMContentLoaded', async () => {
+      audio = document.getElementById('audioPlayer');
+      lucide.createIcons();
+
+      // Load interview JSON data
+      try {
+        const resp = await fetch('interview_data.json');
+        interviewData = await resp.json();
+        buildChapterDrawer();
+        buildTimelineMarkers();
+      } catch (err) {
+        console.error('Failed to load interview_data.json:', err);
+      }
+
+      // Audio Event Listeners
+      audio.addEventListener('timeupdate', onTimeUpdate);
+      audio.addEventListener('play', () => {
+        isPlaying = true;
+        document.getElementById('playOverlay').style.opacity = '0';
+        document.getElementById('playOverlay').style.pointerEvents = 'none';
+        document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
+        lucide.createIcons();
+      });
+      audio.addEventListener('pause', () => {
+        isPlaying = false;
+        document.getElementById('playOverlay').style.opacity = '1';
+        document.getElementById('playOverlay').style.pointerEvents = 'auto';
+        document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+        lucide.createIcons();
+      });
+      audio.addEventListener('loadedmetadata', () => {
+        document.getElementById('totTime').innerText = formatTime(Math.round(audio.duration));
+      });
+
+      // Start Rendering Loop (60 FPS)
+      requestAnimationFrame(renderLoop);
+    });
+
+    // Web Audio API Setup
+    function initWebAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 128;
+        analyser.smoothingTimeConstant = 0.8;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        audioSource = audioCtx.createMediaElementSource(audio);
+        audioSource.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function togglePlay() {
+      initWebAudio();
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+
+    function skipSeconds(sec) {
+      if (!audio) return;
+      initWebAudio();
+      audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
+    }
+
+    function setSpeed(spd) {
+      if (!audio) return;
+      audio.playbackRate = spd;
+      ['10', '125', '15'].forEach(id => {
+        const btn = document.getElementById('speed' + id);
+        if (btn) btn.className = 'px-1.5 py-0.2 rounded text-slate-400 hover:text-white';
+      });
+      const activeBtn = document.getElementById('speed' + (spd === 1.0 ? '10' : spd === 1.25 ? '125' : '15'));
+      if (activeBtn) activeBtn.className = 'px-1.5 py-0.2 rounded text-white bg-blue-600 font-medium';
+    }
+
+    function changeVolume(val) {
+      if (!audio) return;
+      audio.volume = parseFloat(val);
+      updateVolIcon();
+    }
+
+    function toggleMute() {
+      if (!audio) return;
+      audio.muted = !audio.muted;
+      updateVolIcon();
+    }
+
+    function updateVolIcon() {
+      const icon = document.getElementById('volIcon');
+      if (audio.muted || audio.volume === 0) {
+        icon.setAttribute('data-lucide', 'volume-x');
+      } else if (audio.volume < 0.5) {
+        icon.setAttribute('data-lucide', 'volume-1');
+      } else {
+        icon.setAttribute('data-lucide', 'volume-2');
+      }
+      lucide.createIcons();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Subtitle Mode
+    function setSubMode(mode) {
+      subMode = mode;
+      ['bilingual', 'en', 'vi'].forEach(m => {
+        const btn = document.getElementById('sub' + m.charAt(0).toUpperCase() + m.slice(1));
+        if (btn) btn.className = 'px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
+      });
+      const activeBtn = document.getElementById('sub' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (activeBtn) activeBtn.className = 'px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm';
+    }
+
+    // Camera View Mode
+    function setCameraView(mode) {
+      cameraMode = mode;
+      ['Auto', 'Wide', 'Thinh', 'Interviewer'].forEach(m => {
+        const btn = document.getElementById('view' + m);
+        if (btn) btn.className = 'px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
+      });
+      const activeBtn = document.getElementById('view' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (activeBtn) activeBtn.className = 'px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm';
+    }
+
+    // Seek Click
+    function seekByClick(e) {
+      if (!audio || !audio.duration) return;
+      initWebAudio();
+      const rect = document.getElementById('progressTrack').getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      audio.currentTime = pos * audio.duration;
+    }
+
+    // Progress Bar Hover Tooltip
+    function onTrackHover(e) {
+      if (!audio || !audio.duration || !interviewData) return;
+      const rect = document.getElementById('progressTrack').getBoundingClientRect();
+      const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const targetSec = pos * audio.duration;
+
+      let chapTitle = '';
+      for (let c of interviewData.chapters) {
+        if (targetSec >= c.start && targetSec <= c.end) {
+          chapTitle = c.title_en;
+          break;
+        }
+      }
+
+      const tooltip = document.getElementById('progressTooltip');
+      tooltip.style.left = (pos * 100) + '%';
+      tooltip.innerText = `${formatTime(targetSec)} • ${chapTitle}`;
+      tooltip.style.opacity = '1';
+    }
+
+    function onTrackLeave() {
+      document.getElementById('progressTooltip').style.opacity = '0';
+    }
+
+    // Time Update Handler
+    function onTimeUpdate() {
+      const cur = audio.currentTime;
+      const dur = audio.duration || 518;
+      document.getElementById('curTime').innerText = formatTime(cur);
+
+      const pct = (cur / dur) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressThumb').style.left = pct + '%';
+
+      updateSubtitles(cur);
+      updateActiveChapter(cur);
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return '00:00';
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    // Search filter for chapters in sidebar
+    function filterChapters(val) {
+      searchQuery = (val || '').toLowerCase().trim();
+      buildChapterDrawer();
+    }
+
+    // Build Chapter Drawer matching reference image
+    function buildChapterDrawer() {
+      if (!interviewData || !interviewData.chapters) return;
+      const container = document.getElementById('chaptersList');
+      container.innerHTML = '';
+
+      interviewData.chapters.forEach((chap, idx) => {
+        if (searchQuery) {
+          const matchText = (chap.title_en + ' ' + chap.title_vi + ' ' + (chap.slide?.headline || '')).toLowerCase();
+          if (!matchText.includes(searchQuery)) return;
+        }
+
+        const isActive = idx === currentChapterIndex;
+        const item = document.createElement('div');
+        item.id = 'chap-item-' + idx;
+        item.className = 'p-3 rounded-xl border transition cursor-pointer text-left group ' +
+          (isActive 
+            ? 'active-chapter-card' 
+            : 'border-slate-800/80 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/80');
+        item.onclick = () => jumpToChapter(idx);
+
+        if (isActive) {
+          item.innerHTML = `
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-cyan-300 border border-blue-500/30">${formatTime(chap.start)}</span>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Đang phát
+              </span>
+            </div>
+            <h4 class="text-xs font-bold text-white mb-0.5 leading-snug">${chap.title_en}</h4>
+            <p class="text-[11px] text-cyan-200/90 leading-snug mb-1.5">${chap.title_vi}</p>
+            <div class="flex items-center gap-1.5 pt-1 border-t border-slate-800/80 text-[10px] text-slate-300">
+              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-cyan-400 flex-shrink-0"></i>
+              <span class="truncate">${chap.slide?.details?.[0] || 'Hoàn thành chương trình'}</span>
+            </div>
+          `;
+        } else {
+          item.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-slate-800/60">${formatTime(chap.start)}</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 transition transform group-hover:translate-x-0.5"></i>
+            </div>
+            <h4 class="text-xs font-bold text-slate-200 group-hover:text-white leading-snug">${chap.title_en}</h4>
+            <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug truncate">${chap.title_vi}</p>
+          `;
+        }
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function buildTimelineMarkers() {
+      if (!interviewData || !interviewData.chapters) return;
+      const track = document.getElementById('chapterMarkers');
+      const dur = interviewData.duration || 518;
+      track.innerHTML = '';
+
+      interviewData.chapters.forEach((chap) => {
+        if (chap.start === 0) return;
+        const mark = document.createElement('div');
+        mark.className = 'absolute top-0 bottom-0 w-0.5 bg-slate-600/60 pointer-events-none';
+        mark.style.left = (chap.start / dur * 100) + '%';
+        track.appendChild(mark);
+      });
+    }
+
+    function jumpToChapter(idx) {
+      if (!interviewData || !interviewData.chapters[idx]) return;
+      const chap = interviewData.chapters[idx];
+      initWebAudio();
+      audio.currentTime = chap.start;
+      if (audio.paused) audio.play();
+    }
+
+    function prevChapter() {
+      if (currentChapterIndex > 0) {
+        jumpToChapter(currentChapterIndex - 1);
+      }
+    }
+
+    function nextChapter() {
+      if (interviewData && currentChapterIndex < interviewData.chapters.length - 1) {
+        jumpToChapter(currentChapterIndex + 1);
+      }
+    }
+
+    function updateActiveChapter(currentTime) {
+      if (!interviewData || !interviewData.chapters) return;
+
+      let foundIdx = 0;
+      for (let i = 0; i < interviewData.chapters.length; i++) {
+        if (currentTime >= interviewData.chapters[i].start && currentTime <= interviewData.chapters[i].end) {
+          foundIdx = i;
+          break;
+        }
+      }
+
+      if (foundIdx !== currentChapterIndex) {
+        currentChapterIndex = foundIdx;
+        const chap = interviewData.chapters[currentChapterIndex];
+
+        buildChapterDrawer();
+        const curEl = document.getElementById('chap-item-' + currentChapterIndex);
+        if (curEl) {
+          curEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        document.getElementById('currentChapterTitle').innerText = chap.title_en;
+        document.getElementById('slideBadge').innerText = 'TOPIC ' + chap.id;
+        document.getElementById('slideHeadline').innerText = chap.slide.headline;
+        document.getElementById('slideSubline').innerText = chap.slide.subline;
+      }
+    }
+
+    // Video Podcast Subtitle State Tracker
+    function updateSubtitles(t) {
+      if (!interviewData || !interviewData.dialogues) return;
+      const D = interviewData.dialogues;
+      let d = D.find(x => t >= x.start && t <= x.end);
+      if (!d) {
+        const prev = D.filter(x => x.end < t).pop();
+        if (prev && t - prev.end < 1.2) d = prev;
+      }
+
+      currentDialogue = d;
+      activeSpeaker = d ? d.speaker : 'none';
+    }
+
+    function toggleChapterDrawer() {
+      const drawer = document.getElementById('chapterDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    // ==========================================
+    // 60 FPS CANVAS RENDERING ENGINE (3 CARDS + VIDEO PODCAST SUBTITLES)
+    // ==========================================
+
+    function renderLoop() {
+      let audioLevel = 0;
+      if (analyser && dataArray && isPlaying) {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        audioLevel = sum / (dataArray.length * 255);
+      }
+
+      // Camera Interpolation
+      updateCameraTarget();
+      cam.x += (cam.targetX - cam.x) * 0.05;
+      cam.y += (cam.targetY - cam.y) * 0.05;
+      cam.scale += (cam.targetScale - cam.scale) * 0.05;
+
+      ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Camera Transform for World Space (Stage & Characters only)
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.scale(cam.scale, cam.scale);
+      ctx.translate(-canvas.width / 2 - cam.x, -canvas.height / 2 - cam.y);
+
+      // 1. Stage Background
+      drawStageBackground();
+
+      // 2. Left Card: Interviewer
+      drawInterviewerCard(audioLevel);
+
+      // 3. Center Card: Esco Smart Collab / Smart Display
+      drawCenterDisplayCard();
+
+      // 4. Right Card: Thái Đỗ Thịnh
+      drawThinhCard(audioLevel);
+
+      // Restore to Screen Space (1280x720) before drawing HUD / Subtitles!
+      ctx.restore();
+
+      // 5. Embedded Video Podcast Subtitles (Screen Space HUD - Fixed Broadcast Lower-Third)
+      // Never affected or clipped by camera zoom / pan!
+      drawPodcastSubtitles();
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    function updateCameraTarget() {
+      if (cameraMode === 'wide') {
+        cam.targetX = 0;
+        cam.targetY = 0;
+        cam.targetScale = 1.0;
+      } else if (cameraMode === 'interviewer') {
+        cam.targetX = -340;
+        cam.targetY = -35;
+        cam.targetScale = 1.35;
+      } else if (cameraMode === 'thinh') {
+        cam.targetX = 340;
+        cam.targetY = -35;
+        cam.targetScale = 1.35;
+      } else {
+        // Auto Mode: Subtle & cinematic focus on active speaker
+        if (activeSpeaker === 'interviewer') {
+          cam.targetX = -170;
+          cam.targetY = -25;
+          cam.targetScale = 1.16;
+        } else if (activeSpeaker === 'thinh') {
+          cam.targetX = 170;
+          cam.targetY = -25;
+          cam.targetScale = 1.16;
+        } else {
+          cam.targetX = 0;
+          cam.targetY = 0;
+          cam.targetScale = 1.0;
+        }
+      }
+    }
+
+    function drawStageBackground() {
+      const W = canvas.width;
+      const H = canvas.height;
+
+      // Dark Tech Backdrop
+      const g = ctx.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 700);
+      g.addColorStop(0, '#0a1224');
+      g.addColorStop(0.6, '#060b14');
+      g.addColorStop(1, '#03060c');
+      ctx.fillStyle = g;
+      ctx.fillRect(-200, -200, W + 400, H + 400);
+
+      // Subtle ambient glows behind interviewer & candidate
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.06)';
+      ctx.beginPath();
+      ctx.arc(200, 310, 180, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.07)';
+      ctx.beginPath();
+      ctx.arc(1080, 310, 180, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // ==========================================
+    // 1. LEFT CARD: INTERVIEWER
+    // ==========================================
+    function drawInterviewerCard(audioLevel) {
+      const isSpeaking = activeSpeaker === 'interviewer';
+      const cx = 175;
+      const cardX = 40;
+      const cardY = 40;
+      const cardW = 270;
+      const cardH = 460;
+
+      // Card Glow & Border
+      ctx.save();
+      if (isSpeaking) {
+        interviewer.glow = Math.min(1.0, interviewer.glow + 0.1);
+        interviewer.mouthOpen = Math.min(1.0, audioLevel * 2.2);
+        ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
+        ctx.shadowBlur = 28;
+      } else {
+        interviewer.glow = Math.max(0.1, interviewer.glow - 0.05);
+        interviewer.mouthOpen = 0;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        ctx.shadowBlur = 16;
+      }
+
+      ctx.fillStyle = '#0c1527';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+      ctx.fill();
+
+      ctx.strokeStyle = isSpeaking ? '#06b6d4' : 'rgba(51, 65, 85, 0.7)';
+      ctx.lineWidth = isSpeaking ? 2 : 1;
+      ctx.stroke();
+      ctx.restore();
+
+      // Top-Left Badge: "• Interviewer"
+      ctx.fillStyle = isSpeaking ? 'rgba(6, 182, 212, 0.2)' : 'rgba(15, 23, 42, 0.8)';
+      roundRect(ctx, cardX + 16, cardY + 16, 92, 24, 12);
+      ctx.fill();
+      ctx.strokeStyle = isSpeaking ? 'rgba(6, 182, 212, 0.4)' : 'rgba(148, 163, 184, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = isSpeaking ? '#38bdf8' : '#94a3b8';
+      ctx.font = 'bold 11px "Be Vietnam Pro"';
+      ctx.fillText('• Interviewer', cardX + 26, cardY + 32);
+
+      // Character Illustration
+      const cy = 330;
+
+      ctx.save();
+      ctx.fillStyle = '#172033';
+      ctx.beginPath();
+      ctx.moveTo(cx - 85, cy + 180);
+      ctx.lineTo(cx - 75, cy + 40);
+      ctx.quadraticCurveTo(cx - 50, cy - 25, cx - 25, cy - 30);
+      ctx.lineTo(cx + 25, cy - 30);
+      ctx.quadraticCurveTo(cx + 50, cy - 25, cx + 75, cy + 40);
+      ctx.lineTo(cx + 85, cy + 180);
+      ctx.closePath();
+      ctx.fill();
+
+      // Cyan Tie (#06b6d4)
+      ctx.fillStyle = '#06b6d4';
+      roundRect(ctx, cx - 12, cy - 30, 24, 140, 4);
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(cx - 15, cy - 55, 30, 30);
+
+      // Head Base (#fef08a)
+      const headY = cy - 85;
+      const headR = 44;
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(cx, headY, headR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#111827';
+      ctx.beginPath();
+      ctx.arc(cx, headY, headR + 1, Math.PI * 0.9, Math.PI * 2.1);
+      ctx.quadraticCurveTo(cx + headR - 4, headY - 8, cx, headY - 14);
+      ctx.quadraticCurveTo(cx - headR + 4, headY - 8, cx - headR * Math.cos(Math.PI * 0.1), headY - headR * Math.sin(Math.PI * 0.1));
+      ctx.fill();
+
+      // Eyebrows
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 25, headY - 12);
+      ctx.lineTo(cx - 9, headY - 12);
+      ctx.moveTo(cx + 9, headY - 12);
+      ctx.lineTo(cx + 25, headY - 12);
+      ctx.stroke();
+
+      // Eyes
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx - 17, headY - 2, 4, 0, Math.PI * 2);
+      ctx.arc(cx + 17, headY - 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Mouth
+      ctx.fillStyle = '#fb7185';
+      if (isSpeaking && interviewer.mouthOpen > 0.05) {
+        ctx.beginPath();
+        ctx.ellipse(cx, headY + 18, 7, 3 + interviewer.mouthOpen * 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        roundRect(ctx, cx - 7, headY + 15, 14, 6, 3);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Label Below Card: "• Người phỏng vấn" (Role only, no extra fluff)
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 15px "Be Vietnam Pro"';
+      ctx.textAlign = 'center';
+      ctx.fillText('• Người phỏng vấn', cx, cardY + cardH + 26);
+      ctx.textAlign = 'left';
+    }
+
+    // ==========================================
+    // 2. CENTER CARD: SMART DISPLAY
+    // ==========================================
+    function drawCenterDisplayCard() {
+      const cardX = 350;
+      const cardY = 25;
+      const cardW = 580;
+      const cardH = 485;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(2, 132, 199, 0.35)';
+      ctx.shadowBlur = 24;
+      ctx.fillStyle = '#070e1c';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // Header Row
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 11px "JetBrains Mono"';
+      ctx.fillText('🌐 ESCO AV SMART COLLAB', cardX + 24, cardY + 36);
+
+      const badgeW = 145;
+      const badgeX = cardX + cardW - badgeW - 24;
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
+      roundRect(ctx, badgeX, cardY + 20, badgeW, 24, 6);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 10px "Be Vietnam Pro"';
+      ctx.textAlign = 'center';
+      ctx.fillText('CANDIDATE DOSSIER', badgeX + badgeW / 2, cardY + 36);
+      ctx.textAlign = 'left';
+
+      // Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px "Be Vietnam Pro"';
+      ctx.fillText('Thái Đỗ Thịnh', cardX + 24, cardY + 86);
+
+      // Verified Badge Circle
+      ctx.fillStyle = '#0284c7';
+      ctx.beginPath();
+      ctx.arc(cardX + 205, cardY + 78, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✓', cardX + 205, cardY + 82);
+      ctx.textAlign = 'left';
+
+      // Subline
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 13px "Be Vietnam Pro"';
+      ctx.fillText('Computer Science Graduate • HCMC Open University', cardX + 24, cardY + 112);
+
+      // 3 Detail Rows
+      const chap = interviewData?.chapters[currentChapterIndex];
+      const details = chap?.slide?.details || [
+        "🎓 Finished all Coursework: Immediate full-time availability without university conflicts.",
+        "💼 6-Month IT Internship at BW Industrial: Built 2 internal financial web tools & user support.",
+        "🎯 Target Role: IT Support & AV Systems Integration at Esco AV Vietnam."
+      ];
+
+      const rowIcons = [
+        { icon: '🎓', bg: 'rgba(6, 182, 212, 0.2)', border: 'rgba(6, 182, 212, 0.4)' },
+        { icon: '💼', bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 0.4)' },
+        { icon: '🎯', bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 0.4)' }
+      ];
+
+      let ry = cardY + 140;
+      for (let i = 0; i < Math.min(3, details.length); i++) {
+        ctx.fillStyle = rowIcons[i].bg;
+        roundRect(ctx, cardX + 24, ry, 36, 36, 8);
+        ctx.fill();
+        ctx.strokeStyle = rowIcons[i].border;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = '17px sans-serif';
+        ctx.fillText(rowIcons[i].icon, cardX + 32, ry + 25);
+
+        ctx.fillStyle = '#f1f5f9';
+        ctx.font = '600 13.5px "Be Vietnam Pro"';
+        const cleanText = details[i].replace(/^[\p{Extended_Pictographic}\s]+/u, '');
+        const lines = wrapText(cleanText, cardW - 105, 2);
+        lines.forEach((l, li) => {
+          ctx.fillText(l, cardX + 72, ry + 15 + li * 18);
+        });
+
+        ry += 64;
+      }
+
+      // Footer
+      const fy = cardY + cardH - 42;
+      ctx.fillStyle = 'rgba(11, 19, 36, 0.85)';
+      ctx.fillRect(cardX, fy, cardW, 42);
+      ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cardX, fy);
+      ctx.lineTo(cardX + cardW, fy);
+      ctx.stroke();
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(cardX + 26, fy + 21, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = 'bold 11px "JetBrains Mono"';
+      ctx.fillText(`LIVE ${formatTime(audio.currentTime)} / 08:38   Bitrate: 1080p 60fps`, cardX + 38, fy + 25);
+
+      if (dataArray && isPlaying) {
+        ctx.fillStyle = activeSpeaker === 'thinh' ? '#10b981' : '#06b6d4';
+        for (let b = 0; b < 16; b++) {
+          const bh = Math.max(2, (dataArray[b] / 255) * 18);
+          ctx.fillRect(cardX + cardW - 90 + b * 5, fy + 30 - bh, 3, bh);
+        }
+      }
+
+      // Label Below Center Card
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 11px "JetBrains Mono"';
+      ctx.textAlign = 'center';
+      ctx.fillText('🔲 Esco Touch 302 Active', cardX + cardW / 2, cardY + cardH + 26);
+      ctx.textAlign = 'left';
+    }
+
+    // ==========================================
+    // 3. RIGHT CARD: THÁI ĐỖ THỊNH
+    // ==========================================
+    function drawThinhCard(audioLevel) {
+      const isSpeaking = activeSpeaker === 'thinh';
+      const cx = 1105;
+      const cardX = 970;
+      const cardY = 40;
+      const cardW = 270;
+      const cardH = 460;
+
+      ctx.save();
+      if (isSpeaking) {
+        thinh.glow = Math.min(1.0, thinh.glow + 0.1);
+        thinh.mouthOpen = Math.min(1.0, audioLevel * 2.2);
+        ctx.shadowColor = 'rgba(16, 185, 129, 0.55)';
+        ctx.shadowBlur = 30;
+      } else {
+        thinh.glow = Math.max(0.1, thinh.glow - 0.05);
+        thinh.mouthOpen = 0;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+        ctx.shadowBlur = 16;
+      }
+
+      ctx.fillStyle = '#091b18';
+      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+      ctx.fill();
+
+      ctx.strokeStyle = isSpeaking ? '#10b981' : 'rgba(16, 185, 129, 0.4)';
+      ctx.lineWidth = isSpeaking ? 2.5 : 1;
+      ctx.stroke();
+      ctx.restore();
+
+      // Top-Right Badge: Role only, no "Candidate"
+      const badgeW = 110;
+      const badgeX = cardX + cardW - badgeW - 16;
+      ctx.fillStyle = isSpeaking ? 'rgba(16, 185, 129, 0.2)' : 'rgba(15, 23, 42, 0.8)';
+      roundRect(ctx, badgeX, cardY + 16, badgeW, 24, 12);
+      ctx.fill();
+      ctx.strokeStyle = isSpeaking ? 'rgba(16, 185, 129, 0.5)' : 'rgba(148, 163, 184, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = isSpeaking ? '#10b981' : '#94a3b8';
+      ctx.font = 'bold 11px "Be Vietnam Pro"';
+      ctx.fillText(isSpeaking ? '• Đang nói' : '• Lắng nghe', badgeX + 16, cardY + 32);
+
+      // Character Illustration
+      const cy = 330;
+
+      ctx.save();
+      ctx.fillStyle = '#047857';
+      ctx.beginPath();
+      ctx.moveTo(cx - 85, cy + 180);
+      ctx.lineTo(cx - 75, cy + 40);
+      ctx.quadraticCurveTo(cx - 50, cy - 25, cx - 25, cy - 30);
+      ctx.lineTo(cx + 25, cy - 30);
+      ctx.quadraticCurveTo(cx + 50, cy - 25, cx + 75, cy + 40);
+      ctx.lineTo(cx + 85, cy + 180);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mint Center Stripe
+      ctx.fillStyle = '#10b981';
+      roundRect(ctx, cx - 12, cy - 30, 24, 140, 4);
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(cx - 15, cy - 55, 30, 30);
+
+      // Head Base (#fef08a)
+      const headY = cy - 85;
+      const headR = 44;
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(cx, headY, headR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath();
+      ctx.arc(cx, headY, headR + 1, Math.PI * 0.9, Math.PI * 2.1);
+      ctx.quadraticCurveTo(cx + headR - 4, headY - 8, cx, headY - 14);
+      ctx.quadraticCurveTo(cx - headR + 4, headY - 8, cx - headR * Math.cos(Math.PI * 0.1), headY - headR * Math.sin(Math.PI * 0.1));
+      ctx.fill();
+
+      // Glasses
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2.5;
+      roundRect(ctx, cx - 28, headY - 12, 22, 18, 3);
+      ctx.stroke();
+      roundRect(ctx, cx + 6, headY - 12, 22, 18, 3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - 6, headY - 3);
+      ctx.lineTo(cx + 6, headY - 3);
+      ctx.stroke();
+
+      // Eyes
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx - 17, headY - 3, 3.5, 0, Math.PI * 2);
+      ctx.arc(cx + 17, headY - 3, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Mouth
+      ctx.save();
+      if (isSpeaking && thinh.mouthOpen > 0.05) {
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.ellipse(cx, headY + 18, 8, 4 + thinh.mouthOpen * 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fb7185';
+        ctx.beginPath();
+        ctx.arc(cx, headY + 19 + thinh.mouthOpen * 4, 5, 0, Math.PI);
+        ctx.fill();
+      } else {
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.ellipse(cx, headY + 18, 7, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      ctx.restore();
+
+      // Label Below Card: "• Thái Đỗ Thịnh" (Clean, no "(Candidate)")
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 15px "Be Vietnam Pro"';
+      ctx.textAlign = 'center';
+      ctx.fillText('• Thái Đỗ Thịnh', cx, cardY + cardH + 26);
+      ctx.textAlign = 'left';
+    }
+
+    // ==========================================
+    // 4. EMBEDDED VIDEO PODCAST SUBTITLES (BROADCAST QUALITY)
+    // Only Speaker Role + Dialogue Subtitle, No Topic, No Candidate Fluff!
+    // ==========================================
+    // ==========================================
+    // 4. EMBEDDED VIDEO PODCAST SUBTITLES (BROADCAST QUALITY)
+    // Only Speaker Role + Dialogue Subtitle, No Topic, No Candidate Fluff!
+    // Large, Bold & Ultra-Legible Typography
+    // ==========================================
+    function drawPodcastSubtitles() {
+      if (subMode === 'off' || !currentDialogue) return;
+
+      const d = currentDialogue;
+      const isInterviewer = d.speaker === 'interviewer';
+      const roleColor = isInterviewer ? '#38bdf8' : '#34d399';
+      const roleBg = isInterviewer ? 'rgba(6, 182, 212, 0.2)' : 'rgba(16, 185, 129, 0.2)';
+      const roleBorder = isInterviewer ? 'rgba(6, 182, 212, 0.55)' : 'rgba(16, 185, 129, 0.55)';
+      const roleName = isInterviewer ? 'NGƯỜI PHỎNG VẤN' : 'THÁI ĐỖ THỊNH';
+      const isSpeaking = activeSpeaker === d.speaker;
+
+      // Detect long dialogue to adapt font size gracefully
+      const isLong = (d.text_en.length > 140) || (d.text_vi.length > 130);
+      const isBilingual = subMode === 'bilingual';
+
+      // Container Dimensions (1180px width, centered at x = 50)
+      const boxW = 1180;
+      const boxH = isBilingual ? (isLong ? 152 : 140) : 96;
+      const boxX = (canvas.width - boxW) / 2;
+      const boxY = 720 - boxH - 12;
+
+      ctx.save();
+      // Semi-transparent deep glass backdrop with blur shadow
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = 24;
+      ctx.shadowOffsetY = 6;
+      ctx.fillStyle = 'rgba(6, 11, 22, 0.94)';
+      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
+      ctx.fill();
+
+      // Left border accent in speaker's color
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = roleColor;
+      roundRect(ctx, boxX, boxY, 5, boxH, 2.5);
+      ctx.fill();
+
+      // Outer border with subtle neon glow
+      ctx.strokeStyle = isInterviewer ? 'rgba(6, 182, 212, 0.45)' : 'rgba(16, 185, 129, 0.45)';
+      ctx.lineWidth = 1.2;
+      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
+      ctx.stroke();
+
+      // Speaker Role Chip (Top-left inside box: Pure role identity, no extra fluff!)
+      ctx.font = 'bold 12px "Be Vietnam Pro"';
+      const labelW = ctx.measureText(roleName).width;
+      const chipW = labelW + 36;
+      const chipH = 26;
+      const chipX = boxX + 22;
+      const chipY = boxY + 12;
+
+      ctx.fillStyle = roleBg;
+      roundRect(ctx, chipX, chipY, chipW, chipH, 13);
+      ctx.fill();
+      ctx.strokeStyle = roleBorder;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Live pulsing voice dot
+      ctx.fillStyle = roleColor;
+      ctx.beginPath();
+      ctx.arc(chipX + 14, chipY + chipH / 2, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (isSpeaking) {
+        ctx.strokeStyle = roleColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        const pulseR = 3.5 + (Math.sin(performance.now() * 0.008) * 0.5 + 0.5) * 3;
+        ctx.arc(chipX + 14, chipY + chipH / 2, pulseR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      // Speaker Role Name (Clean, pure role!)
+      ctx.fillStyle = roleColor;
+      ctx.font = 'bold 12px "Be Vietnam Pro"';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(roleName, chipX + 24, chipY + chipH / 2);
+
+      // Subtitle dialogue text - Full width, BIG & CRISP
+      const textX = boxX + 22;
+      const maxTextW = boxW - 44;
+
+      if (isBilingual) {
+        // English Line (Bold White 23px / 20px)
+        const enFontSize = isLong ? 20 : 23;
+        const enLineH = isLong ? 26 : 30;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${enFontSize}px "Be Vietnam Pro"`;
+        ctx.textBaseline = 'top';
+        const enText = `“${d.text_en}”`;
+        const enLines = wrapText(enText, maxTextW, 3);
+        const startEnY = boxY + 44;
+        enLines.forEach((line, i) => {
+          ctx.fillText(line, textX, startEnY + i * enLineH);
+        });
+
+        // Vietnamese Line (Luminous Cyan 18px / 16px)
+        const viFontSize = isLong ? 16 : 18;
+        const viLineH = isLong ? 21 : 24;
+        ctx.fillStyle = '#67e8f9';
+        ctx.font = `600 ${viFontSize}px "Be Vietnam Pro"`;
+        const viText = `“${d.text_vi}”`;
+        const viLines = wrapText(viText, maxTextW, 3);
+        const startViY = startEnY + (enLines.length * enLineH) + 5;
+        viLines.forEach((line, i) => {
+          ctx.fillText(line, textX, startViY + i * viLineH);
+        });
+      } else if (subMode === 'en') {
+        // Single English Line (Large 27px / 23px Bold)
+        const fontSize = isLong ? 23 : 27;
+        const lineH = isLong ? 30 : 35;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontSize}px "Be Vietnam Pro"`;
+        ctx.textBaseline = 'top';
+        const enText = `“${d.text_en}”`;
+        const enLines = wrapText(enText, maxTextW, 3);
+        const startEnY = boxY + 44;
+        enLines.forEach((line, i) => {
+          ctx.fillText(line, textX, startEnY + i * lineH);
+        });
+      } else if (subMode === 'vi') {
+        // Single Vietnamese Line (Large 27px / 23px Bold Cyan)
+        const fontSize = isLong ? 23 : 27;
+        const lineH = isLong ? 30 : 35;
+        ctx.fillStyle = '#67e8f9';
+        ctx.font = `bold ${fontSize}px "Be Vietnam Pro"`;
+        ctx.textBaseline = 'top';
+        const viText = `“${d.text_vi}”`;
+        const viLines = wrapText(viText, maxTextW, 3);
+        const startViY = boxY + 44;
+        viLines.forEach((line, i) => {
+          ctx.fillText(line, textX, startViY + i * lineH);
+        });
+      }
+
+      ctx.restore();
+    }
+
+    // Helper: Wrap text for canvas
+    function wrapText(text, maxW, maxLines = 4) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      for (const w of words) {
+        const t = line ? line + ' ' + w : w;
+        if (line && ctx.measureText(t).width > maxW) {
+          lines.push(line);
+          line = w;
+        } else {
+          line = t;
+        }
+      }
+      if (line) lines.push(line);
+      return maxLines ? lines.slice(0, maxLines) : lines;
+    }
+
+    // Helper: Round Rectangle
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // ==========================================
+    // RECORD & EXPORT VIDEO (MP4/WEBM)
+    // ==========================================
+
+    function toggleRecording() {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+
+    function startRecording() {
+      initWebAudio();
+      const stream = canvas.captureStream(60);
+
+      if (audioCtx) {
+        const audioDest = audioCtx.createMediaStreamDestination();
+        audioSource.connect(audioDest);
+        const audioTrack = audioDest.stream.getAudioTracks()[0];
+        if (audioTrack) {
+          stream.addTrack(audioTrack);
+        }
+      }
+
+      let mimeType = 'video/webm;codecs=vp9,opus';
+      if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
+        mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
+        mimeType = 'video/webm;codecs=h264';
+      }
+
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 6000000 });
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+        a.download = `Esco_AV_Podcast_${Date.now()}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 100);
+      };
+
+      mediaRecorder.start(1000);
+      isRecording = true;
+      recStartTime = Date.now();
+
+      // UI: Solid Red pulsing
+      document.getElementById('recText').innerText = 'Dừng & tải MP4';
+      document.getElementById('btnRecord').className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 transition active:scale-95 animate-pulse';
+      document.getElementById('recDot').className = 'w-2 h-2 rounded-full bg-white';
+      document.getElementById('recIndicator').classList.remove('hidden');
+
+      recTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+        document.getElementById('recTimer').innerText = formatTime(elapsed);
+      }, 1000);
+
+      if (audio.paused) {
+        audio.play();
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      isRecording = false;
+      clearInterval(recTimerInterval);
+
+      document.getElementById('recText').innerText = 'Ghi & xuất MP4';
+      document.getElementById('btnRecord').className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900/80 text-slate-200 hover:text-white hover:border-rose-500/60 shadow-sm transition active:scale-95';
+      document.getElementById('recDot').className = 'w-2 h-2 rounded-full bg-rose-500';
+      document.getElementById('recIndicator').classList.add('hidden');
+    }
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        skipSeconds(-10);
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        skipSeconds(10);
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        toggleMute();
+      }
+    });
+  </script>
+</body>
+</html>
