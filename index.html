@@ -316,12 +316,6 @@
 
             <!-- Center / Actions Toolbar -->
             <div class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              <!-- Pre-Interview Quick Start in Header (if banner is closed) -->
-              <button id="btnHeaderStart" onclick="startTeamsInterview()" class="hidden px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white transition active:scale-95 text-xs font-bold items-center gap-1 shadow-sm" title="Bắt đầu vào phỏng vấn">
-                <i data-lucide="play" class="w-3 h-3 fill-white"></i>
-                <span class="hidden md:inline">Bắt đầu</span>
-              </button>
-
               <!-- Record Action -->
               <button onclick="toggleRecordPractice()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded bg-[#2b2b36] hover:bg-[#383846] text-zinc-200 transition active:scale-95 text-xs font-medium" title="Ghi video buổi tập [G]">
                 <span class="w-2 h-2 rounded-full bg-red-500" id="teamsRecBtnDot"></span>
@@ -400,15 +394,10 @@
                 </div>
               </div>
 
-              <!-- Action Buttons -->
+              <!-- Action Buttons: Duy nhất 1 nút Bắt đầu phỏng vấn -->
               <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
-                <button id="btnBannerCam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#22222a] hover:bg-[#2c2c36] border border-[#3b3b47] text-zinc-200 transition flex items-center gap-1.5 active:scale-95" title="Mở Webcam [C]">
-                  <i data-lucide="video" class="w-3.5 h-3.5"></i>
-                  <span id="btnBannerCamText">Mở Cam [C]</span>
-                </button>
-
-                <button id="btnStartInterview" onclick="startTeamsInterview()" class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer">
-                  <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i>
+                <button id="btnStartInterview" onclick="startTeamsInterview()" class="w-full sm:w-auto px-5 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center justify-center gap-2 shadow-lg active:scale-95 cursor-pointer ring-2 ring-emerald-500/50 animate-pulse">
+                  <i data-lucide="play" class="w-4 h-4 fill-white"></i>
                   <span>Bắt đầu phỏng vấn</span>
                 </button>
               </div>
@@ -497,7 +486,7 @@
 
                 <!-- Teams Authentic Lower-Third Pill Badge (Teams Mode) -->
                 <div id="managerBadgeTeams" class="hidden absolute bottom-2.5 left-2.5 flex items-center gap-2 px-2.5 py-1 rounded bg-[#121216]/80 backdrop-blur-sm text-xs font-medium text-white shadow-sm border border-white/5">
-                  <span id="teamsManagerName">hihi (Guest)</span>
+                  <span id="teamsManagerName">Hiring Manager (Guest)</span>
                   <span id="teamsManagerMicIcon" class="text-zinc-400">
                     <i data-lucide="mic-off" class="w-3.5 h-3.5"></i>
                   </span>
@@ -532,7 +521,7 @@
 
                 <!-- Teams Authentic Lower-Third Pill Badge (Teams Mode) -->
                 <div id="hrBadgeTeams" class="hidden absolute bottom-2.5 left-2.5 flex items-center gap-2 px-2.5 py-1 rounded bg-[#121216]/80 backdrop-blur-sm text-xs font-medium text-white shadow-sm border border-white/5">
-                  <span id="teamsHRName">haha (Guest)</span>
+                  <span id="teamsHRName">HR Recruiter (Guest)</span>
                   <span id="teamsHRMicIcon" class="text-zinc-400">
                     <i data-lucide="mic-off" class="w-3.5 h-3.5"></i>
                   </span>
@@ -2199,12 +2188,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     // Cập nhật trạng thái Cam & Mic trong Banner
     function updateTeamsReadinessUI() {
       const banner = document.getElementById('teamsPreInterviewBanner');
-      const headerStartBtn = document.getElementById('btnHeaderStart');
 
       // Chỉ hiện giao diện chuẩn bị phỏng vấn khi đang ở chế độ Phỏng Vấn Thật (Teams)
       if (!isTeamsFullMode) {
         if (banner) banner.classList.add('hidden');
-        if (headerStartBtn) headerStartBtn.classList.add('hidden');
         return;
       }
 
@@ -2212,30 +2199,25 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       const camTxt = document.getElementById('camStatusText');
       const micDot = document.getElementById('micStatusDot');
       const micTxt = document.getElementById('micStatusText');
-      const btnCam = document.getElementById('btnBannerCam');
-      const btnCamText = document.getElementById('btnBannerCamText');
       const btnStart = document.getElementById('btnStartInterview');
+      const teamsCamBtn = document.getElementById('teamsCamBtn');
 
       if (isTeamsInterviewStarted) {
         if (banner) banner.classList.add('hidden');
-        if (headerStartBtn) headerStartBtn.classList.add('hidden');
         return;
       } else {
         if (banner) banner.classList.remove('hidden');
-        if (headerStartBtn) headerStartBtn.classList.remove('hidden');
       }
 
       // Trạng thái Camera
       if (isWebcamActive) {
         if (camDot) camDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-        if (camTxt) camTxt.innerText = 'Camera: Đã sẵn sàng ✓';
-        if (btnCam) btnCam.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 transition flex items-center gap-1.5 active:scale-95';
-        if (btnCamText) btnCamText.innerText = 'Tắt Cam [C]';
+        if (camTxt) camTxt.innerText = 'Camera: Đã bật ✓';
+        if (teamsCamBtn) teamsCamBtn.className = 'p-1.5 rounded bg-[#6264a7] text-white hover:bg-[#7274bd] transition active:scale-95 shadow-sm';
       } else {
         if (camDot) camDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
-        if (camTxt) camTxt.innerText = 'Camera: Chưa bật';
-        if (btnCam) btnCam.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#22222a] hover:bg-[#2c2c36] border border-[#3b3b47] text-zinc-200 transition flex items-center gap-1.5 active:scale-95';
-        if (btnCamText) btnCamText.innerText = 'Mở Cam [C]';
+        if (camTxt) camTxt.innerText = 'Camera: Chưa bật [C]';
+        if (teamsCamBtn) teamsCamBtn.className = 'p-1.5 rounded hover:bg-[#2b2b36] text-zinc-300 hover:text-white transition active:scale-95';
       }
 
       // Trạng thái Micro
@@ -2247,13 +2229,9 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         if (micTxt) micTxt.innerText = 'Mic: Đang tắt (Mute)';
       }
 
-      // Nút bắt đầu sáng khi cả cam và mic đã sẵn sàng
+      // Nút bắt đầu nổi bật
       if (btnStart) {
-        if (isWebcamActive && !isCandidateMicMuted) {
-          btnStart.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center gap-1.5 shadow-lg active:scale-95 ring-2 ring-emerald-500/50 animate-pulse cursor-pointer';
-        } else {
-          btnStart.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#505294] to-[#6264a7] hover:from-[#5b5da8] hover:to-[#7274bd] transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer';
-        }
+        btnStart.className = 'w-full sm:w-auto px-5 py-2 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center justify-center gap-2 shadow-lg active:scale-95 cursor-pointer ring-2 ring-emerald-500/50 animate-pulse';
       }
     }
 
