@@ -227,7 +227,7 @@
       </div>
 
       <!-- Toggle Webcam: Bật = Practice (Tắt sound), Tắt = Nghe (Bật sound) -->
-      <button id="btnWebcam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm" title="Bật/Tắt chế độ Practice bằng Webcam (Phím C)">
+      <button id="btnWebcam" onclick="toggleWebcam()" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition items-center gap-1.5 active:scale-95 shadow-sm" title="Bật/Tắt chế độ Practice bằng Webcam (Phím C)">
         <i data-lucide="camera" class="w-3.5 h-3.5 text-zinc-400" id="webcamIcon"></i>
         <span id="webcamBtnText">Bật Webcam (Practice) [C]</span>
       </button>
@@ -375,7 +375,7 @@
           </div>
 
           <!-- PRE-INTERVIEW READINESS & START BANNER (KHI MỞ CAM & MIC RỒI BẤM BẮT ĐẦU) -->
-          <div id="teamsPreInterviewBanner" class="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-full max-w-[680px] px-3 pointer-events-auto transition-all duration-300">
+          <div id="teamsPreInterviewBanner" class="hidden absolute top-16 left-1/2 -translate-x-1/2 z-30 w-full max-w-[680px] px-3 pointer-events-auto transition-all duration-300">
             <div class="rounded-xl bg-[#121217]/95 backdrop-blur-md border border-[#30303c] p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-[#6264a7]/20 border border-[#6264a7]/50 flex items-center justify-center text-[#8b8df8] flex-shrink-0">
@@ -2056,10 +2056,18 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           }
         }
       } else {
-        // Thoát chế độ phỏng vấn thật: mở lại âm thanh cho chế độ nghe
+        isTeamsInterviewStarted = false;
+        if (isWebcamActive) {
+          disableWebcam();
+        }
         if (audio) {
           audio.muted = false;
         }
+        const banner = document.getElementById('teamsPreInterviewBanner');
+        if (banner) banner.classList.add('hidden');
+        const cap = document.getElementById('teamsCaptionsCard');
+        if (cap) cap.classList.add('hidden');
+
         document.body.classList.remove('teams-fullscreen-active');
         if (document.exitFullscreen && document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
@@ -2120,6 +2128,14 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     function updateTeamsReadinessUI() {
       const banner = document.getElementById('teamsPreInterviewBanner');
       const headerStartBtn = document.getElementById('btnHeaderStart');
+
+      // Chỉ hiện giao diện chuẩn bị phỏng vấn khi đang ở chế độ Phỏng Vấn Thật (Teams)
+      if (!isTeamsFullMode) {
+        if (banner) banner.classList.add('hidden');
+        if (headerStartBtn) headerStartBtn.classList.add('hidden');
+        return;
+      }
+
       const camDot = document.getElementById('camStatusDot');
       const camTxt = document.getElementById('camStatusText');
       const micDot = document.getElementById('micStatusDot');
@@ -2634,8 +2650,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
       if (isWebcamActive) {
         // CHẾ ĐỘ PRACTICE (WEBCAM LIVE, SOUND TẮT)
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5 active:scale-95 shadow-md';
-        txt.innerText = 'Tắt Webcam (Về Chế Độ Nghe) [C]';
+        if (btn) {
+          btn.className = 'hidden px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition items-center gap-1.5 active:scale-95 shadow-md';
+          txt.innerText = 'Tắt Webcam (Về Chế Độ Nghe) [C]';
+        }
         micDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
         candLabel.innerText = 'Webcam Live (Thái Đỗ Thịnh)';
         candCard.className = 'relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#091816] border-2 border-red-500 shadow-2xl transition-all duration-200';
@@ -2644,8 +2662,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         modeText.innerText = 'CHẾ ĐỘ PRACTICE (SOUND TẮT)';
       } else {
         // CHẾ ĐỘ NGHE (SOUND BẬT, 2 NHÂN VẬT GỐC)
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm';
-        txt.innerText = 'Bật Webcam (Practice) [C]';
+        if (btn) {
+          btn.className = 'hidden px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition items-center gap-1.5 active:scale-95 shadow-sm';
+          txt.innerText = 'Bật Webcam (Practice) [C]';
+        }
         micDot.className = 'w-2 h-2 rounded-full bg-zinc-400';
         candLabel.innerText = 'Thái Đỗ Thịnh (Bạn)';
         candCard.className = 'relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#091816] border border-[#27272a] shadow-xl transition-all duration-200';
@@ -3036,11 +3056,15 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         e.preventDefault();
         finishUserAnswer();
       } else if (e.code === 'KeyC') {
-        e.preventDefault();
-        toggleWebcam();
+        if (isTeamsFullMode) {
+          e.preventDefault();
+          toggleWebcam();
+        }
       } else if (e.code === 'KeyG') {
-        e.preventDefault();
-        toggleRecordPractice();
+        if (isTeamsFullMode) {
+          e.preventDefault();
+          toggleRecordPractice();
+        }
       } else if (e.code === 'KeyR') {
         e.preventDefault();
         replayCurrentSentence();
