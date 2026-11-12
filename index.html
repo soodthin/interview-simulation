@@ -396,7 +396,15 @@
       "patient with users", "proactive", "learn by doing", "stay calm", "first 2 months"
     ];
 
-    // Helper: Round Rectangle
+    
+    function getChapterInterviewerDialogue(chapIndex) {
+      if (!interviewData || !interviewData.chapters || !interviewData.chapters[chapIndex]) return null;
+      const chap = interviewData.chapters[chapIndex];
+      if (!interviewData.dialogues) return null;
+      return interviewData.dialogues.find(d => d.speaker === 'interviewer' && d.start >= chap.start && d.start < chap.end);
+    }
+
+// Helper: Round Rectangle
     function roundRect(ctx, x, y, width, height, radius) {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
@@ -1135,24 +1143,19 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       buildChapterDrawer();
       syncQuestionCardForChapter(idx);
 
-      if (isWebcamActive) {
-        // In Practice Mode: KEEP SOUND MUTED & STOPPED so candidate can speak!
-        if (audio && !audio.paused) audio.pause();
+      initWebAudio();
+
+      // Cả 2 chế độ đều phát câu hỏi của HR:
+      // - Chế độ nghe: tiếp tục phát câu trả lời mẫu của candidate
+      // - Chế độ practice: onTimeUpdate sẽ tự động DỪNG SOUND ngay khi HR đọc xong câu hỏi!
+      if (chap.start < 518.0) {
         if (simTimer) stopSimulatedPlayback();
-        isPlaying = false;
-        document.getElementById('playIcon').setAttribute('data-lucide', 'play');
-        lucide.createIcons();
+        audio.currentTime = chap.start;
+        audio.muted = false; // Bật sound để nghe câu hỏi của HR!
+        audio.play().catch(() => {});
       } else {
-        // In Listening Mode: Play pre-recorded audio
-        initWebAudio();
-        if (chap.start < 518.0) {
-          if (simTimer) stopSimulatedPlayback();
-          audio.currentTime = chap.start;
-          audio.play().catch(() => {});
-        } else {
-          if (!audio.paused) audio.pause();
-          startSimulatedPlayback(chap.start, chap.end);
-        }
+        if (!audio.paused) audio.pause();
+        startSimulatedPlayback(chap.start, chap.end);
       }
     }
 
@@ -1211,7 +1214,6 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
     // Simulated Playback for Chapters 15-20 (Only in Listening Mode)
     function startSimulatedPlayback(startTime, endTime) {
-      if (isWebcamActive) return; // Do not play in Practice Mode
       stopSimulatedPlayback();
       simCurrentTime = startTime;
       isPlaying = true;
@@ -1226,6 +1228,12 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         simCurrentTime += 0.25;
         if (simCurrentTime >= startTime + 5.0) {
           if (hrGlow) hrGlow.style.opacity = '0';
+          if (isWebcamActive) {
+            // HR đọc câu hỏi xong: Dừng sound để user trả lời!
+            stopSimulatedPlayback();
+            startAnswerCountdown(90);
+            return;
+          }
           activeSpeaker = 'thinh';
         }
         if (simCurrentTime >= endTime) {
@@ -1294,7 +1302,8 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
         isWebcamActive = true;
         updateModeUI();
-        startAnswerCountdown(90); // Bắt đầu tính giờ trả lời cho user
+        // Trong chế độ Practice: Cho HR đọc câu hỏi, sau đó tự dừng để user trả lời!
+        jumpToChapter(currentChapterIndex);
       } catch (err) {
         console.warn('Cannot access camera/mic:', err);
         alert('Không thể mở Webcam hoặc Microphone. Vui lòng cấp quyền trong trình duyệt.');
@@ -1457,6 +1466,21 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
             syncQuestionCardForChapter(i);
           }
           break;
+        }
+      }
+
+      // PRACTICE MODE: CHỈ MỞ ĐỌC CÂU HỎI CỦA HR, HẾT CÂU HỎI TỰ DỪNG SOUND ĐỂ USER TRẢ LỜI!
+      if (isWebcamActive) {
+        const intD = getChapterInterviewerDialogue(currentChapterIndex);
+        if (intD && cur >= intD.end - 0.12) {
+          if (!audio.paused) {
+            audio.pause();
+            isPlaying = false;
+            document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+            lucide.createIcons();
+            startAnswerCountdown(90);
+          }
+          return;
         }
       }
 
