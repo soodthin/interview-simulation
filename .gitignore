@@ -19,3 +19,6 @@ Thumbs.db
 *.mp4
 !Esco_AV_Interview_Preview_10s.mp4
 
+# Playwright MCP temp files
+.playwright-mcp/
+

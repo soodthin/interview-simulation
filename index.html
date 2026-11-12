@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full">
+<html lang="vi" class="h-full dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mô Phỏng Phòng Phỏng Vấn Esco AV - Thái Đỗ Thịnh</title>
-  <!-- Inline Podcast Favicon (Prevents /favicon.ico 404) -->
+  <title>Mô Phỏng Phỏng Vấn Esco AV — Thái Đỗ Thịnh</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & Be Vietnam Pro & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -20,9 +16,9 @@
       box-sizing: border-box;
     }
     body {
-      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #050811;
-      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #080911;
+      color: #f8fafc;
       height: 100vh;
       max-height: 100vh;
       overflow: hidden;
@@ -32,408 +28,692 @@
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
     }
+
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
       width: 5px;
-      height: 0px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.4);
+      background: #0d0f18;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(59, 130, 246, 0.4);
-      border-radius: 4px;
+      background: #23273b;
+      border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(59, 130, 246, 0.7);
+      background: #363c5a;
     }
-    /* Glassmorphism */
-    .glass-panel {
-      background: rgba(10, 16, 30, 0.88);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
+
     .active-chapter-card {
-      background: linear-gradient(135deg, rgba(14, 28, 54, 0.95), rgba(8, 16, 32, 0.95)) !important;
-      border: 1px solid rgba(6, 182, 212, 0.45) !important;
-      box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.15) !important;
+      background: #141726 !important;
+      border: 1px solid #3b82f6 !important;
+      box-shadow: 0 4px 20px -2px rgba(59, 130, 246, 0.3);
     }
-    /* Tooltip */
+
+    /* Highlighted English Key Points inside teleprompter */
+    .kp-highlight {
+      color: #fde047;
+      background: rgba(250, 204, 21, 0.16);
+      border-bottom: 2px solid rgba(250, 204, 21, 0.7);
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
     #progressTooltip {
       pointer-events: none;
-      transform: translate(-50%, -120%);
-      transition: opacity 0.15s ease-out;
+      transform: translate(-50%, -125%);
+      transition: opacity 0.15s ease;
+    }
+
+    /* Neon glow animation */
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 35px rgba(59, 130, 246, 0.7);
+      }
+    }
+    .glow-active-webcam {
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseAmber {
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.45);
+      }
+      50% {
+        box-shadow: 0 0 40px rgba(245, 158, 11, 0.8);
+      }
+    }
+    .glow-user-turn {
+      animation: pulseAmber 1.8s infinite ease-in-out;
     }
   </style>
 </head>
-<body class="h-screen max-h-screen flex flex-col justify-between overflow-hidden bg-[#050811] text-slate-100 select-none">
+<body class="h-screen max-h-screen flex flex-col justify-between overflow-hidden bg-[#080911] text-slate-100 select-none">
 
-  <!-- 1. Top Navigation Bar (Fixed 56px, clean & balanced) -->
-  <header class="h-14 flex-shrink-0 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md px-4 flex items-center justify-between z-40">
+  <!-- 1. TOP HEADER BAR -->
+  <header class="h-14 flex-shrink-0 border-b border-[#181a28] bg-[#0c0d16] px-4 flex items-center justify-between z-40">
+    <!-- Left Role & App Title -->
     <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 p-0.5 shadow-md flex items-center justify-center">
-        <div class="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center">
-          <i data-lucide="video" class="w-4 h-4 text-cyan-400"></i>
-        </div>
+      <div class="w-9 h-9 rounded-xl bg-[#141726] border border-[#23273e] flex items-center justify-center text-blue-400 shadow-sm">
+        <i data-lucide="video" class="w-4 h-4"></i>
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-xs sm:text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
-            ESCO AV <span class="text-[11px] px-2 py-0.2 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium">Smart Room 302</span>
-          </h1>
-          <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Podcast
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/25 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span>
+            IT Support & AV Systems Fresher
           </span>
+          <span class="text-xs text-slate-400 font-medium hidden md:inline">|</span>
+          <span class="text-xs text-slate-300 font-semibold hidden md:inline">Thái Đỗ Thịnh • Esco AV Vietnam</span>
         </div>
-        <p class="text-[11px] text-slate-400 hidden sm:block">IT Support & AV Systems Fresher • Thái Đỗ Thịnh</p>
       </div>
     </div>
 
-    <!-- Quick action buttons -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- Camera Angle Switcher (Góc quay) -->
-      <div class="hidden md:flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800 text-xs">
-        <span class="text-[11px] text-slate-400 pl-2 pr-1 font-medium flex items-center gap-1">
-          <i data-lucide="camera" class="w-3.5 h-3.5 text-cyan-400"></i> Góc quay:
-        </span>
-        <button id="viewAuto" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('auto')">
-          Tự động zoom
-        </button>
-        <button id="viewWide" class="px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm" onclick="setCameraView('wide')">
-          Toàn cảnh
-        </button>
-        <button id="viewThinh" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('thinh')">
-          Thái Đỗ Thịnh
-        </button>
-        <button id="viewInterviewer" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setCameraView('interviewer')">
-          Người phỏng vấn
-        </button>
+    <!-- Right Controls: Script Subtitle Toggle, Full Script Modal, Webcam, Sidebar -->
+    <div class="flex items-center gap-2">
+      <!-- Session Recording Timer -->
+      <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#121422] border border-[#1f2338] text-xs font-mono font-semibold text-red-400 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        <span id="sessionTimerText">00:00</span>
       </div>
 
-      <!-- Subtitle Mode Switcher (Unified active style) -->
-      <div class="flex items-center bg-slate-900/90 rounded-lg p-0.5 border border-slate-800 text-xs">
-        <button id="subBilingual" class="px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm" onclick="setSubMode('bilingual')">
-          Song ngữ
-        </button>
-        <button id="subEn" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setSubMode('en')">
-          EN
-        </button>
-        <button id="subVi" class="px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition" onclick="setSubMode('vi')">
-          VI
-        </button>
-      </div>
-
-      <!-- Ghi & Xuất MP4 Button -->
-      <button id="btnRecord" onclick="toggleRecording()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900/80 text-slate-200 hover:text-white hover:border-rose-500/60 shadow-sm transition active:scale-95">
-        <span id="recDot" class="w-2 h-2 rounded-full bg-rose-500"></span>
-        <span id="recText">Ghi & xuất MP4</span>
+      <!-- TOGGLE SCRIPT IN SUBTITLE AREA BUTTON -->
+      <button id="btnHeaderScriptToggle" onclick="toggleScriptSubtitle()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 transition flex items-center gap-1.5 shadow-md shadow-amber-400/20 active:scale-95" title="Bật/Tắt hiển thị kịch bản trả lời ngay tại phụ đề (Phím S)">
+        <i data-lucide="scroll-text" class="w-3.5 h-3.5"></i>
+        <span id="headerScriptBtnLabel">Kịch Bản Phụ Đề: BẬT [S]</span>
       </button>
 
-      <!-- Toggle Chapters Panel Button -->
-      <button onclick="toggleChapterDrawer()" title="Danh sách câu hỏi" class="p-2 rounded-lg bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition">
+      <!-- VIEW FULL SCRIPT MODAL BUTTON -->
+      <button onclick="openScriptModal()" class="px-2.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 hover:text-white bg-[#141728] hover:bg-[#20253e] border border-[#232742] transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Mở bảng tra cứu kịch bản 20 câu & mẫu câu giao tiếp">
+        <i data-lucide="book-open" class="w-3.5 h-3.5 text-blue-400"></i>
+        <span class="hidden md:inline">Tra Cứu</span>
+      </button>
+
+      <!-- Webcam Practice Toggle Button (DEFAULT: OFF, User clicks to practice) -->
+      <button id="btnWebcam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition flex items-center gap-1.5 shadow-md shadow-blue-600/20 active:scale-95" title="Bật/Tắt Webcam để luyện phỏng vấn thực tế (Phím C)">
+        <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+        <span id="webcamBtnLabel">Bật Webcam</span>
+      </button>
+
+      <!-- Toggle 20 Questions Sidebar -->
+      <button onclick="toggleChapterDrawer()" title="Ẩn/Hiện danh sách câu hỏi" class="p-2 rounded-xl bg-[#121422] text-slate-300 hover:text-white hover:bg-[#1c2035] border border-[#1f2338] transition">
         <i data-lucide="list-ordered" class="w-4 h-4"></i>
       </button>
     </div>
   </header>
 
-  <!-- 2. Main Workspace (Video Podcast Layout with Embedded Subtitles) -->
+  <!-- 2. MAIN WORKSPACE -->
   <main class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden w-full relative">
 
-    <!-- Center Stage Container (Expansive, clean, video podcast stage) -->
-    <div class="flex-1 min-h-0 flex flex-col items-center justify-between p-2 sm:p-3 overflow-hidden relative">
-      
-      <!-- Video Stage 16:9 Canvas (Fills viewport comfortably) -->
-      <div class="relative w-full flex-1 min-h-0 flex items-center justify-center overflow-hidden">
-        <div class="relative w-full max-w-[1240px] h-full max-h-[calc(100vh-140px)] aspect-[16/9] rounded-xl overflow-hidden shadow-2xl border border-slate-800/80 bg-[#060b14] group">
-          
-          <!-- HTML5 Canvas for 60fps 3-Card Stage with Embedded Podcast Subtitles -->
-          <canvas id="stageCanvas" width="1280" height="720" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+    <!-- CENTER STAGE (2 CARDS + QUESTION & SCRIPT CARD + PLAYER CONTROLS) -->
+    <div class="flex-1 min-h-0 flex flex-col items-center justify-between p-3 sm:p-4 overflow-y-auto relative gap-2.5 bg-[#080911]">
 
-          <!-- Big Center Play Button Overlay (when paused) -->
-          <div id="playOverlay" onclick="togglePlay()" class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/45 backdrop-blur-sm transition-opacity duration-300 cursor-pointer">
-            <div class="w-16 h-16 rounded-full bg-blue-600/90 text-white flex items-center justify-center shadow-xl shadow-blue-500/40 hover:scale-105 transition group-hover:bg-blue-500 border border-white/20">
-              <i data-lucide="play" class="w-8 h-8 ml-1"></i>
-            </div>
-            <span class="mt-3 px-3.5 py-1 rounded-full bg-slate-900/90 text-xs font-medium text-slate-200 border border-slate-700/60 shadow-lg">
-              Bấm để bắt đầu xem video podcast
-            </span>
+      <!-- STAGE CONTAINER -->
+      <div class="w-full max-w-[960px] flex-1 flex flex-col justify-center items-center gap-3 my-auto">
+
+        <!-- Top Status Row -->
+        <div class="w-full flex items-center justify-between text-xs px-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-400 font-mono text-[11px] uppercase tracking-wider">AI Interactive Mock Simulation</span>
           </div>
-
-          <!-- Recording Indicator Badge -->
-          <div id="recIndicator" class="hidden absolute top-3 left-3 z-20 flex items-center gap-2 px-3 py-1 rounded-full bg-red-600 text-white text-xs font-bold tracking-wider shadow-lg animate-pulse">
-            <span class="w-2 h-2 rounded-full bg-white"></span>
-            RECORDING MP4 <span id="recTimer" class="font-mono ml-1 font-normal">00:00</span>
+          <div class="text-[11px] font-mono text-slate-500">
+            [Space] Dừng/Phát • [Enter] Hoàn thành câu • [S] Bật/Tắt kịch bản phụ đề • [C] Bật cam
           </div>
-
         </div>
+
+        <!-- THE 2 CARDS + CENTER CONNECTOR ROW -->
+        <div class="w-full flex items-center justify-center gap-3 sm:gap-6">
+          
+          <!-- LEFT CARD: INTERVIEWER (Animated Cartoon Character) -->
+          <div id="cardInterviewer" class="relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border border-[#1e2338] shadow-2xl transition-all duration-300">
+            <!-- 2D Expressive Cartoon Canvas -->
+            <canvas id="interviewerCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+            
+            <!-- Speaking Pulse Ring Overlay -->
+            <div id="interviewerSpeakingGlow" class="absolute inset-0 rounded-[inherit] pointer-events-none ring-2 ring-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.6)] transition-opacity duration-300 opacity-0"></div>
+
+            <!-- Bottom Left Badge -->
+            <div class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shadow-lg">
+              <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              <span>Esco Interview</span>
+            </div>
+          </div>
+
+          <!-- CENTER CONNECTOR BADGE -->
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#121524] border border-[#22273f] flex items-center justify-center text-blue-400 shadow-xl flex-shrink-0 z-10">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+
+          <!-- RIGHT CARD: CANDIDATE (Default: 2D Cartoon Thái Đỗ Thịnh; Switches to Live Webcam on toggle) -->
+          <div id="cardCandidate" class="relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border border-[#1e2338] shadow-2xl transition-all duration-300">
+            
+            <!-- 2D Animated Candidate Character (Active by default!) -->
+            <canvas id="candidateCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+
+            <!-- Live Webcam Video (Active only when user clicks "Bật Webcam") -->
+            <video id="webcamVideo" autoplay playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
+
+            <!-- Speaking Glow Overlay for Candidate -->
+            <div id="candidateSpeakingGlow" class="absolute inset-0 rounded-[inherit] pointer-events-none ring-2 ring-emerald-500 shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-opacity duration-300 opacity-0"></div>
+
+            <!-- Bottom Left Badge -->
+            <div class="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 shadow-lg">
+              <span id="candidateLiveDot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="candidateBadgeLabel">Thái Đỗ Thịnh</span>
+            </div>
+
+            <!-- Top Right: REC Badge (Only visible when webcam is active) -->
+            <div id="webcamRecBadge" class="hidden absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center gap-1.5 shadow-lg font-mono">
+              <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> REC
+            </div>
+
+            <!-- Bottom Right: Dynamic Audio Wave Bars (Only visible when webcam is active) -->
+            <div id="webcamWaveContainer" class="hidden absolute bottom-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 flex items-center gap-1 shadow-md h-7">
+              <span id="waveBar1" class="w-1 h-2 rounded-full bg-blue-400 transition-all duration-75"></span>
+              <span id="waveBar2" class="w-1 h-4 rounded-full bg-blue-400 transition-all duration-75"></span>
+              <span id="waveBar3" class="w-1 h-2.5 rounded-full bg-blue-400 transition-all duration-75"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM QUESTION & SCRIPT SUBTITLE CARD (Teleprompter Script Display!) -->
+        <div id="questionCard" class="w-full max-w-[960px] rounded-2xl sm:rounded-3xl bg-[#0e101c] border border-[#1d2238] p-4 sm:p-5 shadow-2xl transition-all">
+          
+          <!-- Top Row: Question Number, Teleprompter Script Toggle & Timer -->
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span id="questionNumBadge" class="px-3 py-1 rounded-full bg-blue-500/15 border border-blue-500/30 text-xs font-bold text-blue-400 flex items-center gap-1.5 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+                <span>Câu 1 / 20</span>
+              </span>
+              <span class="text-xs text-slate-400 font-medium hidden sm:inline" id="chapterCategoryTitle">
+                Tell me about yourself
+              </span>
+            </div>
+
+            <!-- Controls: Teleprompter Toggle + Timer + Replay -->
+            <div class="flex items-center gap-2">
+              <!-- SCRIPT TELEPROMPTER TOGGLE BUTTON ON CARD -->
+              <button id="btnCardScriptToggle" onclick="toggleScriptSubtitle()" class="px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm bg-amber-400 text-slate-950 hover:bg-amber-300" title="Bật/Tắt hiển thị kịch bản câu trả lời (Phím S)">
+                <i data-lucide="scroll-text" class="w-3.5 h-3.5"></i>
+                <span id="scriptToggleLabel">Kịch Bản: ĐANG BẬT</span>
+              </button>
+
+              <!-- Countdown Timer -->
+              <span class="px-2.5 py-1 rounded-full bg-slate-900/90 border border-[#252b44] text-xs font-mono font-semibold text-amber-300 flex items-center gap-1 shadow-sm">
+                <i data-lucide="clock" class="w-3 h-3 text-amber-400"></i>
+                <span id="questionCountdown">01:30</span>
+              </span>
+
+              <button onclick="replayCurrentSentence()" class="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition" title="Nghe lại câu hỏi này (Phím R)">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Interviewer's Question Header (English is Large & Bold, Vietnamese is secondary) -->
+          <div id="questionContainer" class="space-y-1 mb-2">
+            <p id="mainQuestionEn" class="text-sm sm:text-base lg:text-[18px] font-extrabold text-white leading-snug tracking-tight">
+              “So, Thinh, could you please <span class="kp-highlight">introduce yourself</span> and tell me a bit about your <span class="kp-highlight">background</span>?”
+            </p>
+            <p id="mainQuestionVi" class="text-xs sm:text-sm font-medium text-slate-400 leading-snug">
+              “Chào Thịnh, em có thể tự giới thiệu về bản thân và chia sẻ một chút về nền tảng học vấn của mình được không?”
+            </p>
+          </div>
+
+          <!-- SCRIPT TELEPROMPTER BOX (Directly in Subtitle Area!) -->
+          <div id="scriptTeleprompterBox" class="rounded-2xl bg-[#121526] border border-amber-500/35 p-3 sm:p-4 shadow-inner space-y-2">
+            <div class="flex items-center justify-between text-xs pb-1.5 border-b border-[#212642]">
+              <span class="font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+                Kịch bản câu trả lời của bạn (Thái Đỗ Thịnh)
+              </span>
+              <button onclick="copyCurrentScriptAnswer(this)" class="px-2 py-0.5 rounded-lg text-[11px] font-medium text-slate-300 hover:text-white bg-[#191d33] hover:bg-[#252b4b] border border-[#2c3358] transition flex items-center gap-1">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+
+            <!-- Full Script Text in English with highlighted key points -->
+            <div id="scriptAnswerText" class="text-xs sm:text-sm lg:text-[15px] font-semibold text-slate-100 space-y-2 leading-relaxed max-h-52 sm:max-h-60 overflow-y-auto pr-1">
+              <!-- Injected dynamically based on current question! -->
+            </div>
+
+            <!-- Notes hint -->
+            <div id="scriptNotesHint" class="pt-1 text-[11px] font-medium text-amber-300/80 italic border-t border-[#1d2238]">
+              💡 Ghi nhớ: CS tốt nghiệp sẵn sàng full-time ngay, kinh nghiệm 6 tháng tại BW Industrial...
+            </div>
+          </div>
+
+          <!-- Action Bar: When it's User Turn to Speak (Webcam Live) -->
+          <div id="practiceActionBar" class="hidden mt-3 pt-3 border-t border-[#1d2238] flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold text-amber-400 flex items-center gap-1 flex-shrink-0">
+                🎯 Key Points gợi ý:
+              </span>
+              <div id="candidateKeyPointsContainer" class="flex items-center gap-1.5 flex-wrap">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+
+            <!-- Done / Next Question Button -->
+            <button onclick="finishUserAnswer()" class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 transition shadow-lg shadow-amber-400/20 flex items-center gap-2 active:scale-95 flex-shrink-0" title="Hoàn thành câu trả lời và chuyển sang câu hỏi tiếp theo (Phím Enter)">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <span>Xong • Câu tiếp [Enter]</span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Playback Control Bar (Compact, fits right below video) -->
-      <div class="w-full max-w-[1240px] h-14 flex-shrink-0 mt-2 glass-panel rounded-xl px-4 py-2 flex flex-col justify-between">
-        
-        <!-- Progress Scrubber Track with Hover Tooltip -->
+      <!-- COMPACT AUDIO SCRUBBER & PLAYBACK CONTROLS -->
+      <div class="w-full max-w-[960px] h-14 flex-shrink-0 bg-[#0c0e18] border border-[#1b1e32] rounded-2xl px-4 py-2 flex flex-col justify-between shadow-xl">
+        <!-- Scrubber Track -->
         <div class="relative flex items-center gap-3">
-          <span id="curTime" class="text-xs font-mono text-cyan-400 w-11 text-right">00:00</span>
-          
-          <div class="relative flex-1 h-2 bg-slate-800/90 rounded-full cursor-pointer group" id="progressTrack" onclick="seekByClick(event)" onmousemove="onTrackHover(event)" onmouseleave="onTrackLeave()">
-            <!-- Floating Hover Tooltip -->
-            <div id="progressTooltip" class="absolute top-0 opacity-0 z-30 px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[10px] font-mono text-white shadow-lg whitespace-nowrap">
-              00:00 - Chapter
+          <span id="curTime" class="text-xs font-mono font-semibold text-slate-400 w-11 text-right">00:00</span>
+
+          <div id="progressTrack" class="relative flex-1 h-2 bg-slate-800/90 rounded-full cursor-pointer group" onclick="seekByClick(event)" onmousemove="onTrackHover(event)" onmouseleave="onTrackLeave()">
+            <div id="progressTooltip" class="absolute top-0 opacity-0 z-30 px-2.5 py-1 rounded bg-[#13141c] border border-slate-700 text-[10px] font-mono text-white shadow-lg whitespace-nowrap">
+              00:00 • Chapter
             </div>
-            <!-- Chapter Markers -->
             <div id="chapterMarkers" class="absolute inset-0 pointer-events-none"></div>
-            <!-- Progress Fill -->
-            <div id="progressFill" class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full w-0"></div>
-            <!-- Thumb -->
-            <div id="progressThumb" class="absolute top-1/2 -mt-1.5 -ml-1.5 w-3 h-3 rounded-full bg-white shadow-md border-2 border-cyan-400 scale-0 group-hover:scale-100 transition-transform"></div>
+            <div id="progressFill" class="absolute top-0 left-0 h-full bg-blue-500 rounded-full w-0"></div>
+            <div id="progressThumb" class="absolute top-1/2 -mt-1.5 -ml-1.5 w-3.5 h-3.5 rounded-full bg-white shadow-md border-2 border-blue-500 scale-0 group-hover:scale-100 transition-transform"></div>
           </div>
 
           <span id="totTime" class="text-xs font-mono text-slate-400 w-11">08:38</span>
         </div>
 
-        <!-- Buttons Row -->
+        <!-- Transport Buttons Row -->
         <div class="flex items-center justify-between text-xs">
           <div class="flex items-center gap-1.5 sm:gap-2">
-            <!-- Play / Pause -->
             <button onclick="togglePlay()" class="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition shadow-sm active:scale-95" title="Phát / Tạm dừng (Space)">
-              <i id="playIcon" data-lucide="play" class="w-3.5 h-3.5 ml-0.5"></i>
-            </button>
-            
-            <!-- -10s Button with clear badge -->
-            <button onclick="skipSeconds(-10)" title="Lùi 10 giây (Phím mũi tên trái)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
-              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 10
+              <i id="playIcon" data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
             </button>
 
-            <!-- +10s Button with clear badge -->
-            <button onclick="skipSeconds(10)" title="Tới 10 giây (Phím mũi tên phải)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
-              10 <i data-lucide="rotate-cw" class="w-3 h-3"></i>
+            <button onclick="skipSeconds(-5)" title="Lùi 5 giây (Mũi tên trái)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> 5s
             </button>
 
-            <!-- Prev Question -->
-            <button onclick="prevChapter()" title="Câu hỏi trước" class="p-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition">
-              <i data-lucide="skip-back" class="w-3.5 h-3.5"></i>
+            <button onclick="skipSeconds(5)" title="Tới 5 giây (Mũi tên phải)" class="px-2 py-1 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition font-mono text-[11px] flex items-center gap-1">
+              5s <i data-lucide="rotate-cw" class="w-3 h-3"></i>
             </button>
 
-            <!-- Next Question -->
-            <button onclick="nextChapter()" title="Câu hỏi kế tiếp" class="p-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition">
-              <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
-            </button>
+            <span class="text-slate-700 mx-1">|</span>
+
+            <!-- Current Chapter Indicator -->
+            <span id="currentChapterTitle" class="text-slate-300 font-semibold text-xs truncate max-w-[200px] sm:max-w-[340px]">
+              1. Introduction & Background
+            </span>
           </div>
 
-          <!-- Current Chapter Name in Toolbar -->
-          <div class="hidden sm:flex items-center gap-2 px-2.5 py-0.5 rounded-lg bg-slate-900/60 border border-slate-800/60 text-xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-            <span id="currentChapterTitle" class="font-medium text-slate-200 truncate max-w-[280px] lg:max-w-[340px]">1. Introduction & Background</span>
-          </div>
-
-          <!-- Shortcuts Hint & Audio Controls -->
-          <div class="flex items-center gap-3">
-            <span class="text-[10px] text-slate-500 font-mono hidden xl:inline">Phím tắt: Space (Dừng/Phát) • ←/→ (±10s)</span>
-
-            <!-- Speed Switcher -->
-            <div class="flex items-center gap-0.5 bg-slate-900/80 rounded-lg p-0.5 border border-slate-800 text-[11px] font-mono">
-              <button onclick="setSpeed(1.0)" id="speed10" class="px-1.5 py-0.2 rounded text-white bg-blue-600 font-medium">1.0x</button>
-              <button onclick="setSpeed(1.25)" id="speed125" class="px-1.5 py-0.2 rounded text-slate-400 hover:text-white">1.25x</button>
-              <button onclick="setSpeed(1.5)" id="speed15" class="px-1.5 py-0.2 rounded text-slate-400 hover:text-white">1.5x</button>
+          <!-- Speed & Volume Controls -->
+          <div class="flex items-center gap-2">
+            <div class="hidden sm:flex items-center bg-[#131524] rounded-lg p-0.5 border border-[#21263d] font-mono text-[11px]">
+              <button id="speed085" onclick="setSpeed(0.85)" class="px-1.5 py-0.5 rounded text-slate-400 hover:text-white">0.85x</button>
+              <button id="speed10" onclick="setSpeed(1.0)" class="px-1.5 py-0.5 rounded text-white bg-[#262c46] font-semibold">1.0x</button>
+              <button id="speed125" onclick="setSpeed(1.25)" class="px-1.5 py-0.5 rounded text-slate-400 hover:text-white">1.25x</button>
             </div>
 
-            <!-- Volume Mute -->
-            <div class="flex items-center gap-1">
-              <button onclick="toggleMute()" class="p-1 text-slate-400 hover:text-white transition" title="Tắt / Bật tiếng (M)">
-                <i id="volIcon" data-lucide="volume-2" class="w-3.5 h-3.5"></i>
-              </button>
-              <input type="range" min="0" max="1" step="0.05" value="1" id="volumeSlider" oninput="changeVolume(this.value)" class="w-14 h-1 bg-slate-700 rounded-lg accent-blue-500 cursor-pointer">
-            </div>
-
-            <!-- Fullscreen -->
-            <button onclick="toggleFullscreen()" title="Toàn màn hình" class="p-1 text-slate-400 hover:text-white transition">
-              <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+            <!-- Volume Mute Toggle -->
+            <button onclick="toggleMute()" class="p-1 rounded text-slate-400 hover:text-white transition">
+              <i id="volIcon" data-lucide="volume-2" class="w-4 h-4"></i>
             </button>
+            <input type="range" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)" class="w-14 sm:w-20 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500">
           </div>
         </div>
-
       </div>
 
     </div>
 
-    <!-- 3. Right Sidebar: Redesigned matching reference image -->
-    <aside id="chapterDrawer" class="w-full lg:w-80 xl:w-96 flex-shrink-0 h-full flex flex-col justify-between border-l border-slate-800/80 bg-slate-950/95 backdrop-blur-xl p-3 overflow-x-hidden transition-all duration-300 z-30">
-      
-      <!-- Top Title Bar -->
-      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800/80 flex-shrink-0">
+    <!-- 3. RIGHT SIDEBAR: QUESTIONS PLAYLIST DRAWER (20 QUESTIONS) -->
+    <aside id="chapterDrawer" class="hidden lg:flex flex-col w-full lg:w-80 xl:w-96 flex-shrink-0 border-l border-[#181a28] bg-[#090b14] h-full overflow-hidden z-30 transition-all">
+      <!-- Drawer Header -->
+      <div class="p-3.5 border-b border-[#181a28] flex items-center justify-between">
         <div>
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <h2 class="text-xs sm:text-sm font-bold text-white tracking-wide">14 câu hỏi & phân cảnh</h2>
-          </div>
-          <p class="text-[11px] text-slate-400 mt-0.5">Phỏng vấn Kỹ sư Fresher Esco AV</p>
-        </div>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 font-mono font-medium">08:38</span>
-      </div>
-
-      <!-- Live Search Input (Real-time filtering!) -->
-      <div class="my-2.5 flex-shrink-0 relative">
-        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-        <input type="text" id="chapterSearch" oninput="filterChapters(this.value)" placeholder="Tìm câu hỏi, từ khóa, kỹ năng..." class="w-full bg-slate-900/90 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 transition">
-      </div>
-
-      <!-- Scrollable Chapters List (High-contrast card items matching image) -->
-      <div id="chaptersList" class="flex-1 min-h-0 flex flex-col gap-2 my-1 overflow-y-auto overflow-x-hidden pr-1">
-        <!-- Dynamically populated via JS -->
-      </div>
-
-      <!-- Live Smart Board Dossier Info (Matching reference bottom card) -->
-      <div class="pt-2 border-t border-slate-800/80 flex-shrink-0">
-        <div class="glass-panel rounded-lg p-2.5 border border-blue-500/20 bg-blue-950/20">
-          <div class="flex items-center justify-between mb-1">
-            <span class="text-[9px] font-bold text-blue-400 tracking-wider uppercase flex items-center gap-1">
-              <i data-lucide="refresh-cw" class="w-3 h-3 text-cyan-400"></i> Smart Display Sync
+            <h3 class="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+              <i data-lucide="list-video" class="w-4 h-4 text-blue-400"></i>
+              Danh Sách Câu Hỏi Phỏng Vấn
+            </h3>
+            <span class="text-[10px] font-mono font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/20">
+              20 Câu
             </span>
-            <span id="slideBadge" class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-cyan-300 font-mono font-semibold">TOPIC 1</span>
           </div>
-          <h3 id="slideHeadline" class="text-xs font-bold text-white truncate">Thái Đỗ Thịnh</h3>
-          <p id="slideSubline" class="text-[10px] text-slate-300 line-clamp-1">Computer Science Graduate • HCMC Open University</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Bấm câu bất kỳ để hiện kịch bản & luyện phản xạ</p>
+        </div>
+        <button onclick="toggleChapterDrawer()" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Search Box -->
+      <div class="p-3 border-b border-[#181a28] bg-[#0c0e18]">
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="chapterSearchInput" oninput="filterChapters(this.value)" placeholder="Tìm câu hỏi, từ khóa..." class="w-full bg-[#121524] border border-[#21263d] rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
         </div>
       </div>
 
+      <!-- Questions List -->
+      <div class="flex-1 min-h-0 overflow-y-auto p-2.5 space-y-1.5" id="chaptersList">
+        <!-- Injected dynamically -->
+      </div>
     </aside>
 
   </main>
 
+  <!-- 4. FULL SCRIPT VIEWER & CHEAT SHEET MODAL -->
+  <div id="scriptModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md transition-opacity">
+    <div class="relative w-full max-w-4xl max-h-[90vh] rounded-3xl bg-[#0c0e18] border border-[#21263d] shadow-2xl flex flex-col overflow-hidden">
+      <!-- Modal Top Bar -->
+      <div class="p-4 sm:p-5 border-b border-[#1b1f33] bg-[#0f1220] flex items-center justify-between gap-3 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-sm flex-shrink-0">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              Kịch Bản Phỏng Vấn Esco AV (Second-Round Preparation)
+            </h3>
+            <p class="text-xs text-slate-400">Ứng viên: Thái Đỗ Thịnh • IT Support & AV Systems Fresher</p>
+          </div>
+        </div>
+
+        <button onclick="closeScriptModal()" class="p-2 rounded-xl bg-[#141728] hover:bg-[#20253e] text-slate-400 hover:text-white transition border border-[#232742]">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Search & Tab Filter Bar -->
+      <div class="p-3 sm:px-5 sm:py-3 border-b border-[#1b1f33] bg-[#0c0e18] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 flex-shrink-0">
+        <!-- Search -->
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" id="scriptSearchInput" oninput="filterScriptContent(this.value)" placeholder="Tìm nhanh câu hỏi, từ khóa, tình huống..." class="w-full bg-[#121524] border border-[#232840] rounded-xl pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition">
+        </div>
+
+        <!-- Section Tabs -->
+        <div class="flex items-center gap-1 overflow-x-auto text-xs bg-[#121524] p-1 rounded-xl border border-[#232840]">
+          <button id="tabCore" onclick="switchScriptTab('core')" class="px-2.5 py-1 rounded-lg font-semibold text-white bg-[#22273d] transition whitespace-nowrap shadow-sm">14 Câu Cốt Lõi</button>
+          <button id="tabSituational" onclick="switchScriptTab('situational')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition whitespace-nowrap">Tình Huống (Q15-20)</button>
+          <button id="tabTechnical" onclick="switchScriptTab('technical')" class="px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition whitespace-nowrap">Kỹ Thuật & Kết</button>
+          <button id="tabCheatsheet" onclick="switchScriptTab('cheatsheet')" class="px-2.5 py-1 rounded-lg font-medium text-amber-300 hover:text-white transition whitespace-nowrap">Mẫu Câu Giao Tiếp</button>
+        </div>
+      </div>
+
+      <!-- Script Content Area (Scrollable) -->
+      <div id="scriptContentArea" class="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <!-- Injected dynamically by JS -->
+      </div>
+    </div>
+  </div>
+
   <!-- Audio Element -->
   <audio id="audioPlayer" src="interview_audio.mp3" preload="auto"></audio>
 
-  <!-- Application Script -->
+  <!-- Embedded Complete Interview Data & Script Data -->
   <script>
+    const DEFAULT_INTERVIEW_DATA = {"title": "Esco AV Interview Simulation - Thái Đỗ Thịnh (IT Support & AV Systems)", "audio_file": "interview_audio.mp3", "duration": 518, "chapters": [{"id": 1, "title_en": "1. Introduction & Background", "title_vi": "Giới thiệu bản thân & nền tảng học vấn", "start": 0.0, "end": 51.0, "speaker": "both", "slide": {"badge": "CANDIDATE DOSSIER", "headline": "Thái Đỗ Thịnh", "subline": "Computer Science Graduate • HCMC Open University", "details": ["🎓 Finished all University Coursework (Immediate Full-time Readiness)", "💼 6-Month IT Internship at BW Industrial (Built 2 internal financial web tools)", "🎯 Target Role: IT Support & AV Systems Integration at Esco AV Vietnam"], "diagram": "profile"}}, {"id": 2, "title_en": "2. Why Esco AV & AV Interest", "title_vi": "Lý do chọn Esco AV & đam mê thiết bị AV", "start": 51.0, "end": 89.0, "speaker": "thinh", "slide": {"badge": "COMPANY FIT", "headline": "Why Esco AV Vietnam?", "subline": "Beyond Desk Work: Enterprise Smart Meeting Rooms", "details": ["🤝 Discovered by Karen (HR Team) during active job search", "🏢 Hands-on hardware deployment: Interactive displays, PTZ cameras, mics & DSPs", "🌏 Direct interaction with Corporate & International Enterprise clients"], "diagram": "av_meeting_room"}}, {"id": 3, "title_en": "3. Internship Experience at BW Industrial", "title_vi": "Kinh nghiệm thực tập tại BW Industrial", "start": 89.0, "end": 165.0, "speaker": "thinh", "slide": {"badge": "INTERNSHIP HIGHLIGHTS", "headline": "Automated Cash Reporting & 14-Bank Parser", "subline": "BW Industrial Finance Operations Automation", "details": ["🏦 Built Python Parser handling unstructured formats from 14 Vietnamese banks", "⚡ Automated daily manual cash reporting into real-time financial dashboards", "👥 Empathy-driven SDLC: Shadowed finance team, built iterative prototypes & screenshot SOPs"], "diagram": "architecture_14_banks"}}, {"id": 4, "title_en": "4. Key Strengths", "title_vi": "Điểm mạnh cốt lõi: Kiên nhẫn & chủ động", "start": 165.0, "end": 203.0, "speaker": "thinh", "slide": {"badge": "CORE COMPETENCIES", "headline": "Patience & Proactive Mindset", "subline": "Delivering Empathy-Driven IT Support", "details": ["🎧 Active Listener: Translating complex tech jargon into simple, actionable steps", "📋 Proactive QA: Self-tested edge cases & authored complete documentation beforehand", "🚀 Escalation discipline: Quickly consults senior team when blocked to prevent delays"], "diagram": "strengths"}}, {"id": 5, "title_en": "5. Growth Areas & Learning Mindset", "title_vi": "Điểm cần hoàn thiện & tinh thần học hỏi", "start": 203.0, "end": 234.0, "speaker": "thinh", "slide": {"badge": "GROWTH MINDSET", "headline": "Bridging Software to Enterprise AV", "subline": "Fast Learner with Strict On-Site Discipline", "details": ["🔧 Transparent about transitioning from software to enterprise-grade AV gear", "📖 Proven self-starter: Reads manuals thoroughly, takes notes, shadow seniors", "🛡️ Strict protocol: 'Never guess at a client office' — verifies before acting"], "diagram": "learning"}}, {"id": 6, "title_en": "6. Technical Skills & Networking Foundation", "title_vi": "Kỹ năng kỹ thuật: Python, TCP/IP & AV", "start": 234.0, "end": 284.0, "speaker": "thinh", "slide": {"badge": "TECHNICAL TOOLKIT", "headline": "Network Diagnostics & Automation", "subline": "Systemic Troubleshooting from Layer 1 to Layer 7", "details": ["🌐 Solid Networking: IP addressing, Subnetting, Default Gateways, DHCP scopes", "🔍 Step-by-step Triage: Physical cable & port LEDs -> ICMP Ping -> Gateway reachability", "🐍 Python scripting for task automation & log parsing", "🎙️ AV Systems Insight: Real-time synchronization of cameras, mics, speakers & video matrices"], "diagram": "networking"}}, {"id": 7, "title_en": "7. Transition from BW Industrial", "title_vi": "Chuyển tiếp sự nghiệp từ kỳ thực tập", "start": 284.0, "end": 313.0, "speaker": "thinh", "slide": {"badge": "CAREER CONTINUITY", "headline": "Successful Project Handover", "subline": "Transitioning from Internship to Full-time Professional", "details": ["✅ Completed 6-month contract with 100% project delivery & thorough documentation", "🎓 University coursework finished: 100% dedicated to full-time career", "🌱 Long-term commitment: Desire to settle down and grow sustainably with Esco AV"], "diagram": "transition"}}, {"id": 8, "title_en": "8. Working with Non-Technical Users", "title_vi": "Hỗ trợ và giao tiếp người dùng phi kỹ thuật", "start": 313.0, "end": 352.0, "speaker": "thinh", "slide": {"badge": "USER EXPERIENCE", "headline": "User Empowerment Philosophy", "subline": "More than fixing bugs — building user confidence", "details": ["🗣️ Plain English & Vietnamese: Zero confusing jargon, step-by-step visual demonstration", "📸 Visual Screenshot Guides: Creating reusable SOPs that empower self-service", "❤️ Psychological safety: Making users feel comfortable asking questions without judgment"], "diagram": "user_support"}}, {"id": 9, "title_en": "9. Prioritizing Multiple Urgent Requests", "title_vi": "Xử lý ưu tiên khi phát sinh nhiều sự cố", "start": 352.0, "end": 381.0, "speaker": "thinh", "slide": {"badge": "INCIDENT TRIAGE", "headline": "Urgency-Driven Priority Matrix", "subline": "Client Boardroom Emergency First", "details": ["🚨 Priority 1: Blocking live client executive call or on-site boardroom setup", "💬 Transparent Communication: Proactive updates to queued users so nobody feels ignored", "📞 Management Alignment: Immediate escalation to direct manager whenever in doubt"], "diagram": "priority_matrix"}}, {"id": 10, "title_en": "10. Independent Work with Singapore Regional Team", "title_vi": "Làm việc độc lập với đội ngũ vùng Singapore", "start": 381.0, "end": 411.0, "speaker": "thinh", "slide": {"badge": "REGIONAL COLLAB", "headline": "Autonomous Execution & Async Reporting", "subline": "Seamless Alignment with Singapore Regional HQ", "details": ["🇸🇬 Comfortable with remote & distributed reporting lines", "📑 Investigation before Escalation: Checking technical docs & logs first", "📝 High-density summaries: Sending concise synthesis of findings for rapid decision-making"], "diagram": "singapore_sg"}}, {"id": 11, "title_en": "11. 5-Year Career Vision", "title_vi": "Tầm nhìn sự nghiệp 5 năm tại Esco AV", "start": 411.0, "end": 442.0, "speaker": "thinh", "slide": {"badge": "CAREER ROADMAP", "headline": "From Fresher to Senior Systems Engineer", "subline": "5-Year Professional Trajectory", "details": ["📍 Year 1: Master internal IT systems & on-site AV setups under senior mentorship", "📍 Year 2-3: Lead enterprise client AV installations & autonomous troubleshooting", "📍 Year 5: Senior AV Systems Engineer handling major deployments & mentoring new freshers"], "diagram": "career_timeline"}}, {"id": 12, "title_en": "12. Manager Expectations & Feedback Culture", "title_vi": "Kỳ vọng đối với người quản lý trực tiếp", "start": 442.0, "end": 470.0, "speaker": "thinh", "slide": {"badge": "WORKPLACE CULTURE", "headline": "Clarity & Direct Feedback", "subline": "Building High-Trust Teamwork", "details": ["🎯 Clear Priorities during high-load periods", "💡 Direct, honest feedback: Eager to receive early constructive critique to improve", "🔄 Two-way transparency: Proactive check-ins and open communication"], "diagram": "feedback"}}, {"id": 13, "title_en": "13. Salary Expectations & Availability", "title_vi": "Mức lương kỳ vọng & thời gian bắt đầu", "start": 470.0, "end": 487.0, "speaker": "thinh", "slide": {"badge": "OFFER READINESS", "headline": "9,000,000 - 11,000,000 VND Gross", "subline": "Aligned with Esco AV Standard Fresher Benchmark", "details": ["💵 Expected Range: 9M - 11M VND Gross/month (Flexible and open to company structure)", "📅 Start Date: Ready to onboard IMMEDIATELY upon offer acceptance", "🚀 100% committed to full-time career progression"], "diagram": "salary"}}, {"id": 14, "title_en": "14. Candidate Questions & Closing", "title_vi": "Câu hỏi cho nhà tuyển dụng & chào kết thúc", "start": 487.0, "end": 518.0, "speaker": "both", "slide": {"badge": "CLOSING CEREMONY", "headline": "Curiosity & High Enthusiasm", "subline": "Next Steps with Esco AV Vietnam", "details": ["❓ Inquired about typical client portfolio in Vietnam & key onboarding focuses", "✨ Warm, professional closing: High appreciation for Esco AV's upcoming projects", "🌟 Strong closing impression: Ready to contribute from Day 1"], "diagram": "closing"}}, {"id": 15, "title_en": "15. Client Onsite Unresolved Issue", "title_vi": "Xử lý khi chưa giải quyết được lỗi tại chỗ", "start": 518.0, "end": 578.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "15. Client Onsite Unresolved Issue", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Bình tĩnh, không đoán mò, ghi lại mã lỗi, gọi senior/Singapore hỗ trợ, báo khách thời gian dự kiến rõ ràng"]}}, {"id": 16, "title_en": "16. Describe a Solved Technical Problem", "title_vi": "Mô tả sự cố kỹ thuật từng tự giải quyết", "start": 578.0, "end": 638.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "16. Describe a Solved Technical Problem", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Dùng ví dụ tool parse sao kê BW lỗi format date/header, debug và fix logic, viết tài liệu cho user"]}}, {"id": 17, "title_en": "17. Handling Unhappy Client", "title_vi": "Xử lý khi khách hàng phàn nàn / bực bội", "start": 638.0, "end": 698.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "17. Handling Unhappy Client", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Lắng nghe trước không ngắt lời, xin lỗi vì sự bất tiện, đưa giải pháp thay thế tạm thời rồi xử lý triệt để"]}}, {"id": 18, "title_en": "18. Client Site Travel & Flexibility", "title_vi": "Khả năng di chuyển đến văn phòng khách hàng", "start": 698.0, "end": 758.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "18. Client Site Travel & Flexibility", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Sẵn sàng 100%, có xe máy cá nhân, thích làm việc thực tế với thiết bị và gặp gỡ khách hàng"]}}, {"id": 19, "title_en": "19. Clarifying Instructions from Singapore", "title_vi": "Làm rõ chỉ đạo kỹ thuật từ Singapore", "start": 758.0, "end": 818.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "19. Clarifying Instructions from Singapore", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Chủ động hỏi lại ngay, tóm tắt lại ý theo cách hiểu của mình để confirm, thà hỏi rõ còn hơn làm sai trên production"]}}, {"id": 20, "title_en": "20. Why Should Esco AV Hire You?", "title_vi": "Tại sao Esco AV nên chọn tuyển dụng bạn?", "start": 818.0, "end": 878.0, "speaker": "both", "slide": {"badge": "SITUATIONAL SCENARIO", "headline": "20. Why Should Esco AV Hire You?", "subline": "Esco AV Onsite Technical & Client Support", "details": ["Ghi nhớ: Nền tảng IT vững + kiên nhẫn với user + sẵn sàng học hỏi thiết bị AV + cam kết gắn bó lâu dài full-time ngay"]}}], "dialogues": [{"speaker": "interviewer", "start": 0.0, "end": 4.8, "text_en": "So, Thinh, could you please introduce yourself and tell me a bit about your background?", "text_vi": "Chào Thịnh, em có thể tự giới thiệu về bản thân và chia sẻ một chút về nền tảng của mình được không?"}, {"speaker": "thinh", "start": 4.9, "end": 6.8, "text_en": "Thank you for meeting with me today.", "text_vi": "Dạ, cảm ơn anh đã dành thời gian gặp em hôm nay ạ."}, {"speaker": "thinh", "start": 6.9, "end": 12.8, "text_en": "I'm Thinh, a final year computer science student at HCMC Open University.", "text_vi": "Em là Thịnh, sinh viên năm cuối ngành Khoa học Máy tính tại Đại học Mở TP.HCM."}, {"speaker": "thinh", "start": 12.9, "end": 17.5, "text_en": "I've finished all my classes, so I can start full-time right away.", "text_vi": "Em đã hoàn thành hết các môn học nên có thể bắt đầu làm việc toàn thời gian ngay lập tức."}, {"speaker": "thinh", "start": 17.6, "end": 21.8, "text_en": "Recently, I did a six-month internship at BW Industrial.", "text_vi": "Gần đây, em vừa hoàn thành kỳ thực tập 6 tháng tại BW Industrial."}, {"speaker": "thinh", "start": 21.9, "end": 29.8, "text_en": "I built two internal web tools: a bank statement parser for 14 banks, and an automated cash reporting tool.", "text_vi": "Em đã xây dựng 2 công cụ web nội bộ: phần mềm trích xuất sao kê cho 14 ngân hàng và công cụ báo cáo dòng tiền tự động."}, {"speaker": "thinh", "start": 29.9, "end": 34.8, "text_en": "I also managed user access and helped the staff with small tech problems.", "text_vi": "Em cũng quản lý phân quyền người dùng và hỗ trợ nhân viên xử lý các sự cố kỹ thuật thường ngày."}, {"speaker": "thinh", "start": 34.9, "end": 43.8, "text_en": "After our first interview, I understood this job covers both internal IT support and setting up AV systems at client offices.", "text_vi": "Sau vòng phỏng vấn đầu tiên, em hiểu công việc này bao gồm cả IT support nội bộ lẫn lắp đặt hệ thống AV tại văn phòng khách hàng."}, {"speaker": "thinh", "start": 43.9, "end": 50.8, "text_en": "I really enjoy that mix of working with systems and talking directly with users, so I'm very excited about this role.", "text_vi": "Em rất thích sự kết hợp giữa làm việc với hệ thống và tương tác trực tiếp với người dùng, nên em rất hào hứng với vị trí này."}, {"speaker": "interviewer", "start": 51.0, "end": 55.8, "text_en": "Why are you interested in this position, and why Esco AV in particular?", "text_vi": "Tại sao em lại quan tâm đến vị trí này, và tại sao lại là Esco AV?"}, {"speaker": "thinh", "start": 56.0, "end": 62.8, "text_en": "Well, Karen from your HR team found my profile online while I was looking for a full-time IT job.", "text_vi": "Dạ, chị Karen từ phòng nhân sự đã tìm thấy hồ sơ của em khi em đang tìm kiếm công việc IT toàn thời gian."}, {"speaker": "thinh", "start": 63.0, "end": 73.8, "text_en": "After the first interview, I liked it even more. It's not only desk work: I get to visit clients, set up smart meeting rooms, and work with real hardware devices.", "text_vi": "Sau buổi phỏng vấn đầu tiên, em lại càng thích hơn. Công việc không chỉ ngồi bàn giấy: em được đến văn phòng khách hàng, setup các phòng họp thông minh và tiếp xúc với thiết bị phần cứng thực tế."}, {"speaker": "thinh", "start": 74.0, "end": 78.8, "text_en": "I also like the opportunity to work with corporate and international clients.", "text_vi": "Em cũng rất thích cơ hội được làm việc với các khách hàng doanh nghiệp và đối tác quốc tế."}, {"speaker": "thinh", "start": 79.0, "end": 88.8, "text_en": "I think my IT background and user support experience can help the team right away, and of course, I'm eager to keep learning AV along the way.", "text_vi": "Em tin nền tảng IT và kinh nghiệm hỗ trợ người dùng sẽ giúp ích ngay cho team, và em luôn sẵn sàng học hỏi thêm về mảng AV trong quá trình làm việc."}, {"speaker": "interviewer", "start": 89.0, "end": 92.8, "text_en": "Could you walk me through your working experience during your internship?", "text_vi": "Em có thể chia sẻ chi tiết hơn về kinh nghiệm làm việc trong kỳ thực tập vừa rồi không?"}, {"speaker": "thinh", "start": 93.0, "end": 100.8, "text_en": "I completed a six-month internship at BW Industrial. My main project was an internal web system for the finance team.", "text_vi": "Em đã hoàn thành kỳ thực tập 6 tháng tại BW Industrial. Dự án chính của em là hệ thống web nội bộ cho phòng Tài chính."}, {"speaker": "thinh", "start": 101.0, "end": 109.8, "text_en": "Before, they made cash reports by hand with statements from 14 banks. Now, the system processes everything automatically.", "text_vi": "Trước đây, họ phải làm báo cáo dòng tiền thủ công từ sao kê của 14 ngân hàng. Giờ đây hệ thống xử lý hoàn toàn tự động."}, {"speaker": "thinh", "start": 110.0, "end": 119.8, "text_en": "At the start, I sat next to the staff and watched how they worked. I took notes on each bank's file format, the repeated steps, and how they sorted transactions.", "text_vi": "Ban đầu, em ngồi cạnh các anh chị nhân viên để quan sát quy trình. Em ghi chú định dạng file của từng ngân hàng, các bước lặp lại và cách họ phân loại giao dịch."}, {"speaker": "thinh", "start": 120.0, "end": 127.8, "text_en": "Then, I built the system in Python. While building, I talked to them a lot to get continuous feedback.", "text_vi": "Sau đó, em xây dựng hệ thống bằng Python. Trong quá trình viết code, em thường xuyên trao đổi để nhận phản hồi liên tục."}, {"speaker": "thinh", "start": 128.0, "end": 141.8, "text_en": "When it was ready, I tested it myself first, then let them try it out. They helped me find real edge cases, which I fixed right away, and I also wrote a clear user guide with screenshots so anyone could use it easily.", "text_vi": "Khi hoàn thiện, em tự kiểm thử trước, sau đó mời mọi người dùng thử. Họ giúp em phát hiện các trường hợp biên thực tế để em sửa ngay, và em đã soạn tài liệu hướng dẫn có ảnh chụp màn hình rõ ràng."}, {"speaker": "thinh", "start": 142.0, "end": 150.8, "text_en": "After it went live, I managed user access and became the first point of contact whenever they ran into file errors or system bugs.", "text_vi": "Khi hệ thống đưa vào hoạt động, em quản lý phân quyền và là đầu mối hỗ trợ đầu tiên mỗi khi họ gặp lỗi file hay sự cố hệ thống."}, {"speaker": "thinh", "start": 151.0, "end": 164.8, "text_en": "So, I learned that in IT support, technical skills matter, but understanding users and their daily workflow matters just as much. That's why I believe I can work well with your clients and your team.", "text_vi": "Qua đó em hiểu rằng trong IT support, kỹ năng kỹ thuật rất quan trọng, nhưng việc thấu hiểu người dùng và quy trình làm việc của họ cũng quan trọng không kém. Đó là lý do em tin mình sẽ phối hợp rất tốt với khách hàng và đội ngũ của công ty."}, {"speaker": "interviewer", "start": 165.0, "end": 168.8, "text_en": "What would you say are your main strengths?", "text_vi": "Theo em, đâu là những điểm mạnh nổi bật nhất của mình?"}, {"speaker": "thinh", "start": 169.0, "end": 171.8, "text_en": "Well, I think two things.", "text_vi": "Dạ, em nghĩ có 2 điểm chính."}, {"speaker": "thinh", "start": 172.0, "end": 185.8, "text_en": "First, I'm very patient with users. When someone has a problem, I listen first, and I explain things in simple words. At BW, I sat right next to the finance staff, so they felt comfortable asking me anything.", "text_vi": "Thứ nhất, em rất kiên nhẫn với người dùng. Khi ai đó gặp sự cố, em luôn lắng nghe trước và giải thích bằng ngôn từ đơn giản, dễ hiểu. Tại BW, em ngồi ngay cạnh phòng tài chính nên mọi người rất thoải mái trao đổi."}, {"speaker": "thinh", "start": 186.0, "end": 202.8, "text_en": "Second, I'm proactive. For example, I tested the system myself before the users touched it, and I authored a full guide before anyone asked. And if I get stuck on a difficult issue, I ask the team right away so things don't get delayed.", "text_vi": "Thứ hai, em rất chủ động. Ví dụ, em tự test kỹ trước khi bàn giao và chủ động viết cẩm nang hướng dẫn từ trước. Khi gặp việc khó, em hỏi ngay để không làm chậm trễ tiến độ."}, {"speaker": "interviewer", "start": 203.0, "end": 207.8, "text_en": "And what about your weaknesses? What is an area you are working on?", "text_vi": "Thế còn điểm yếu thì sao? Đâu là mảng em đang nỗ lực cải thiện?"}, {"speaker": "thinh", "start": 208.0, "end": 215.8, "text_en": "Hmm, my background is mostly in software, so I don't have much direct experience with enterprise AV equipment yet.", "text_vi": "Dạ, nền tảng của em chủ yếu về phần mềm, nên em chưa có nhiều kinh nghiệm trực tiếp với thiết bị AV doanh nghiệp."}, {"speaker": "thinh", "start": 216.0, "end": 233.8, "text_en": "But at home, I often help friends and family with Wi-Fi, monitors, and computer setups. I learn by doing: I read the manuals carefully, take notes, and ask senior engineers. If I'm not sure, I always ask first. I never guess when working at a client's office.", "text_vi": "Nhưng ở nhà em thường xuyên giúp người thân cài đặt Wi-Fi, màn hình và máy tính. Em học bằng thực hành: đọc kỹ hướng dẫn sử dụng, ghi chú và hỏi các kỹ sư đàn anh. Em luôn hỏi trước và không bao giờ đoán mò khi ở văn phòng khách hàng."}, {"speaker": "interviewer", "start": 234.0, "end": 237.8, "text_en": "What technical skills can you bring to this IT fresher role?", "text_vi": "Những kỹ năng kỹ thuật nào em có thể mang lại cho vị trí IT Fresher này?"}, {"speaker": "thinh", "start": 238.0, "end": 244.8, "text_en": "Well, I know Python from my internship, so I can write scripts to automate repeated manual work.", "text_vi": "Dạ, em biết Python từ kỳ thực tập, có thể viết script tự động hóa các thao tác thủ công lặp lại."}, {"speaker": "thinh", "start": 245.0, "end": 261.8, "text_en": "I also have a solid foundation in networking from university: things like IP addresses, subnets, gateways, and DHCP. If a device doesn't connect, I check the physical cable and port lights first, then use ping to verify connectivity.", "text_vi": "Em cũng có nền tảng mạng vững từ trường đại học: địa chỉ IP, Subnet, Gateway, DHCP. Nếu thiết bị mất kết nối, em kiểm tra cáp vật lý và đèn tín hiệu cổng trước, rồi dùng lệnh ping để kiểm tra kết nối."}, {"speaker": "thinh", "start": 262.0, "end": 270.8, "text_en": "Besides that, I use many tools and operating systems daily, so I pick up new devices and software quickly.", "text_vi": "Bên cạnh đó, em sử dụng nhiều công cụ và hệ điều hành hàng ngày nên làm quen thiết bị và phần mềm mới rất nhanh chóng."}, {"speaker": "thinh", "start": 271.0, "end": 283.8, "text_en": "I know AV is more than software: cameras, mics, speakers, and screens must all sync together. While I'm new to enterprise AV hardware, my IT foundation helps me learn the setup very fast.", "text_vi": "Em biết AV không chỉ là phần mềm: camera, micro, loa và màn hình đều phải đồng bộ với nhau. Dù em mới với phần cứng AV doanh nghiệp, nền tảng IT sẽ giúp em học cách cài đặt rất nhanh."}, {"speaker": "interviewer", "start": 284.0, "end": 287.8, "text_en": "Why did you leave your previous role at BW Industrial?", "text_vi": "Tại sao em lại rời công việc trước đây tại BW Industrial?"}, {"speaker": "thinh", "start": 288.0, "end": 300.8, "text_en": "It was a fixed six-month internship contract. We finished building the cash reporting system and handed it over to the finance team with complete documentation, so the internship ended as scheduled.", "text_vi": "Dạ đó là hợp đồng thực tập 6 tháng cố định. Bọn em đã xây dựng xong hệ thống báo cáo dòng tiền và bàn giao đầy đủ tài liệu cho phòng tài chính, nên kỳ thực tập kết thúc đúng lộ trình."}, {"speaker": "thinh", "start": 301.0, "end": 312.8, "text_en": "Now that I have completed all my coursework at university, I'm ready to start my full-time career. This role fits my technical support skills, and I want to stay long-term and grow with the company.", "text_vi": "Giờ em đã hoàn tất việc học tại trường và sẵn sàng cho sự nghiệp chính thức. Vị trí này rất hợp với kỹ năng hỗ trợ kỹ thuật của em, và em mong muốn gắn bó lâu dài cùng công ty."}, {"speaker": "interviewer", "start": 313.0, "end": 316.8, "text_en": "How do you handle working with non-technical users or clients?", "text_vi": "Em xử lý thế nào khi làm việc với người dùng hoặc khách hàng không rành kỹ thuật?"}, {"speaker": "thinh", "start": 317.0, "end": 327.8, "text_en": "I try to use plain, simple words instead of technical jargon. I explain step by step, and I demonstrate the workflow directly on their screen.", "text_vi": "Em cố gắng dùng từ ngữ bình dị, đơn giản thay vì thuật ngữ chuyên môn. Em giải thích từng bước và thị phạm trực tiếp quy trình trên màn hình của họ."}, {"speaker": "thinh", "start": 328.0, "end": 336.8, "text_en": "At BW, I sat alongside the accounting staff to show them how to navigate the system, and provided a screenshot guide for them to review later.", "text_vi": "Ở BW, em ngồi cạnh các anh chị kế toán chỉ cách thao tác hệ thống, rồi làm tài liệu có hình chụp màn hình để họ tiện xem lại."}, {"speaker": "thinh", "start": 337.0, "end": 351.8, "text_en": "To me, good IT support isn't just fixing the bug: it's making people feel comfortable asking questions, and confident enough to handle routine tasks themselves next time.", "text_vi": "Với em, IT support tốt không chỉ là sửa lỗi: mà là làm người dùng cảm thấy dễ chịu khi hỏi, và tự tin tự giải quyết các tác vụ thông thường lần sau."}, {"speaker": "interviewer", "start": 352.0, "end": 356.8, "text_en": "How do you handle situations where multiple support requests come in at the same time?", "text_vi": "Em giải quyết thế nào khi có nhiều yêu cầu hỗ trợ cùng đến một lúc?"}, {"speaker": "thinh", "start": 357.0, "end": 366.8, "text_en": "First, I prioritize by urgency. An issue blocking an active client call or an ongoing meeting room setup always comes first.", "text_vi": "Trước tiên, em sắp xếp theo mức độ khẩn cấp. Sự cố chặn cuộc gọi của khách hàng hay việc setup phòng họp đang diễn ra luôn luôn được ưu tiên số một."}, {"speaker": "thinh", "start": 367.0, "end": 373.8, "text_en": "At the same time, I send the other users a quick update so they know I'm on it and nobody feels ignored.", "text_vi": "Cùng lúc đó, em nhắn tin báo nhanh cho những người dùng khác để họ an tâm là em đang xử lý và không ai cảm thấy bị ngó lơ."}, {"speaker": "thinh", "start": 374.0, "end": 380.8, "text_en": "And if I'm ever unsure about which priority to tackle first, I check in with my manager right away to confirm.", "text_vi": "Và nếu chưa rõ việc nào cần ưu tiên hơn, em sẽ trao đổi ngay với quản lý để xác nhận."}, {"speaker": "interviewer", "start": 381.0, "end": 386.8, "text_en": "Since our regional management is based in Singapore, how do you handle working independently?", "text_vi": "Vì cấp quản lý khu vực đặt tại Singapore, em xử lý việc làm việc độc lập ra sao?"}, {"speaker": "thinh", "start": 387.0, "end": 398.8, "text_en": "Yes, I'm comfortable working independently, but I know communication is key. When I receive a task, I make sure I understand the objective clearly, and I keep the team updated on progress.", "text_vi": "Dạ em hoàn toàn thoải mái khi làm việc độc lập, nhưng em hiểu giao tiếp là chìa khóa. Khi nhận nhiệm vụ, em làm rõ mục tiêu và luôn cập nhật tiến độ cho team."}, {"speaker": "thinh", "start": 399.0, "end": 410.8, "text_en": "If I run into a roadblock, I check the technical documentation first. If I still need guidance, I reach out with a concise summary of what I've already investigated, so we can solve it efficiently.", "text_vi": "Nếu gặp trở ngại, em tra cứu tài liệu kỹ thuật trước. Nếu vẫn cần chỉ dẫn, em sẽ liên hệ với bản tóm tắt ngắn gọn những gì em đã tìm hiểu để cùng giải quyết nhanh nhất."}, {"speaker": "interviewer", "start": 411.0, "end": 414.8, "text_en": "Where do you see yourself 5 years from now?", "text_vi": "Em nhìn thấy bản thân ở đâu sau 5 năm nữa?"}, {"speaker": "thinh", "start": 415.0, "end": 432.8, "text_en": "Well, in the first year, my goal is to get fully comfortable with both our internal IT systems and on-site AV setups while working closely with my mentor. I want to collaborate smoothly with senior engineers, communicate well with clients on site, and gradually handle routine tasks independently.", "text_vi": "Dạ, trong năm đầu tiên, mục tiêu của em là nắm vững cả hệ thống IT nội bộ và lắp đặt AV tại chỗ khi đồng hành cùng mentor. Em muốn phối hợp nhịp nhàng với các kỹ sư đi trước, giao tiếp tốt với khách hàng tại chỗ và dần tự chủ giải quyết công việc."}, {"speaker": "thinh", "start": 433.0, "end": 441.8, "text_en": "Looking ahead to 5 years, I want to grow into a senior engineer, handling larger client deployments and mentoring new freshers joining the team.", "text_vi": "Hướng đến 5 năm tới, em muốn phát triển thành kỹ sư cấp cao, phụ trách các dự án triển khai quy mô lớn hơn và dẫn dắt các bạn fresher mới gia nhập công ty."}, {"speaker": "interviewer", "start": 442.0, "end": 444.8, "text_en": "What are your expectations from your manager?", "text_vi": "Em kỳ vọng điều gì từ người quản lý của mình?"}, {"speaker": "thinh", "start": 445.0, "end": 452.8, "text_en": "I think the most helpful thing is clear priorities, especially when multiple urgent tasks arise at the same time.", "text_vi": "Em thấy điều hữu ích nhất là các ưu tiên rõ ràng, nhất là khi có nhiều việc gấp cùng xuất hiện một lúc."}, {"speaker": "thinh", "start": 453.0, "end": 463.8, "text_en": "Honest, direct feedback is also very important to me. If there's a better way to approach a client or configure a system, I appreciate hearing it early so I can improve.", "text_vi": "Phản hồi thẳng thắn, chân thành cũng rất quan trọng. Nếu có cách tiếp cận khách hàng hay cấu hình hệ thống tốt hơn, em rất trân trọng được góp ý sớm để cải thiện."}, {"speaker": "thinh", "start": 464.0, "end": 469.8, "text_en": "On my end, I'll always ask when I need clarification and keep my manager informed.", "text_vi": "Về phía em, em sẽ luôn chủ động hỏi khi cần làm rõ và luôn cập nhật tình hình cho quản lý."}, {"speaker": "interviewer", "start": 470.0, "end": 474.8, "text_en": "What are your salary expectations for this role, and when would you be available to start?", "text_vi": "Mức lương mong đợi của em cho vị trí này là bao nhiêu, và khi nào em có thể bắt đầu làm việc?"}, {"speaker": "thinh", "start": 475.0, "end": 486.8, "text_en": "From my first interview, I understand the range is around 9 to 11 million VND gross per month, and that works well for me. But I'm flexible, and I'd be glad to hear what the company has planned for this role.", "text_vi": "Từ buổi phỏng vấn đầu, em hiểu mức lương dao động khoảng 9 đến 11 triệu đồng Gross mỗi tháng, mức này rất phù hợp với em. Nhưng em cũng rất linh hoạt và sẵn lòng lắng nghe kế hoạch của công ty dành cho vị trí này."}, {"speaker": "interviewer", "start": 487.0, "end": 489.8, "text_en": "Do you have any questions for me before we conclude?", "text_vi": "Em có câu hỏi nào cho anh trước khi chúng ta kết thúc không?"}, {"speaker": "thinh", "start": 490.0, "end": 493.8, "text_en": "Yes, definitely! I just have a couple of quick questions.", "text_vi": "Dạ chắc chắn rồi ạ! Em chỉ có vài câu hỏi ngắn thôi ạ."}, {"speaker": "thinh", "start": 494.0, "end": 500.8, "text_en": "First, what kind of clients do we usually work with in Vietnam, and what will my main focus look like during the first month or two?", "text_vi": "Thứ nhất, ở Việt Nam mình thường làm việc với những đối tượng khách hàng nào, và trọng tâm chính của em trong một hai tháng đầu sẽ như thế nào ạ?"}, {"speaker": "interviewer", "start": 501.0, "end": 506.8, "text_en": "Thank you, Thinh. It was great speaking with you today. We will follow up on the next steps soon.", "text_vi": "Cảm ơn Thịnh. Rất vui vì buổi trò chuyện hôm nay cùng em. Bên anh sẽ sớm liên hệ các bước tiếp theo nhé."}, {"speaker": "thinh", "start": 507.0, "end": 517.8, "text_en": "Thank you very much for your time today! I really enjoyed learning more about Esco AV and the team's upcoming projects. I look forward to hearing from you soon. Have a great day!", "text_vi": "Em cảm ơn anh rất nhiều vì buổi gặp gỡ hôm nay! Em rất thích tìm hiểu thêm về Esco AV và các dự án sắp tới. Em mong sớm nhận được tin từ anh. Chúc anh một ngày tuyệt vời ạ!"}, {"speaker": "interviewer", "start": 518.0, "end": 523.0, "text_en": "What if you cannot fix a technical problem at a client office?", "text_vi": "Nếu em không thể xử lý được sự cố ngay tại văn phòng khách hàng thì em sẽ làm gì?"}, {"speaker": "interviewer", "start": 578.0, "end": 583.0, "text_en": "Could you describe a technical problem you solved during your work or study?", "text_vi": "Hãy mô tả một sự cố kỹ thuật cụ thể mà em từng tự mình giải quyết thành công."}, {"speaker": "interviewer", "start": 638.0, "end": 643.0, "text_en": "What if a client is unhappy because an AV system is not working?", "text_vi": "Nếu khách hàng bực bội vì hệ thống phòng họp gặp trục trặc thì em sẽ xử lý ra sao?"}, {"speaker": "interviewer", "start": 698.0, "end": 703.0, "text_en": "Are you comfortable travelling to client sites across the city?", "text_vi": "Em có sẵn sàng di chuyển thường xuyên đến các văn phòng khách hàng để hỗ trợ kỹ thuật không?"}, {"speaker": "interviewer", "start": 758.0, "end": 763.0, "text_en": "What if you do not understand a technical instruction from the Singapore team?", "text_vi": "Nếu nhận chỉ đạo kỹ thuật từ đội ngũ Singapore bằng tiếng Anh mà em chưa hiểu rõ thì em sẽ làm thế nào?"}, {"speaker": "interviewer", "start": 818.0, "end": 823.0, "text_en": "Finally, why should we hire you for this IT Support & AV Systems role?", "text_vi": "Tại sao Esco AV nên chọn tuyển dụng em cho vị trí này thay vì các ứng viên khác?"}]};
+    const FULL_SCRIPT_DATA = {"title": "Second-Round Interview Preparation - ESCO AV", "candidate": "Thái Đỗ Thịnh", "role": "IT Support & AV Systems Fresher", "company": "ESCO AV Vietnam", "sections": [{"id": "core", "name": "14 Câu Hỏi Cốt Lõi (Core Interview Questions)", "icon": "list-ordered", "items": [{"num": 1, "title": "Tell me about yourself", "answer_en": "Thank you for meeting with me today. I’m Thinh, a final-year Computer Science student at HCMC Open University. I’ve finished all my classes, so I can start full-time right away.\n\nRecently, I did a six-month internship at BW Industrial. I build two internal web tools: a bank statement parser for 14 banks and an automated cash reporting tool. I also managed user access and helped staff with small tech problems.\n\nAfter our first interview, I understood this job covers both internal IT support and setting up AV systems at client offices. I really enjoy that mix of working with systems and talking directly with users. So I’m very excited about this role.", "notes": "Nhấn mạnh: CS tốt nghiệp sẵn sàng full-time ngay, kinh nghiệm 6 tháng tại BW Industrial (làm tool thực tế cho 14 ngân hàng, hỗ trợ user), hiểu rõ tính chất kết hợp IT Support + AV onsite."}, {"num": 2, "title": "Why do you want this position? / Why ESCO AV?", "answer_en": "Well, Ms. Huyen found my profile online, and I was looking for a full-time IT job.\n\nAfter the first interview, I liked it even more. It’s not only desk work. I can visit clients, set up smart meeting rooms, and work with real devices. I also like working with international clients.\n\nI think my IT background and my user support experience can help the team. And of course, I’ll keep learning AV along the way.", "notes": "Lý do chọn: Thích tính chất onsite làm việc với thiết bị phòng họp thông minh thực tế, tiếp xúc khách hàng quốc tế, đóng góp nền tảng IT Support sẵn có và chủ động học thêm mảng AV."}, {"num": 3, "title": "Tell me about your working experience", "answer_en": "I did a six-month internship at BW Industrial. My main project was an internal web system for the finance team. Before, they made the cash report by hand, with statements from 14 banks. Now the system does it automatically.\n\nAt the start, I sat next to the staff and watched how they work. I took notes on each bank’s file format, the repeated steps, and how they sort transactions. Then I built the system in Python. While building, I talked to them a lot to get feedback.\n\nWhen it was ready, I tested it myself first. Then I let them try it out. They helped me find real problems, and I fixed them, and I also wrote a clear user guide, so anyone can use the system.\n\nAfter it went live, I managed user access. Basically, I became the first person they asked when they had file errors or system bugs.\n\nSo I learned that in IT support, technical skills matter, but understanding users and their daily work matters just as much. That’s why I think I can work well with your clients and your team.", "notes": "Quy trình làm việc chuẩn: Ngồi cùng user thu thập yêu cầu → code Python → tự test kỹ trước khi giao → viết user guide → quản lý phân quyền và hỗ trợ trực tiếp khi có sự cố."}, {"num": 4, "title": "What are your strengths?", "answer_en": "Well, I think two things. First, I’m very patient with users. When someone has a problem, I listen first, and I try to explain in simple words. At BW, I sat next to the finance staff, so they felt comfortable to ask me anything.\n\nSecond, I’m proactive. For example, I tested the system myself before the users touched it, and I wrote a full guide before anyone asked.\n\nAnd if I get stuck, I ask the team right away so things don't get delayed.", "notes": "2 Điểm mạnh lớn nhất: Kiên nhẫn lắng nghe/giải thích dễ hiểu với user + Tính chủ động (proactive, tự test, viết guide trước, gặp khó hỏi ngay tránh delay)."}, {"num": 5, "title": "What are your weaknesses?", "answer_en": "Hmm, my background is mostly in software, so I don’t have much experience with enterprise AV equipment yet.\n\nBut at home, I often help friends and family with Wi-Fi, screens, and computer problems. And I learn by doing. I read the manual carefully, take notes, and ask experienced engineers.\n\nIf I’m not sure, I ask first. I don’t guess when working at a client’s office.", "notes": "Điểm cần cải thiện: Chưa có nhiều kinh nghiệm thực chiến với thiết bị AV doanh nghiệp. Cách khắc phục: Ham học hỏi qua thực tế, đọc kỹ manual, hỏi kỹ sư có kinh nghiệm, tuyệt đối không đoán mò khi ở văn phòng khách hàng."}, {"num": 6, "title": "What technical skills can you bring?", "answer_en": "Well, I know Python from my internship, and I can build small tools to automate repeated work.\n\nI learned basic networking at university, like IP address, subnets, gateway, and DHCP. If a device doesn’t connect, I check the cable and the port light first, then I use ping to test the connection. I also practice by fixing computer problems myself.\n\nAlso, I use many apps and software every day, so I’m comfortable learning new devices and new software.\n\nActually, I know AV is not only software. Cameras, mics, speakers, and screens must work together. I’m new to professional AV, but my IT base helps me learn quickly.", "notes": "Kỹ năng: Python tự động hóa công việc lặp lại, Networking cơ bản (IP, subnet, gateway, DHCP, ping, port lights), quen thuộc với phần mềm & thiết bị mới, hiểu nguyên lý phối hợp camera-mic-loa-màn hình."}, {"num": 7, "title": "Why did you leave your last job?", "answer_en": "It was a fixed six-month internship. We finished the system and handed it over to the finance team with complete documentation, so the internship ended as scheduled.\n\nTo be honest, now I want to start my career. This job fits my skills in IT support, and I want to stay long-term and grow with the company.", "notes": "Lý do: Kỳ thực tập 6 tháng kết thúc đúng hạn sau khi đã hoàn thành dự án và bàn giao tài liệu đầy đủ. Mong muốn hiện tại: Bắt đầu sự nghiệp chính thức, gắn bó lâu dài và phát triển cùng Esco AV."}, {"num": 8, "title": "How do you work with non-technical users?", "answer_en": "I try to use simple words, not technical words. I explain step by step, and I show them on the screen.\n\nAt BW, I sat next to the finance staff and showed them how to use the system. I also wrote a user guide, so they could check it again later.\n\nI think good support is not only fixing the problem. It’s also making people feel comfortable to ask, and confident to do it by themselves next time.", "notes": "Triết lý hỗ trợ: Dùng từ ngữ đơn giản, hướng dẫn từng bước trên màn hình, viết tài liệu lưu lại. Hỗ trợ tốt là giúp người dùng thấy thoải mái khi hỏi và tự tin tự làm được lần sau."}, {"num": 9, "title": "How do you handle many support requests at once?", "answer_en": "First, I check the urgency. A problem blocking an important meeting or an active client comes first.\n\nAt the same time, I send the other users a quick update so they know I'm on it and nobody feels ignored.\n\nAnd if I'm not sure which one to handle first, I ask my manager right away to confirm.", "notes": "Xử lý quá tải: Đánh giá độ khẩn cấp (cuộc họp VIP hoặc khách hàng đang diễn ra ưu tiên số 1), luôn nhắn tin cập nhật tiến độ cho các user khác để không ai bị bỏ rơi, hỏi quản lý khi chưa rõ thứ tự ưu tiên."}, {"num": 10, "title": "How do you work independently with a team in Singapore?", "answer_en": "Yeah, I can work by myself, but communication is important. When I get a task, I make sure I understand the goal, and I keep them updated.\n\nIf I have a problem, I read the documents first. If I still need help, I explain what I already tried.", "notes": "Làm việc từ xa/độc lập: Đảm bảo hiểu rõ mục tiêu, liên tục cập nhật tiến độ. Khi gặp sự cố: đọc tài liệu trước, khi cần hỗ trợ sẽ tóm tắt rõ những cách mình đã thử trước đó."}, {"num": 11, "title": "Where do you see yourself in five years?", "answer_en": "Well, in the first year, my goal is to get fully comfortable with both our internal IT systems and on-site AV setups while working closely with my mentor.\n\nAnd I want to collaborate smoothly with senior engineers, communicate well with clients on-site, and gradually handle routine tasks independently.\n\nLooking ahead to five years, I want to grow into a senior engineer, handling larger client deployments and mentoring new freshers joining the team.", "notes": "Lộ trình 5 năm: Năm 1 nắm vững IT nội bộ + AV onsite, phối hợp nhịp nhàng với đàn anh. 5 năm: Trở thành Senior Engineer phụ trách các dự án triển khai lớn và hướng dẫn đàn em mới vào."}, {"num": 12, "title": "What do you expect from your manager?", "answer_en": "I think the most helpful thing is clear priorities, especially when many problems come at the same time. Honest direct feedback is also very important to me. If there’s a better way to do something, I appreciate hearing it early so I can improve.\n\nAnd from my side, I’ll ask questions when I’m not sure, and I’ll keep you updated.", "notes": "Kỳ vọng ở sếp: Định hướng ưu tiên rõ ràng khi nhiều việc dồn dập + Phản hồi thẳng thắn, sớm để cải thiện. Bản thân: Chủ động hỏi và cập nhật đều đặn."}, {"num": 13, "title": "Salary expectation / When can you start?", "answer_en": "“From my first interview, I understand it’s around 9 to 11 million VND gross per month, and that’s fine for me. But I’m flexible. I’d like to hear what you have in mind for this role.“\n\n“Thank you. That works for me. I’m happy with that, and I’m excited to join the team.“ (nếu cao hơn hoặc đồng ý với gross hiện tại)\n\n“During probation, what percentage of the salary will I receive?”\n\n“Okay, I understand. Thank you for explaining.”\n\n“I can start next week, or any date that works for the team. I’ve finished all my classes, so I’m free.”", "notes": "Mức lương: 9 - 11 triệu Gross/tháng (linh hoạt theo chính sách công ty). Hỏi rõ % lương thử việc. Thời gian bắt đầu: Sẵn sàng đi làm ngay tuần sau vì đã học xong toàn bộ chương trình."}, {"num": 14, "title": "Do you have any questions for me?", "answer_en": "Question 1: “What does success look like in the first 2 months for this role?”\n\nQuestion 2: “How does the Vietnam IT team work with the Singapore team, for daily support or for projects?”\n\nOptional: “How do new engineers learn AV equipment here? Do they shadow senior engineers on-site first?”", "notes": "Câu hỏi thông minh hỏi lại nhà tuyển dụng: Tiêu chuẩn đánh giá thành công sau 2 tháng đầu? Cách phối hợp giữa team VN và Singapore? Quy trình đào tạo thiết bị AV thực tế onsite."}]}, {"id": "situational", "name": "Câu Hỏi Tình Huống (Situational Questions Q15 - Q20)", "icon": "zap", "items": [{"num": 15, "title": "What if you can’t fix a problem at a client’s office?", "answer_en": "I stay calm and polite. First, I check the basics: power, cables, connections, and the device status. Then I check the network. If it’s still not working, I read the manual or search for the error. Basically, I don’t keep guessing, because random changes can make things worse. So I call my senior engineer and explain what I already checked. And I tell the client how it’s going.", "notes": "Quy tắc vàng: Bình tĩnh, kiểm tra từ cơ bản (nguồn, dây cáp, mạng, device status) → đọc manual/mã lỗi → tuyệt đối không đoán mò → báo cáo đàn anh kèm những bước đã kiểm tra → cập nhật tình hình cho khách hàng an tâm."}, {"num": 16, "title": "Describe a technical problem you solved", "answer_en": "Well, when the tool was ready, I let the finance staff test it. They told me what felt slow or confusing. For example, one problem was file formatting differences across banks. I asked them to show me their steps, then I repeated the same steps myself and checked the workflow. Then I fixed it and asked them to test again. I also updated the guide. So I learned to look at problems from the user’s side, not only from the code.", "notes": "Ví dụ thực tế: Xử lý định dạng file sao kê khác nhau giữa các ngân hàng, tái hiện các bước của user để sửa triệt để, cập nhật hướng dẫn sử dụng."}, {"num": 17, "title": "What if a client is unhappy because a system isn’t working?", "answer_en": "First, I stay calm and let them finish. I tell them, ‘I understand, and I’ll do my best to help.’ Then I check the problem, tell them what I know, and tell them how it’s going. If I can’t fix it by myself, I ask a senior engineer quickly. I stay professional and take responsibility.", "notes": "Xử lý khách hàng nóng giận: Lắng nghe không ngắt lời, đồng cảm (‘Em hiểu và sẽ cố gắng hết sức để hỗ trợ’), thông báo tình hình minh bạch, nhờ hỗ trợ nhanh khi cần, giữ tác phong chuyên nghiệp chịu trách nhiệm."}, {"num": 18, "title": "Are you comfortable travelling to client sites?", "answer_en": "Yes, of course. I know on-site support is part of the job. I’m happy with that, because I enjoy meeting users face to face. It helps me understand the problem faster.\n\nBesides, I want real experience with different clients and systems. I’m also okay working on weekends or events when the team needs me.", "notes": "Sẵn sàng di chuyển onsite: Thích gặp user trực tiếp để nắm bắt vấn đề nhanh hơn, tích lũy kinh nghiệm hệ thống thực tế, sẵn sàng hỗ trợ cuối tuần hoặc sự kiện đột xuất."}, {"num": 19, "title": "What if you don’t understand an instruction from Singapore?", "answer_en": "I try to get the main point first. I mean, if one part is unclear, I ask them politely to explain that part again. Then I say it back to them in my own words, so we agree before I start. Asking early saves time for everyone.", "notes": "Kỹ thuật giao tiếp quốc tế: Xác nhận lại ý chính, lịch sự nhờ giải thích phần chưa rõ, diễn đạt lại bằng từ ngữ của mình (paraphrasing) để đồng thuận trước khi bắt tay làm."}, {"num": 20, "title": "Why should we hire you?", "answer_en": "I think I’m a good fit because I already work directly with users. I supported the finance staff, managed user access, and helped with their daily problems. I also test things carefully before users do, so problems come out early. To be honest, I’m still new to AV, but I have a solid IT base, and I’m patient with people. I’m ready to learn from the team and start helping soon.", "notes": "Chốt deal: Đã quen làm việc trực tiếp hỗ trợ user, cẩn thận tự test kỹ, nền tảng IT vững vàng, kiên nhẫn và sẵn sàng học hỏi nhanh mảng AV."}]}, {"id": "technical", "name": "Câu Hỏi Kỹ Thuật Bổ Sung & Lời Kết", "icon": "wrench", "items": [{"title": "If they ask about your AV experience (Kinh nghiệm AV)", "answer_en": "Honestly, I haven’t worked with enterprise AV yet. But I understand what cameras, mics, speakers, and displays do in a meeting room, and I often set up screens at home. I’m ready to learn real installation from the team.", "notes": "Thành thật nhưng tự tin: Hiểu nguyên lý phối hợp các thiết bị phòng họp và sẵn sàng học lắp đặt thực tế."}, {"title": "If they ask about networking (Kỹ năng Mạng)", "answer_en": "I know the basics: IP address, subnet, gateway, and DHCP. If a device doesn’t connect, I check the cable and the port light first, then I use ping to test the connection. I’d like more practice with real enterprise networks.", "notes": "Vận dụng: Quy trình troubleshoot mạng từng bước bài bản (vật lý → tín hiệu đèn → ping kiểm tra IP/gateway)."}, {"title": "If they ask whether you learn quickly (Khả năng học hỏi)", "answer_en": "I think so. When something is new to me, I try a simple task first. If I get stuck, I read the manual or search for the answer, and I take notes, so I can do it again later. I do this at home too, like when I fix a Wi-Fi problem for my family.", "notes": "Phương pháp: Bắt đầu từ tác vụ đơn giản, đọc manual, ghi chép lại tài liệu để lần sau tự làm nhanh."}, {"title": "Closing Statement (Lời cảm ơn và kết thúc buổi phỏng vấn)", "answer_en": "Thank you for your time today. I really enjoyed learning about the role and the team. I’m very interested, and I hope to grow with ESCO AV. I look forward to hearing from you soon. Have a great day!", "notes": "Lời chào kết chuyên nghiệp, thể hiện sự hào hứng và trân trọng cơ hội."}]}, {"id": "cheatsheet", "name": "Bảng Mẫu Câu Giao Tiếp Tình Huống Thực Tế (Cheat Sheet)", "icon": "message-square", "table": [{"situation": "Kiểm tra tín hiệu đầu buổi", "sentence_en": "Good morning/afternoon! Can you hear and see me clearly on your end?", "meaning_vi": "Chào anh/chị! Đầu cầu bên anh/chị có nghe và thấy em rõ không ạ?"}, {"situation": "Khi lỡ nói đè tiếng nhau", "sentence_en": "Sorry, please go ahead, I'm listening.", "meaning_vi": "Dạ em xin lỗi, mời anh/chị nói trước ạ, em đang nghe đây."}, {"situation": "Xác nhận lại câu hỏi cho chắc", "sentence_en": "Just to make sure I understand correctly, are you asking about [topic]?", "meaning_vi": "Để chắc là em hiểu đúng ý, có phải anh/chị đang hỏi về [chủ đề] đúng không ạ?"}, {"situation": "Xin ngắt lời lịch sự", "sentence_en": "Sorry to interrupt, but may I ask a quick clarifying question?", "meaning_vi": "Xin lỗi vì ngắt lời, em có thể xin phép hỏi rõ hơn một chút được không ạ?"}, {"situation": "Nhờ lặp lại câu hỏi", "sentence_en": "I’m sorry, would you mind repeating that question once more, please?", "meaning_vi": "Em xin lỗi, anh/chị có phiền nhắc lại câu hỏi đó thêm một lần nữa giúp em được không ạ?"}, {"situation": "Xin vài giây suy nghĩ", "sentence_en": "That’s a great question. Let me take a quick second to think about that.", "meaning_vi": "Câu hỏi hay quá ạ. Cho em xin vài giây để sắp xếp lại ý một chút."}, {"situation": "Tiếp thu & xác nhận", "sentence_en": "Understood, thank you for clarifying that for me.", "meaning_vi": "Em hiểu rồi ạ, cảm ơn anh/chị đã giải thích rõ giúp em."}, {"situation": "Kiểm tra xem trả lời đã đủ ý chưa", "sentence_en": "Does that answer your question, or would you like me to elaborate?", "meaning_vi": "Dạ câu trả lời đó đã đúng ý anh/chị chưa, hay anh/chị có muốn em nói sâu thêm chỗ nào không ạ?"}, {"situation": "Bắt đầu đặt câu hỏi ngược lại", "sentence_en": "Yes, definitely! Could you share a bit about [topic]?", "meaning_vi": "Dạ vâng! Anh/chị có thể chia sẻ thêm một chút về [chủ đề] được không ạ? (Vào việc nhanh, tự nhiên)."}, {"situation": "Cảm ơn và chốt buổi họp", "sentence_en": "Thank you so much for your time today. It was great speaking with you.", "meaning_vi": "Cảm ơn anh/chị rất nhiều vì buổi hôm nay. Em rất vui vì được trao đổi cùng anh/chị."}]}]};
+
+    const IMPORTANT_PHRASES = [
+      'introduce yourself', 'background', 'computer science', 'HCMC Open University',
+      'full-time', 'BW Industrial', 'bank statement', 'cash reports', 'internal web tools',
+      'user access', 'IT Support', 'Esco AV', 'AV systems', 'troubleshooting',
+      'hands-on', 'on-site', 'patient', 'proactive', 'growth mindset', 'Python',
+      'HDMI', 'microphones', 'video conference', 'Crestron', 'Logitech', 'Polycom',
+      'urgent', 'priority', 'VIP meeting', 'calm under pressure', 'systematic check',
+      'English documentation', 'Vietnamese users', 'communication', 'five years',
+      'Audio Visual Engineer', 'solution design', 'salary expectation', '9 to 11 million',
+      'Ms. Huyen', 'Singapore team', 'stay calm and polite', 'power, cables, connections'
+    ];
+
+    function getDialogueKeyPointsAndHTML(textEn) {
+      let highlightedHTML = textEn;
+      const foundChips = [];
+
+      const sortedPhrases = [...IMPORTANT_PHRASES].sort((a, b) => b.length - a.length);
+
+      sortedPhrases.forEach(phrase => {
+        const regex = new RegExp(`(${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'i');
+        if (regex.test(highlightedHTML)) {
+          foundChips.push(phrase);
+          highlightedHTML = highlightedHTML.replace(regex, `<span class="kp-highlight">$1</span>`);
+        }
+      });
+
+      foundChips.sort((a, b) => textEn.toLowerCase().indexOf(a.toLowerCase()) - textEn.toLowerCase().indexOf(b.toLowerCase()));
+
+      if (foundChips.length === 0) {
+        const clean = textEn.replace(/[.,?!]/g, '').trim();
+        foundChips.push(clean);
+      }
+
+      return {
+        chips: foundChips.slice(0, 4),
+        html: `“${highlightedHTML}”`
+      };
+    }
+
     // Global State
-    let interviewData = null;
+    let interviewData = DEFAULT_INTERVIEW_DATA;
+    let fullScript = FULL_SCRIPT_DATA;
     let audio = null;
     let audioCtx = null;
     let analyser = null;
     let audioSource = null;
     let dataArray = null;
     let isPlaying = false;
-    let subMode = 'bilingual'; // 'bilingual', 'en', 'vi', 'off'
-    let cameraMode = 'wide'; // 'auto', 'wide', 'thinh', 'interviewer'
-    let activeSpeaker = 'none'; // 'interviewer', 'thinh', 'both', 'none'
+    let subMode = 'bilingual'; // 'bilingual', 'keypoints'
+    let activeSpeaker = 'interviewer';
     let currentChapterIndex = 0;
     let currentDialogue = null;
     let searchQuery = '';
 
-    // MediaRecorder for Exporting MP4/WebM
-    let mediaRecorder = null;
-    let recordedChunks = [];
-    let isRecording = false;
-    let recStartTime = 0;
-    let recTimerInterval = null;
+    // SCRIPT TELEPROMPTER SUBTITLE STATE (ENABLED BY DEFAULT AS REQUESTED)
+    let isScriptSubtitleActive = true;
 
-    // Canvas & Stage
-    const canvas = document.getElementById('stageCanvas');
-    const ctx = canvas.getContext('2d');
+    // Webcam & Practice State (DISABLED BY DEFAULT - User clicks to enable!)
+    let isWebcamActive = false;
+    let isUserTurnToAnswer = false;
+    let webcamStream = null;
+    let userAudioCtx = null;
+    let userAnalyser = null;
+    let userDataArray = null;
+    let sessionStartMs = Date.now();
+    let countdownTimerSec = 90;
+    let countdownInterval = null;
 
-    // Smooth Camera Transform State
-    let cam = {
-      x: 0,
-      y: 0,
-      scale: 1.0,
-      targetX: 0,
-      targetY: 0,
-      targetScale: 1.0
-    };
+    // Active Script Modal Tab
+    let activeScriptTab = 'core';
+    let scriptSearchQuery = '';
 
     // Characters Animation State
-    let interviewer = {
-      mouthOpen: 0,
-      glow: 0.1
+    let animState = {
+      interviewer: {
+        glow: 0.15,
+        mouthOpen: 0,
+        mouthWidth: 1,
+        mouthRound: 0,
+        jawDrop: 0,
+        headTilt: 0
+      },
+      thinh: {
+        glow: 0.15,
+        mouthOpen: 0,
+        mouthWidth: 1,
+        mouthRound: 0,
+        jawDrop: 0,
+        headTilt: 0
+      }
     };
 
-    let thinh = {
-      mouthOpen: 0,
-      glow: 0.8
-    };
-
-    // DOM Ready Initialization
+    // Initialize App
     window.addEventListener('DOMContentLoaded', async () => {
       audio = document.getElementById('audioPlayer');
       lucide.createIcons();
 
-      // Load interview JSON data
       try {
         const resp = await fetch('interview_data.json');
-        interviewData = await resp.json();
-        buildChapterDrawer();
-        buildTimelineMarkers();
-      } catch (err) {
-        console.error('Failed to load interview_data.json:', err);
+        if (resp.ok) {
+          interviewData = await resp.json();
+        }
+      } catch (e) {
+        // Uses embedded DEFAULT_INTERVIEW_DATA
       }
+
+      try {
+        const sResp = await fetch('interview_script.json');
+        if (sResp.ok) {
+          fullScript = await sResp.json();
+        }
+      } catch (e) {
+        // Uses embedded FULL_SCRIPT_DATA
+      }
+
+      buildChapterDrawer();
+      buildTimelineMarkers();
+      syncQuestionCardForChapter(0);
+      updateScriptSubtitleUI();
+      renderScriptContent();
+
+      // Start Session Timer
+      setInterval(() => {
+        const elapsed = Math.floor((Date.now() - sessionStartMs) / 1000);
+        const m = Math.floor(elapsed / 60);
+        const s = elapsed % 60;
+        const el = document.getElementById('sessionTimerText');
+        if (el) el.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      }, 1000);
 
       // Audio Event Listeners
       audio.addEventListener('timeupdate', onTimeUpdate);
       audio.addEventListener('play', () => {
         isPlaying = true;
-        document.getElementById('playOverlay').style.opacity = '0';
-        document.getElementById('playOverlay').style.pointerEvents = 'none';
         document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
         lucide.createIcons();
       });
       audio.addEventListener('pause', () => {
         isPlaying = false;
-        document.getElementById('playOverlay').style.opacity = '1';
-        document.getElementById('playOverlay').style.pointerEvents = 'auto';
         document.getElementById('playIcon').setAttribute('data-lucide', 'play');
         lucide.createIcons();
       });
       audio.addEventListener('loadedmetadata', () => {
-        document.getElementById('totTime').innerText = formatTime(Math.round(audio.duration));
+        if (audio.duration && !isNaN(audio.duration)) {
+          document.getElementById('totTime').innerText = formatTime(Math.round(audio.duration));
+        }
       });
 
-      // Start Rendering Loop (60 FPS)
-      requestAnimationFrame(renderLoop);
+      // Combined Animation Loop: Interviewer + Thinh Cartoon Characters + Mic Waves
+      requestAnimationFrame(mainAnimationLoop);
     });
 
-    // Web Audio API Setup
+    // Web Audio API
     function initWebAudio() {
       if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 128;
-        analyser.smoothingTimeConstant = 0.8;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        try {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 64;
+          analyser.smoothingTimeConstant = 0.3;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-        audioSource = audioCtx.createMediaElementSource(audio);
-        audioSource.connect(analyser);
-        analyser.connect(audioCtx.destination);
+          audioSource = audioCtx.createMediaElementSource(audio);
+          audioSource.connect(analyser);
+          analyser.connect(audioCtx.destination);
+        } catch (err) {
+          console.warn('WebAudio fallback:', err);
+        }
       }
-      if (audioCtx.state === 'suspended') {
+      if (audioCtx && audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
     }
 
+    let simTimer = null;
+    let simTime = 0;
+
     function togglePlay() {
+      if (isUserTurnToAnswer) {
+        finishUserAnswer();
+        return;
+      }
       initWebAudio();
-      if (audio.paused) {
-        audio.play();
+      if (audio.paused && !simTimer) {
+        audio.play().catch(() => {
+          startSimulatedPlayback();
+        });
       } else {
         audio.pause();
+        stopSimulatedPlayback();
       }
     }
 
+    function startSimulatedPlayback() {
+      isPlaying = true;
+      document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
+      lucide.createIcons();
+
+      simTimer = setInterval(() => {
+        const dur = interviewData.duration || 518;
+        simTime = (simTime + 0.1 * (audio.playbackRate || 1)) % dur;
+        syncTimeline(simTime, dur);
+      }, 100);
+    }
+
+    function stopSimulatedPlayback() {
+      if (simTimer) {
+        clearInterval(simTimer);
+        simTimer = null;
+      }
+      isPlaying = false;
+      document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+      lucide.createIcons();
+    }
+
+    function getCurrentTime() {
+      return simTimer ? simTime : (audio.currentTime || simTime);
+    }
+
+    function setCurrentTime(sec) {
+      simTime = sec;
+      if (audio && audio.duration) {
+        audio.currentTime = sec;
+      }
+      const dur = (audio && audio.duration) ? audio.duration : (interviewData.duration || 518);
+      syncTimeline(sec, dur);
+    }
+
     function skipSeconds(sec) {
-      if (!audio) return;
       initWebAudio();
-      audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
+      const dur = (audio && audio.duration) ? audio.duration : (interviewData.duration || 518);
+      setCurrentTime(Math.max(0, Math.min(dur, getCurrentTime() + sec)));
+    }
+
+    function replayCurrentSentence() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      if (chap) {
+        setCurrentTime(chap.start);
+        if (!isPlaying) togglePlay();
+      }
     }
 
     function setSpeed(spd) {
-      if (!audio) return;
-      audio.playbackRate = spd;
-      ['10', '125', '15'].forEach(id => {
+      if (audio) audio.playbackRate = spd;
+      ['085', '10', '125'].forEach(id => {
         const btn = document.getElementById('speed' + id);
-        if (btn) btn.className = 'px-1.5 py-0.2 rounded text-slate-400 hover:text-white';
+        if (btn) btn.className = 'px-1.5 py-0.5 rounded text-slate-400 hover:text-white';
       });
-      const activeBtn = document.getElementById('speed' + (spd === 1.0 ? '10' : spd === 1.25 ? '125' : '15'));
-      if (activeBtn) activeBtn.className = 'px-1.5 py-0.2 rounded text-white bg-blue-600 font-medium';
+      const key = spd === 0.85 ? '085' : spd === 1.0 ? '10' : '125';
+      const activeBtn = document.getElementById('speed' + key);
+      if (activeBtn) activeBtn.className = 'px-1.5 py-0.5 rounded text-white bg-[#262c46] font-semibold';
     }
 
     function changeVolume(val) {
@@ -460,57 +740,42 @@
       lucide.createIcons();
     }
 
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-    // Subtitle Mode
     function setSubMode(mode) {
       subMode = mode;
-      ['bilingual', 'en', 'vi'].forEach(m => {
-        const btn = document.getElementById('sub' + m.charAt(0).toUpperCase() + m.slice(1));
-        if (btn) btn.className = 'px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
-      });
-      const activeBtn = document.getElementById('sub' + mode.charAt(0).toUpperCase() + mode.slice(1));
-      if (activeBtn) activeBtn.className = 'px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm';
+      const btnBi = document.getElementById('subBilingual');
+      const btnKp = document.getElementById('subKeypoints');
+      if (mode === 'bilingual') {
+        btnBi.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-white bg-[#22273d] transition shadow-sm';
+        btnKp.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-amber-300 hover:text-white transition';
+      } else {
+        btnKp.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold text-amber-300 bg-[#22273d] transition shadow-sm';
+        btnBi.className = 'px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+      }
+      syncQuestionCardForChapter(currentChapterIndex);
     }
 
-    // Camera View Mode
-    function setCameraView(mode) {
-      cameraMode = mode;
-      ['Auto', 'Wide', 'Thinh', 'Interviewer'].forEach(m => {
-        const btn = document.getElementById('view' + m);
-        if (btn) btn.className = 'px-2 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white transition';
-      });
-      const activeBtn = document.getElementById('view' + mode.charAt(0).toUpperCase() + mode.slice(1));
-      if (activeBtn) activeBtn.className = 'px-2.5 py-1 rounded-md text-xs font-medium text-white bg-blue-600 transition shadow-sm';
-    }
-
-    // Seek Click
     function seekByClick(e) {
-      if (!audio || !audio.duration) return;
-      initWebAudio();
-      const rect = document.getElementById('progressTrack').getBoundingClientRect();
+      const track = document.getElementById('progressTrack');
+      const rect = track.getBoundingClientRect();
       const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      audio.currentTime = pos * audio.duration;
+      const dur = (audio && audio.duration) ? audio.duration : (interviewData.duration || 518);
+      setCurrentTime(pos * dur);
     }
 
-    // Progress Bar Hover Tooltip
     function onTrackHover(e) {
-      if (!audio || !audio.duration || !interviewData) return;
-      const rect = document.getElementById('progressTrack').getBoundingClientRect();
+      const track = document.getElementById('progressTrack');
+      const rect = track.getBoundingClientRect();
       const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-      const targetSec = pos * audio.duration;
+      const dur = (audio && audio.duration) ? audio.duration : (interviewData.duration || 518);
+      const targetSec = pos * dur;
 
       let chapTitle = '';
-      for (let c of interviewData.chapters) {
-        if (targetSec >= c.start && targetSec <= c.end) {
-          chapTitle = c.title_en;
-          break;
+      if (interviewData && interviewData.chapters) {
+        for (const c of interviewData.chapters) {
+          if (targetSec >= c.start && targetSec <= c.end) {
+            chapTitle = c.title_en;
+            break;
+          }
         }
       }
 
@@ -524,18 +789,32 @@
       document.getElementById('progressTooltip').style.opacity = '0';
     }
 
-    // Time Update Handler
     function onTimeUpdate() {
+      if (simTimer) return;
       const cur = audio.currentTime;
-      const dur = audio.duration || 518;
-      document.getElementById('curTime').innerText = formatTime(cur);
+      const dur = audio.duration || interviewData.duration || 518;
+      syncTimeline(cur, dur);
+    }
 
-      const pct = (cur / dur) * 100;
+    function syncTimeline(cur, dur) {
+      document.getElementById('curTime').innerText = formatTime(cur);
+      const pct = Math.min(100, (cur / dur) * 100);
       document.getElementById('progressFill').style.width = pct + '%';
       document.getElementById('progressThumb').style.left = pct + '%';
 
-      updateSubtitles(cur);
+      if (isUserTurnToAnswer) return;
+
+      // Auto-pause when HR finishes asking the question ONLY in Webcam Practice Mode
+      if (isWebcamActive && !isUserTurnToAnswer) {
+        const intD = getChapterInterviewerDialogue(currentChapterIndex);
+        if (intD && cur >= intD.end - 0.1) {
+          pauseForUserAnswer();
+          return;
+        }
+      }
+
       updateActiveChapter(cur);
+      updateSpeakingStates(cur);
     }
 
     function formatTime(sec) {
@@ -545,808 +824,325 @@
       return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
     }
 
-    // Search filter for chapters in sidebar
-    function filterChapters(val) {
-      searchQuery = (val || '').toLowerCase().trim();
-      buildChapterDrawer();
+    function getChapterInterviewerDialogue(chapIndex) {
+      if (!interviewData || !interviewData.chapters || !interviewData.chapters[chapIndex]) return null;
+      const chap = interviewData.chapters[chapIndex];
+      return interviewData.dialogues.find(d => d.speaker === 'interviewer' && d.start >= chap.start && d.start < chap.end);
     }
 
-    // Build Chapter Drawer matching reference image
-    function buildChapterDrawer() {
-      if (!interviewData || !interviewData.chapters) return;
-      const container = document.getElementById('chaptersList');
-      container.innerHTML = '';
+    function updateSpeakingStates(cur) {
+      if (!interviewData || !interviewData.dialogues) return;
+      const d = interviewData.dialogues.find(x => cur >= x.start && cur <= x.end);
+      const hrGlow = document.getElementById('interviewerSpeakingGlow');
+      const thinhGlow = document.getElementById('candidateSpeakingGlow');
 
-      interviewData.chapters.forEach((chap, idx) => {
-        if (searchQuery) {
-          const matchText = (chap.title_en + ' ' + chap.title_vi + ' ' + (chap.slide?.headline || '')).toLowerCase();
-          if (!matchText.includes(searchQuery)) return;
-        }
-
-        const isActive = idx === currentChapterIndex;
-        const item = document.createElement('div');
-        item.id = 'chap-item-' + idx;
-        item.className = 'p-3 rounded-xl border transition cursor-pointer text-left group ' +
-          (isActive 
-            ? 'active-chapter-card' 
-            : 'border-slate-800/80 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900/80');
-        item.onclick = () => jumpToChapter(idx);
-
-        if (isActive) {
-          item.innerHTML = `
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-500/20 text-cyan-300 border border-blue-500/30">${formatTime(chap.start)}</span>
-              <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Đang phát
-              </span>
-            </div>
-            <h4 class="text-xs font-bold text-white mb-0.5 leading-snug">${chap.title_en}</h4>
-            <p class="text-[11px] text-cyan-200/90 leading-snug mb-1.5">${chap.title_vi}</p>
-            <div class="flex items-center gap-1.5 pt-1 border-t border-slate-800/80 text-[10px] text-slate-300">
-              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-cyan-400 flex-shrink-0"></i>
-              <span class="truncate">${chap.slide?.details?.[0] || 'Hoàn thành chương trình'}</span>
-            </div>
-          `;
-        } else {
-          item.innerHTML = `
-            <div class="flex items-center justify-between mb-1">
-              <span class="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-slate-800/60">${formatTime(chap.start)}</span>
-              <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-600 group-hover:text-cyan-400 transition transform group-hover:translate-x-0.5"></i>
-            </div>
-            <h4 class="text-xs font-bold text-slate-200 group-hover:text-white leading-snug">${chap.title_en}</h4>
-            <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug truncate">${chap.title_vi}</p>
-          `;
-        }
-        container.appendChild(item);
-      });
-      lucide.createIcons();
-    }
-
-    function buildTimelineMarkers() {
-      if (!interviewData || !interviewData.chapters) return;
-      const track = document.getElementById('chapterMarkers');
-      const dur = interviewData.duration || 518;
-      track.innerHTML = '';
-
-      interviewData.chapters.forEach((chap) => {
-        if (chap.start === 0) return;
-        const mark = document.createElement('div');
-        mark.className = 'absolute top-0 bottom-0 w-0.5 bg-slate-600/60 pointer-events-none';
-        mark.style.left = (chap.start / dur * 100) + '%';
-        track.appendChild(mark);
-      });
-    }
-
-    function jumpToChapter(idx) {
-      if (!interviewData || !interviewData.chapters[idx]) return;
-      const chap = interviewData.chapters[idx];
-      initWebAudio();
-      audio.currentTime = chap.start;
-      if (audio.paused) audio.play();
-    }
-
-    function prevChapter() {
-      if (currentChapterIndex > 0) {
-        jumpToChapter(currentChapterIndex - 1);
+      if (d && d.speaker === 'interviewer') {
+        activeSpeaker = 'interviewer';
+        if (hrGlow) hrGlow.style.opacity = '1';
+        if (thinhGlow) thinhGlow.style.opacity = '0';
+      } else if (d && d.speaker === 'thinh') {
+        activeSpeaker = 'thinh';
+        if (hrGlow) hrGlow.style.opacity = '0';
+        if (thinhGlow && !isWebcamActive) thinhGlow.style.opacity = '1';
+      } else {
+        if (hrGlow) hrGlow.style.opacity = '0';
+        if (thinhGlow) thinhGlow.style.opacity = '0';
       }
     }
 
-    function nextChapter() {
+    // ============================================================================
+    // TELEPROMPTER SCRIPT IN SUBTITLE AREA CONTROLLER
+    // ============================================================================
+    function toggleScriptSubtitle() {
+      isScriptSubtitleActive = !isScriptSubtitleActive;
+      updateScriptSubtitleUI();
+    }
+
+    function updateScriptSubtitleUI() {
+      const box = document.getElementById('scriptTeleprompterBox');
+      const label = document.getElementById('scriptToggleLabel');
+      const cardBtn = document.getElementById('btnCardScriptToggle');
+      const headerBtn = document.getElementById('btnHeaderScriptToggle');
+      const headerLabel = document.getElementById('headerScriptBtnLabel');
+      const qEn = document.getElementById('mainQuestionEn');
+
+      if (isScriptSubtitleActive) {
+        if (box) box.classList.remove('hidden');
+        if (label) label.innerText = 'Kịch Bản: ĐANG BẬT';
+        if (headerLabel) headerLabel.innerText = 'Kịch Bản Phụ Đề: BẬT [S]';
+        if (cardBtn) cardBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm bg-amber-400 text-slate-950 hover:bg-amber-300';
+        if (headerBtn) headerBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 transition flex items-center gap-1.5 shadow-md shadow-amber-400/20 active:scale-95';
+        if (qEn) qEn.className = 'text-sm sm:text-base font-extrabold text-white leading-snug tracking-tight';
+      } else {
+        if (box) box.classList.add('hidden');
+        if (label) label.innerText = 'Kịch Bản: TẮT';
+        if (headerLabel) headerLabel.innerText = 'Kịch Bản Phụ Đề: TẮT [S]';
+        if (cardBtn) cardBtn.className = 'px-2.5 py-1 rounded-xl text-xs font-medium text-slate-300 bg-[#141728] hover:bg-[#20253e] border border-[#232742] transition flex items-center gap-1.5 shadow-sm';
+        if (headerBtn) headerBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-[#141728] hover:bg-[#20253e] border border-[#232742] transition flex items-center gap-1.5 shadow-sm active:scale-95';
+        if (qEn) qEn.className = 'text-base sm:text-xl lg:text-[22px] font-extrabold text-white leading-relaxed tracking-tight';
+      }
+    }
+
+    function copyCurrentScriptAnswer(btnEl) {
+      const textEl = document.getElementById('scriptAnswerText');
+      if (!textEl) return;
+      const text = textEl.innerText.replace(/[“”]/g, '');
+      navigator.clipboard.writeText(text).then(() => {
+        const oldHtml = btnEl.innerHTML;
+        btnEl.innerHTML = '<span class="text-emerald-400">Đã chép ✓</span>';
+        setTimeout(() => {
+          btnEl.innerHTML = oldHtml;
+        }, 1500);
+      }).catch(e => console.warn(e));
+    }
+
+    // Sync Question Card & Subtitle Teleprompter Script for given chapter
+    function syncQuestionCardForChapter(idx) {
+      if (!interviewData || !interviewData.chapters || !interviewData.chapters[idx]) return;
+      const chap = interviewData.chapters[idx];
+      const intD = getChapterInterviewerDialogue(idx);
+
+      document.getElementById('questionNumBadge').innerHTML = `
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+        <span>Câu ${chap.id} / ${interviewData.chapters.length}</span>
+      `;
+      document.getElementById('chapterCategoryTitle').innerText = chap.title_en;
+      document.getElementById('currentChapterTitle').innerText = `${chap.id}. ${chap.title_en}`;
+
+      if (intD) {
+        const extracted = getDialogueKeyPointsAndHTML(intD.text_en);
+        document.getElementById('mainQuestionEn').innerHTML = extracted.html;
+        document.getElementById('mainQuestionVi').innerText = `“${intD.text_vi}”`;
+      } else {
+        document.getElementById('mainQuestionEn').innerText = `“${chap.title_en}”`;
+        document.getElementById('mainQuestionVi').innerText = `“${chap.title_vi}”`;
+      }
+
+      // Populate Teleprompter Script Box with User's Prepared Script for this Question
+      const qNum = chap.id;
+      let scriptItem = null;
+      if (fullScript && fullScript.sections) {
+        for (const sec of fullScript.sections) {
+          if (sec.items) {
+            const found = sec.items.find(it => it.num === qNum);
+            if (found) {
+              scriptItem = found;
+              break;
+            }
+          }
+        }
+      }
+
+      const scriptTextEl = document.getElementById('scriptAnswerText');
+      const scriptNotesEl = document.getElementById('scriptNotesHint');
+
+      if (scriptItem && scriptTextEl) {
+        const paragraphs = scriptItem.answer_en.split('\n\n').map(p => {
+          const cleanP = p.replace(/^[“"]+|[”"]+$/g, '').trim();
+          let highlighted = cleanP;
+          const sortedPhrases = [...IMPORTANT_PHRASES].sort((a, b) => b.length - a.length);
+          sortedPhrases.forEach(phrase => {
+            const regex = new RegExp(`(${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'i');
+            highlighted = highlighted.replace(regex, `<span class="kp-highlight">$1</span>`);
+          });
+          return `<p class="leading-relaxed">“${highlighted}”</p>`;
+        }).join('');
+
+        scriptTextEl.innerHTML = paragraphs;
+        if (scriptNotesEl) {
+          scriptNotesEl.innerText = scriptItem.notes ? `💡 Ghi nhớ: ${scriptItem.notes}` : '';
+          scriptNotesEl.style.display = scriptItem.notes ? 'block' : 'none';
+        }
+      } else if (scriptTextEl) {
+        // Fallback for dialogues
+        const thinhDlgs = interviewData.dialogues.filter(d => d.speaker === 'thinh' && d.start >= chap.start && d.start < chap.end);
+        scriptTextEl.innerHTML = thinhDlgs.map(d => `<p class="leading-relaxed">“${d.text_en}”</p>`).join('');
+      }
+
+      // Populate Candidate Key Points Cues
+      const kpContainer = document.getElementById('candidateKeyPointsContainer');
+      kpContainer.innerHTML = '';
+
+      let cues = [];
+      if (chap.slide && chap.slide.details) {
+        cues = chap.slide.details.map(d => d.replace(/^[^\w\s]+/, '').trim());
+      } else {
+        const thinhDlgs = interviewData.dialogues.filter(d => d.speaker === 'thinh' && d.start >= chap.start && d.start < chap.end);
+        cues = thinhDlgs.map(d => d.text_en.split('.')[0]).slice(0, 3);
+      }
+
+      cues.forEach(cue => {
+        const chip = document.createElement('span');
+        chip.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#161a2c] text-amber-300 border border-amber-500/30 shadow-sm';
+        chip.innerText = cue;
+        kpContainer.appendChild(chip);
+      });
+    }
+
+    // Flow: HR finishes question -> Pause for User Answer (Only in Webcam Practice Mode)
+    function pauseForUserAnswer() {
+      isUserTurnToAnswer = true;
+      if (audio && !audio.paused) audio.pause();
+      if (simTimer) stopSimulatedPlayback();
+
+      const hrGlow = document.getElementById('interviewerSpeakingGlow');
+      if (hrGlow) hrGlow.style.opacity = '0';
+
+      const candCard = document.getElementById('cardCandidate');
+      candCard.className = 'relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border-2 border-amber-400 glow-user-turn transition-all duration-300';
+
+      document.getElementById('practiceActionBar').classList.remove('hidden');
+      startAnswerCountdown(90);
+    }
+
+    function finishUserAnswer() {
+      isUserTurnToAnswer = false;
+      document.getElementById('practiceActionBar').classList.add('hidden');
+      stopAnswerCountdown();
+
+      const candCard = document.getElementById('cardCandidate');
+      candCard.className = isWebcamActive
+        ? 'relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border-2 border-blue-500 glow-active-webcam transition-all duration-300'
+        : 'relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border border-[#1e2338] shadow-2xl transition-all duration-300';
+
       if (interviewData && currentChapterIndex < interviewData.chapters.length - 1) {
         jumpToChapter(currentChapterIndex + 1);
-      }
-    }
-
-    function updateActiveChapter(currentTime) {
-      if (!interviewData || !interviewData.chapters) return;
-
-      let foundIdx = 0;
-      for (let i = 0; i < interviewData.chapters.length; i++) {
-        if (currentTime >= interviewData.chapters[i].start && currentTime <= interviewData.chapters[i].end) {
-          foundIdx = i;
-          break;
-        }
-      }
-
-      if (foundIdx !== currentChapterIndex) {
-        currentChapterIndex = foundIdx;
-        const chap = interviewData.chapters[currentChapterIndex];
-
-        buildChapterDrawer();
-        const curEl = document.getElementById('chap-item-' + currentChapterIndex);
-        if (curEl) {
-          curEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        document.getElementById('currentChapterTitle').innerText = chap.title_en;
-        document.getElementById('slideBadge').innerText = 'TOPIC ' + chap.id;
-        document.getElementById('slideHeadline').innerText = chap.slide.headline;
-        document.getElementById('slideSubline').innerText = chap.slide.subline;
-      }
-    }
-
-    // Video Podcast Subtitle State Tracker
-    function updateSubtitles(t) {
-      if (!interviewData || !interviewData.dialogues) return;
-      const D = interviewData.dialogues;
-      let d = D.find(x => t >= x.start && t <= x.end);
-      if (!d) {
-        const prev = D.filter(x => x.end < t).pop();
-        if (prev && t - prev.end < 1.2) d = prev;
-      }
-
-      currentDialogue = d;
-      activeSpeaker = d ? d.speaker : 'none';
-    }
-
-    function toggleChapterDrawer() {
-      const drawer = document.getElementById('chapterDrawer');
-      drawer.classList.toggle('hidden');
-    }
-
-    // ==========================================
-    // 60 FPS CANVAS RENDERING ENGINE (3 CARDS + VIDEO PODCAST SUBTITLES)
-    // ==========================================
-
-    function renderLoop() {
-      let audioLevel = 0;
-      if (analyser && dataArray && isPlaying) {
-        analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) {
-          sum += dataArray[i];
-        }
-        audioLevel = sum / (dataArray.length * 255);
-      }
-
-      // Camera Interpolation
-      updateCameraTarget();
-      cam.x += (cam.targetX - cam.x) * 0.05;
-      cam.y += (cam.targetY - cam.y) * 0.05;
-      cam.scale += (cam.targetScale - cam.scale) * 0.05;
-
-      ctx.save();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Camera Transform for World Space (Stage & Characters only)
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.scale(cam.scale, cam.scale);
-      ctx.translate(-canvas.width / 2 - cam.x, -canvas.height / 2 - cam.y);
-
-      // 1. Stage Background
-      drawStageBackground();
-
-      // 2. Left Card: Interviewer
-      drawInterviewerCard(audioLevel);
-
-      // 3. Center Card: Esco Smart Collab / Smart Display
-      drawCenterDisplayCard();
-
-      // 4. Right Card: Thái Đỗ Thịnh
-      drawThinhCard(audioLevel);
-
-      // Restore to Screen Space (1280x720) before drawing HUD / Subtitles!
-      ctx.restore();
-
-      // 5. Embedded Video Podcast Subtitles (Screen Space HUD - Fixed Broadcast Lower-Third)
-      // Never affected or clipped by camera zoom / pan!
-      drawPodcastSubtitles();
-
-      requestAnimationFrame(renderLoop);
-    }
-
-    function updateCameraTarget() {
-      if (cameraMode === 'wide') {
-        cam.targetX = 0;
-        cam.targetY = 0;
-        cam.targetScale = 1.0;
-      } else if (cameraMode === 'interviewer') {
-        cam.targetX = -340;
-        cam.targetY = -35;
-        cam.targetScale = 1.35;
-      } else if (cameraMode === 'thinh') {
-        cam.targetX = 340;
-        cam.targetY = -35;
-        cam.targetScale = 1.35;
       } else {
-        // Auto Mode: Subtle & cinematic focus on active speaker
-        if (activeSpeaker === 'interviewer') {
-          cam.targetX = -170;
-          cam.targetY = -25;
-          cam.targetScale = 1.16;
-        } else if (activeSpeaker === 'thinh') {
-          cam.targetX = 170;
-          cam.targetY = -25;
-          cam.targetScale = 1.16;
-        } else {
-          cam.targetX = 0;
-          cam.targetY = 0;
-          cam.targetScale = 1.0;
+        alert('🎉 Chúc mừng bạn đã hoàn thành xuất sắc buổi luyện phỏng vấn cùng Esco AV!');
+      }
+    }
+
+    function startAnswerCountdown(sec) {
+      stopAnswerCountdown();
+      countdownTimerSec = sec;
+      const el = document.getElementById('questionCountdown');
+      if (el) el.innerText = formatCountdown(countdownTimerSec);
+
+      countdownInterval = setInterval(() => {
+        countdownTimerSec--;
+        if (el) el.innerText = formatCountdown(Math.max(0, countdownTimerSec));
+        if (countdownTimerSec <= 0) {
+          stopAnswerCountdown();
+        }
+      }, 1000);
+    }
+
+    function stopAnswerCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+      const el = document.getElementById('questionCountdown');
+      if (el) el.innerText = '01:30';
+    }
+
+    function formatCountdown(sec) {
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    // Webcam Toggle & Switch
+    async function toggleWebcam() {
+      if (isWebcamActive) {
+        stopWebcam();
+      } else {
+        await startWebcam();
+      }
+    }
+
+    async function startWebcam() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+          audio: true
+        });
+        webcamStream = stream;
+        const videoEl = document.getElementById('webcamVideo');
+        videoEl.srcObject = stream;
+        await videoEl.play();
+        isWebcamActive = true;
+
+        try {
+          const audioTrack = stream.getAudioTracks()[0];
+          if (audioTrack) {
+            userAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            userAnalyser = userAudioCtx.createAnalyser();
+            userAnalyser.fftSize = 64;
+            userAnalyser.smoothingTimeConstant = 0.3;
+            userDataArray = new Uint8Array(userAnalyser.frequencyBinCount);
+            const source = userAudioCtx.createMediaStreamSource(new MediaStream([audioTrack]));
+            source.connect(userAnalyser);
+          }
+        } catch (aErr) {
+          console.warn('Microphone analyser fallback:', aErr);
+        }
+      } catch (err) {
+        console.warn('Webcam audio+video failed, fallback to video-only:', err);
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          webcamStream = stream;
+          const videoEl = document.getElementById('webcamVideo');
+          videoEl.srcObject = stream;
+          await videoEl.play();
+          isWebcamActive = true;
+        } catch (vErr) {
+          alert('Không thể mở Webcam: ' + vErr.message + '\nVui lòng cho phép quyền truy cập camera trong trình duyệt để luyện phỏng vấn.');
+          isWebcamActive = false;
         }
       }
+      updateWebcamUI();
     }
 
-    function drawStageBackground() {
-      const W = canvas.width;
-      const H = canvas.height;
-
-      // Dark Tech Backdrop
-      const g = ctx.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 700);
-      g.addColorStop(0, '#0a1224');
-      g.addColorStop(0.6, '#060b14');
-      g.addColorStop(1, '#03060c');
-      ctx.fillStyle = g;
-      ctx.fillRect(-200, -200, W + 400, H + 400);
-
-      // Subtle ambient glows behind interviewer & candidate
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.06)';
-      ctx.beginPath();
-      ctx.arc(200, 310, 180, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.07)';
-      ctx.beginPath();
-      ctx.arc(1080, 310, 180, 0, Math.PI * 2);
-      ctx.fill();
+    function stopWebcam() {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+      }
+      const videoEl = document.getElementById('webcamVideo');
+      if (videoEl) videoEl.srcObject = null;
+      if (userAudioCtx) {
+        try { userAudioCtx.close(); } catch (e) {}
+        userAudioCtx = null;
+        userAnalyser = null;
+        userDataArray = null;
+      }
+      isWebcamActive = false;
+      isUserTurnToAnswer = false;
+      document.getElementById('practiceActionBar').classList.add('hidden');
+      stopAnswerCountdown();
+      updateWebcamUI();
     }
 
-    // ==========================================
-    // 1. LEFT CARD: INTERVIEWER
-    // ==========================================
-    function drawInterviewerCard(audioLevel) {
-      const isSpeaking = activeSpeaker === 'interviewer';
-      const cx = 175;
-      const cardX = 40;
-      const cardY = 40;
-      const cardW = 270;
-      const cardH = 460;
+    function updateWebcamUI() {
+      const btn = document.getElementById('btnWebcam');
+      const label = document.getElementById('webcamBtnLabel');
+      const cvs = document.getElementById('candidateCanvas');
+      const videoEl = document.getElementById('webcamVideo');
+      const recBadge = document.getElementById('webcamRecBadge');
+      const waveContainer = document.getElementById('webcamWaveContainer');
+      const candCard = document.getElementById('cardCandidate');
+      const candLabel = document.getElementById('candidateBadgeLabel');
 
-      // Card Glow & Border
-      ctx.save();
-      if (isSpeaking) {
-        interviewer.glow = Math.min(1.0, interviewer.glow + 0.1);
-        interviewer.mouthOpen = Math.min(1.0, audioLevel * 2.2);
-        ctx.shadowColor = 'rgba(6, 182, 212, 0.5)';
-        ctx.shadowBlur = 28;
+      if (isWebcamActive) {
+        if (btn) btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-red-600 hover:bg-red-500 transition flex items-center gap-1.5 shadow-md shadow-red-600/20 active:scale-95';
+        if (label) label.innerText = 'Tắt Webcam';
+        if (cvs) cvs.classList.add('hidden');
+        if (videoEl) videoEl.classList.remove('hidden');
+        if (recBadge) recBadge.classList.remove('hidden');
+        if (waveContainer) waveContainer.classList.remove('hidden');
+        if (candLabel) candLabel.innerText = 'Webcam Live';
+        if (candCard) candCard.className = 'relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border-2 border-blue-500 glow-active-webcam transition-all duration-300';
       } else {
-        interviewer.glow = Math.max(0.1, interviewer.glow - 0.05);
-        interviewer.mouthOpen = 0;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-        ctx.shadowBlur = 16;
+        if (btn) btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition flex items-center gap-1.5 shadow-md shadow-blue-600/20 active:scale-95';
+        if (label) label.innerText = 'Bật Webcam';
+        if (cvs) cvs.classList.remove('hidden');
+        if (videoEl) videoEl.classList.add('hidden');
+        if (recBadge) recBadge.classList.add('hidden');
+        if (waveContainer) waveContainer.classList.add('hidden');
+        if (candLabel) candLabel.innerText = 'Thái Đỗ Thịnh';
+        if (candCard) candCard.className = 'relative flex-1 max-w-[420px] aspect-[4/3] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0e18] border border-[#1e2338] shadow-2xl transition-all duration-300';
       }
-
-      ctx.fillStyle = '#0c1527';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
-      ctx.fill();
-
-      ctx.strokeStyle = isSpeaking ? '#06b6d4' : 'rgba(51, 65, 85, 0.7)';
-      ctx.lineWidth = isSpeaking ? 2 : 1;
-      ctx.stroke();
-      ctx.restore();
-
-      // Top-Left Badge: "• Interviewer"
-      ctx.fillStyle = isSpeaking ? 'rgba(6, 182, 212, 0.2)' : 'rgba(15, 23, 42, 0.8)';
-      roundRect(ctx, cardX + 16, cardY + 16, 92, 24, 12);
-      ctx.fill();
-      ctx.strokeStyle = isSpeaking ? 'rgba(6, 182, 212, 0.4)' : 'rgba(148, 163, 184, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.fillStyle = isSpeaking ? '#38bdf8' : '#94a3b8';
-      ctx.font = 'bold 11px "Be Vietnam Pro"';
-      ctx.fillText('• Interviewer', cardX + 26, cardY + 32);
-
-      // Character Illustration
-      const cy = 330;
-
-      ctx.save();
-      ctx.fillStyle = '#172033';
-      ctx.beginPath();
-      ctx.moveTo(cx - 85, cy + 180);
-      ctx.lineTo(cx - 75, cy + 40);
-      ctx.quadraticCurveTo(cx - 50, cy - 25, cx - 25, cy - 30);
-      ctx.lineTo(cx + 25, cy - 30);
-      ctx.quadraticCurveTo(cx + 50, cy - 25, cx + 75, cy + 40);
-      ctx.lineTo(cx + 85, cy + 180);
-      ctx.closePath();
-      ctx.fill();
-
-      // Cyan Tie (#06b6d4)
-      ctx.fillStyle = '#06b6d4';
-      roundRect(ctx, cx - 12, cy - 30, 24, 140, 4);
-      ctx.fill();
-
-      // Neck
-      ctx.fillStyle = '#fef08a';
-      ctx.fillRect(cx - 15, cy - 55, 30, 30);
-
-      // Head Base (#fef08a)
-      const headY = cy - 85;
-      const headR = 44;
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.arc(cx, headY, headR, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Hair
-      ctx.fillStyle = '#111827';
-      ctx.beginPath();
-      ctx.arc(cx, headY, headR + 1, Math.PI * 0.9, Math.PI * 2.1);
-      ctx.quadraticCurveTo(cx + headR - 4, headY - 8, cx, headY - 14);
-      ctx.quadraticCurveTo(cx - headR + 4, headY - 8, cx - headR * Math.cos(Math.PI * 0.1), headY - headR * Math.sin(Math.PI * 0.1));
-      ctx.fill();
-
-      // Eyebrows
-      ctx.strokeStyle = '#1e293b';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(cx - 25, headY - 12);
-      ctx.lineTo(cx - 9, headY - 12);
-      ctx.moveTo(cx + 9, headY - 12);
-      ctx.lineTo(cx + 25, headY - 12);
-      ctx.stroke();
-
-      // Eyes
-      ctx.fillStyle = '#000000';
-      ctx.beginPath();
-      ctx.arc(cx - 17, headY - 2, 4, 0, Math.PI * 2);
-      ctx.arc(cx + 17, headY - 2, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Mouth
-      ctx.fillStyle = '#fb7185';
-      if (isSpeaking && interviewer.mouthOpen > 0.05) {
-        ctx.beginPath();
-        ctx.ellipse(cx, headY + 18, 7, 3 + interviewer.mouthOpen * 9, 0, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        roundRect(ctx, cx - 7, headY + 15, 14, 6, 3);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // Label Below Card: "• Người phỏng vấn" (Role only, no extra fluff)
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 15px "Be Vietnam Pro"';
-      ctx.textAlign = 'center';
-      ctx.fillText('• Người phỏng vấn', cx, cardY + cardH + 26);
-      ctx.textAlign = 'left';
-    }
-
-    // ==========================================
-    // 2. CENTER CARD: SMART DISPLAY
-    // ==========================================
-    function drawCenterDisplayCard() {
-      const cardX = 350;
-      const cardY = 25;
-      const cardW = 580;
-      const cardH = 485;
-
-      ctx.save();
-      ctx.shadowColor = 'rgba(2, 132, 199, 0.35)';
-      ctx.shadowBlur = 24;
-      ctx.fillStyle = '#070e1c';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
-      ctx.fill();
-
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.45)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      ctx.restore();
-
-      // Header Row
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 11px "JetBrains Mono"';
-      ctx.fillText('🌐 ESCO AV SMART COLLAB', cardX + 24, cardY + 36);
-
-      const badgeW = 145;
-      const badgeX = cardX + cardW - badgeW - 24;
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.12)';
-      roundRect(ctx, badgeX, cardY + 20, badgeW, 24, 6);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 10px "Be Vietnam Pro"';
-      ctx.textAlign = 'center';
-      ctx.fillText('CANDIDATE DOSSIER', badgeX + badgeW / 2, cardY + 36);
-      ctx.textAlign = 'left';
-
-      // Title
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 26px "Be Vietnam Pro"';
-      ctx.fillText('Thái Đỗ Thịnh', cardX + 24, cardY + 86);
-
-      // Verified Badge Circle
-      ctx.fillStyle = '#0284c7';
-      ctx.beginPath();
-      ctx.arc(cardX + 205, cardY + 78, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('✓', cardX + 205, cardY + 82);
-      ctx.textAlign = 'left';
-
-      // Subline
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 13px "Be Vietnam Pro"';
-      ctx.fillText('Computer Science Graduate • HCMC Open University', cardX + 24, cardY + 112);
-
-      // 3 Detail Rows
-      const chap = interviewData?.chapters[currentChapterIndex];
-      const details = chap?.slide?.details || [
-        "🎓 Finished all Coursework: Immediate full-time availability without university conflicts.",
-        "💼 6-Month IT Internship at BW Industrial: Built 2 internal financial web tools & user support.",
-        "🎯 Target Role: IT Support & AV Systems Integration at Esco AV Vietnam."
-      ];
-
-      const rowIcons = [
-        { icon: '🎓', bg: 'rgba(6, 182, 212, 0.2)', border: 'rgba(6, 182, 212, 0.4)' },
-        { icon: '💼', bg: 'rgba(245, 158, 11, 0.2)', border: 'rgba(245, 158, 11, 0.4)' },
-        { icon: '🎯', bg: 'rgba(16, 185, 129, 0.2)', border: 'rgba(16, 185, 129, 0.4)' }
-      ];
-
-      let ry = cardY + 140;
-      for (let i = 0; i < Math.min(3, details.length); i++) {
-        ctx.fillStyle = rowIcons[i].bg;
-        roundRect(ctx, cardX + 24, ry, 36, 36, 8);
-        ctx.fill();
-        ctx.strokeStyle = rowIcons[i].border;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.font = '17px sans-serif';
-        ctx.fillText(rowIcons[i].icon, cardX + 32, ry + 25);
-
-        ctx.fillStyle = '#f1f5f9';
-        ctx.font = '600 13.5px "Be Vietnam Pro"';
-        const cleanText = details[i].replace(/^[\p{Extended_Pictographic}\s]+/u, '');
-        const lines = wrapText(cleanText, cardW - 105, 2);
-        lines.forEach((l, li) => {
-          ctx.fillText(l, cardX + 72, ry + 15 + li * 18);
-        });
-
-        ry += 64;
-      }
-
-      // Footer
-      const fy = cardY + cardH - 42;
-      ctx.fillStyle = 'rgba(11, 19, 36, 0.85)';
-      ctx.fillRect(cardX, fy, cardW, 42);
-      ctx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(cardX, fy);
-      ctx.lineTo(cardX + cardW, fy);
-      ctx.stroke();
-
-      ctx.fillStyle = '#10b981';
-      ctx.beginPath();
-      ctx.arc(cardX + 26, fy + 21, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.font = 'bold 11px "JetBrains Mono"';
-      ctx.fillText(`LIVE ${formatTime(audio.currentTime)} / 08:38   Bitrate: 1080p 60fps`, cardX + 38, fy + 25);
-
-      if (dataArray && isPlaying) {
-        ctx.fillStyle = activeSpeaker === 'thinh' ? '#10b981' : '#06b6d4';
-        for (let b = 0; b < 16; b++) {
-          const bh = Math.max(2, (dataArray[b] / 255) * 18);
-          ctx.fillRect(cardX + cardW - 90 + b * 5, fy + 30 - bh, 3, bh);
-        }
-      }
-
-      // Label Below Center Card
-      ctx.fillStyle = '#64748b';
-      ctx.font = 'bold 11px "JetBrains Mono"';
-      ctx.textAlign = 'center';
-      ctx.fillText('🔲 Esco Touch 302 Active', cardX + cardW / 2, cardY + cardH + 26);
-      ctx.textAlign = 'left';
-    }
-
-    // ==========================================
-    // 3. RIGHT CARD: THÁI ĐỖ THỊNH
-    // ==========================================
-    function drawThinhCard(audioLevel) {
-      const isSpeaking = activeSpeaker === 'thinh';
-      const cx = 1105;
-      const cardX = 970;
-      const cardY = 40;
-      const cardW = 270;
-      const cardH = 460;
-
-      ctx.save();
-      if (isSpeaking) {
-        thinh.glow = Math.min(1.0, thinh.glow + 0.1);
-        thinh.mouthOpen = Math.min(1.0, audioLevel * 2.2);
-        ctx.shadowColor = 'rgba(16, 185, 129, 0.55)';
-        ctx.shadowBlur = 30;
-      } else {
-        thinh.glow = Math.max(0.1, thinh.glow - 0.05);
-        thinh.mouthOpen = 0;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-        ctx.shadowBlur = 16;
-      }
-
-      ctx.fillStyle = '#091b18';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 20);
-      ctx.fill();
-
-      ctx.strokeStyle = isSpeaking ? '#10b981' : 'rgba(16, 185, 129, 0.4)';
-      ctx.lineWidth = isSpeaking ? 2.5 : 1;
-      ctx.stroke();
-      ctx.restore();
-
-      // Top-Right Badge: Role only, no "Candidate"
-      const badgeW = 110;
-      const badgeX = cardX + cardW - badgeW - 16;
-      ctx.fillStyle = isSpeaking ? 'rgba(16, 185, 129, 0.2)' : 'rgba(15, 23, 42, 0.8)';
-      roundRect(ctx, badgeX, cardY + 16, badgeW, 24, 12);
-      ctx.fill();
-      ctx.strokeStyle = isSpeaking ? 'rgba(16, 185, 129, 0.5)' : 'rgba(148, 163, 184, 0.2)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.fillStyle = isSpeaking ? '#10b981' : '#94a3b8';
-      ctx.font = 'bold 11px "Be Vietnam Pro"';
-      ctx.fillText(isSpeaking ? '• Đang nói' : '• Lắng nghe', badgeX + 16, cardY + 32);
-
-      // Character Illustration
-      const cy = 330;
-
-      ctx.save();
-      ctx.fillStyle = '#047857';
-      ctx.beginPath();
-      ctx.moveTo(cx - 85, cy + 180);
-      ctx.lineTo(cx - 75, cy + 40);
-      ctx.quadraticCurveTo(cx - 50, cy - 25, cx - 25, cy - 30);
-      ctx.lineTo(cx + 25, cy - 30);
-      ctx.quadraticCurveTo(cx + 50, cy - 25, cx + 75, cy + 40);
-      ctx.lineTo(cx + 85, cy + 180);
-      ctx.closePath();
-      ctx.fill();
-
-      // Mint Center Stripe
-      ctx.fillStyle = '#10b981';
-      roundRect(ctx, cx - 12, cy - 30, 24, 140, 4);
-      ctx.fill();
-
-      // Neck
-      ctx.fillStyle = '#fef08a';
-      ctx.fillRect(cx - 15, cy - 55, 30, 30);
-
-      // Head Base (#fef08a)
-      const headY = cy - 85;
-      const headR = 44;
-      ctx.fillStyle = '#fef08a';
-      ctx.beginPath();
-      ctx.arc(cx, headY, headR, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Hair
-      ctx.fillStyle = '#064e3b';
-      ctx.beginPath();
-      ctx.arc(cx, headY, headR + 1, Math.PI * 0.9, Math.PI * 2.1);
-      ctx.quadraticCurveTo(cx + headR - 4, headY - 8, cx, headY - 14);
-      ctx.quadraticCurveTo(cx - headR + 4, headY - 8, cx - headR * Math.cos(Math.PI * 0.1), headY - headR * Math.sin(Math.PI * 0.1));
-      ctx.fill();
-
-      // Glasses
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 2.5;
-      roundRect(ctx, cx - 28, headY - 12, 22, 18, 3);
-      ctx.stroke();
-      roundRect(ctx, cx + 6, headY - 12, 22, 18, 3);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(cx - 6, headY - 3);
-      ctx.lineTo(cx + 6, headY - 3);
-      ctx.stroke();
-
-      // Eyes
-      ctx.fillStyle = '#000000';
-      ctx.beginPath();
-      ctx.arc(cx - 17, headY - 3, 3.5, 0, Math.PI * 2);
-      ctx.arc(cx + 17, headY - 3, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Mouth
-      ctx.save();
-      if (isSpeaking && thinh.mouthOpen > 0.05) {
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.ellipse(cx, headY + 18, 8, 4 + thinh.mouthOpen * 9, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fb7185';
-        ctx.beginPath();
-        ctx.arc(cx, headY + 19 + thinh.mouthOpen * 4, 5, 0, Math.PI);
-        ctx.fill();
-      } else {
-        ctx.fillStyle = '#000000';
-        ctx.beginPath();
-        ctx.ellipse(cx, headY + 18, 7, 5, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      ctx.restore();
-
-      // Label Below Card: "• Thái Đỗ Thịnh" (Clean, no "(Candidate)")
-      ctx.fillStyle = '#10b981';
-      ctx.font = 'bold 15px "Be Vietnam Pro"';
-      ctx.textAlign = 'center';
-      ctx.fillText('• Thái Đỗ Thịnh', cx, cardY + cardH + 26);
-      ctx.textAlign = 'left';
-    }
-
-    // ==========================================
-    // 4. EMBEDDED VIDEO PODCAST SUBTITLES (BROADCAST QUALITY)
-    // Only Speaker Role + Dialogue Subtitle, No Topic, No Candidate Fluff!
-    // ==========================================
-    // ==========================================
-    // 4. EMBEDDED VIDEO PODCAST SUBTITLES (BROADCAST QUALITY)
-    // Only Speaker Role + Dialogue Subtitle, No Topic, No Candidate Fluff!
-    // Large, Bold & Ultra-Legible Typography
-    // ==========================================
-    function drawPodcastSubtitles() {
-      if (subMode === 'off' || !currentDialogue) return;
-
-      const d = currentDialogue;
-      const isInterviewer = d.speaker === 'interviewer';
-      const roleColor = isInterviewer ? '#38bdf8' : '#34d399';
-      const roleBg = isInterviewer ? 'rgba(6, 182, 212, 0.2)' : 'rgba(16, 185, 129, 0.2)';
-      const roleBorder = isInterviewer ? 'rgba(6, 182, 212, 0.55)' : 'rgba(16, 185, 129, 0.55)';
-      const roleName = isInterviewer ? 'NGƯỜI PHỎNG VẤN' : 'THÁI ĐỖ THỊNH';
-      const isSpeaking = activeSpeaker === d.speaker;
-
-      // Detect long dialogue to adapt font size gracefully
-      const isLong = (d.text_en.length > 140) || (d.text_vi.length > 130);
-      const isBilingual = subMode === 'bilingual';
-
-      // Container Dimensions (1180px width, centered at x = 50)
-      const boxW = 1180;
-      const boxH = isBilingual ? (isLong ? 152 : 140) : 96;
-      const boxX = (canvas.width - boxW) / 2;
-      const boxY = 720 - boxH - 12;
-
-      ctx.save();
-      // Semi-transparent deep glass backdrop with blur shadow
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-      ctx.shadowBlur = 24;
-      ctx.shadowOffsetY = 6;
-      ctx.fillStyle = 'rgba(6, 11, 22, 0.94)';
-      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
-      ctx.fill();
-
-      // Left border accent in speaker's color
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = roleColor;
-      roundRect(ctx, boxX, boxY, 5, boxH, 2.5);
-      ctx.fill();
-
-      // Outer border with subtle neon glow
-      ctx.strokeStyle = isInterviewer ? 'rgba(6, 182, 212, 0.45)' : 'rgba(16, 185, 129, 0.45)';
-      ctx.lineWidth = 1.2;
-      roundRect(ctx, boxX, boxY, boxW, boxH, 16);
-      ctx.stroke();
-
-      // Speaker Role Chip (Top-left inside box: Pure role identity, no extra fluff!)
-      ctx.font = 'bold 12px "Be Vietnam Pro"';
-      const labelW = ctx.measureText(roleName).width;
-      const chipW = labelW + 36;
-      const chipH = 26;
-      const chipX = boxX + 22;
-      const chipY = boxY + 12;
-
-      ctx.fillStyle = roleBg;
-      roundRect(ctx, chipX, chipY, chipW, chipH, 13);
-      ctx.fill();
-      ctx.strokeStyle = roleBorder;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Live pulsing voice dot
-      ctx.fillStyle = roleColor;
-      ctx.beginPath();
-      ctx.arc(chipX + 14, chipY + chipH / 2, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      if (isSpeaking) {
-        ctx.strokeStyle = roleColor;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        const pulseR = 3.5 + (Math.sin(performance.now() * 0.008) * 0.5 + 0.5) * 3;
-        ctx.arc(chipX + 14, chipY + chipH / 2, pulseR, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-
-      // Speaker Role Name (Clean, pure role!)
-      ctx.fillStyle = roleColor;
-      ctx.font = 'bold 12px "Be Vietnam Pro"';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(roleName, chipX + 24, chipY + chipH / 2);
-
-      // Subtitle dialogue text - Full width, BIG & CRISP
-      const textX = boxX + 22;
-      const maxTextW = boxW - 44;
-
-      if (isBilingual) {
-        // English Line (Bold White 23px / 20px)
-        const enFontSize = isLong ? 20 : 23;
-        const enLineH = isLong ? 26 : 30;
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${enFontSize}px "Be Vietnam Pro"`;
-        ctx.textBaseline = 'top';
-        const enText = `“${d.text_en}”`;
-        const enLines = wrapText(enText, maxTextW, 3);
-        const startEnY = boxY + 44;
-        enLines.forEach((line, i) => {
-          ctx.fillText(line, textX, startEnY + i * enLineH);
-        });
-
-        // Vietnamese Line (Luminous Cyan 18px / 16px)
-        const viFontSize = isLong ? 16 : 18;
-        const viLineH = isLong ? 21 : 24;
-        ctx.fillStyle = '#67e8f9';
-        ctx.font = `600 ${viFontSize}px "Be Vietnam Pro"`;
-        const viText = `“${d.text_vi}”`;
-        const viLines = wrapText(viText, maxTextW, 3);
-        const startViY = startEnY + (enLines.length * enLineH) + 5;
-        viLines.forEach((line, i) => {
-          ctx.fillText(line, textX, startViY + i * viLineH);
-        });
-      } else if (subMode === 'en') {
-        // Single English Line (Large 27px / 23px Bold)
-        const fontSize = isLong ? 23 : 27;
-        const lineH = isLong ? 30 : 35;
-        ctx.fillStyle = '#ffffff';
-        ctx.font = `bold ${fontSize}px "Be Vietnam Pro"`;
-        ctx.textBaseline = 'top';
-        const enText = `“${d.text_en}”`;
-        const enLines = wrapText(enText, maxTextW, 3);
-        const startEnY = boxY + 44;
-        enLines.forEach((line, i) => {
-          ctx.fillText(line, textX, startEnY + i * lineH);
-        });
-      } else if (subMode === 'vi') {
-        // Single Vietnamese Line (Large 27px / 23px Bold Cyan)
-        const fontSize = isLong ? 23 : 27;
-        const lineH = isLong ? 30 : 35;
-        ctx.fillStyle = '#67e8f9';
-        ctx.font = `bold ${fontSize}px "Be Vietnam Pro"`;
-        ctx.textBaseline = 'top';
-        const viText = `“${d.text_vi}”`;
-        const viLines = wrapText(viText, maxTextW, 3);
-        const startViY = boxY + 44;
-        viLines.forEach((line, i) => {
-          ctx.fillText(line, textX, startViY + i * lineH);
-        });
-      }
-
-      ctx.restore();
-    }
-
-    // Helper: Wrap text for canvas
-    function wrapText(text, maxW, maxLines = 4) {
-      const words = text.split(' ');
-      const lines = [];
-      let line = '';
-      for (const w of words) {
-        const t = line ? line + ' ' + w : w;
-        if (line && ctx.measureText(t).width > maxW) {
-          lines.push(line);
-          line = w;
-        } else {
-          line = t;
-        }
-      }
-      if (line) lines.push(line);
-      return maxLines ? lines.slice(0, maxLines) : lines;
     }
 
     // Helper: Round Rectangle
@@ -1364,94 +1160,825 @@
       ctx.closePath();
     }
 
-    // ==========================================
-    // RECORD & EXPORT VIDEO (MP4/WEBM)
-    // ==========================================
+    // Natural Character Mouth Lip-Sync
+    function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
+      const open = isSpeaking ? Math.max(0, Math.min(1, state.mouthOpen)) : 0;
+      const spread = state.mouthWidth || 1.0;
+      const round = state.mouthRound || 0.0;
 
-    function toggleRecording() {
-      if (!isRecording) {
-        startRecording();
+      ctx.save();
+      ctx.translate(0, yPos);
+
+      const w = (9.6 * spread) * (1 - round * 0.28) + open * (1.2 - round * 0.8);
+      const cornerY = -1.1 * (1 - open * 0.75);
+      const topCtrlY = 1.1 - open * (1.5 + round * 1.8);
+      const botCtrlY = 1.1 + Math.pow(open, 0.95) * 13.8;
+      const cavityHeight = (botCtrlY - topCtrlY) * 0.75;
+
+      if (cavityHeight > 0.45) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-w, cornerY);
+        ctx.bezierCurveTo(-w * 0.48, topCtrlY, w * 0.48, topCtrlY, w, cornerY);
+        ctx.bezierCurveTo(w * 0.62, botCtrlY, -w * 0.62, botCtrlY, -w, cornerY);
+        ctx.closePath();
+
+        ctx.fillStyle = '#3b0a14';
+        ctx.fill();
+        ctx.clip();
+
+        if (open > 0.12) {
+          const actualBotY = 0.25 * cornerY + 0.75 * botCtrlY;
+          ctx.fillStyle = '#f472b6';
+          ctx.beginPath();
+          ctx.ellipse(0, actualBotY - 0.6, w * 0.64, 2.4 + open * 3.0, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const teethHeight = Math.max(0, (1.8 + open * 2.1) * (1 - round * 0.45));
+        if (teethHeight > 0.3) {
+          const actualTopY = 0.25 * cornerY + 0.75 * topCtrlY;
+          ctx.fillStyle = '#ffffff';
+          roundRect(ctx, -w * 0.78, actualTopY - 0.5, w * 1.56, teethHeight, 1.8);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Lip Outline
+      ctx.strokeStyle = isSpeaking ? '#e11d48' : '#e28b8b';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-w, cornerY);
+      ctx.bezierCurveTo(-w * 0.48, topCtrlY, w * 0.48, topCtrlY, w, cornerY);
+      ctx.stroke();
+
+      if (cavityHeight > 0.45) {
+        ctx.beginPath();
+        ctx.moveTo(w, cornerY);
+        ctx.bezierCurveTo(w * 0.62, botCtrlY, -w * 0.62, botCtrlY, -w, cornerY);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // Left Character Canvas: Interviewer (Navy Suit & Tie)
+    function drawInterviewerCanvas(now, audioLevel) {
+      const cvs = document.getElementById('interviewerCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+      const t = now * 0.001;
+
+      const isSpeaking = activeSpeaker === 'interviewer' && isPlaying;
+      const cx = w / 2;
+
+      const state = animState.interviewer;
+      if (isSpeaking) {
+        state.mouthOpen += ((0.25 + audioLevel * 1.8) - state.mouthOpen) * 0.35;
+        state.headTilt = Math.sin(t * 3.8) * 0.035;
       } else {
-        stopRecording();
+        state.mouthOpen += (0 - state.mouthOpen) * 0.2;
+        state.headTilt = Math.sin(t * 1.4) * 0.015;
+      }
+      state.jawDrop = state.mouthOpen * 3.5;
+
+      const blinkCycle = (t + 1.2) % 4.0;
+      const isBlinking = blinkCycle > 3.85;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Studio Backdrop
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#0c1322');
+      grad.addColorStop(1, '#070a14');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Backlight Halo
+      ctx.fillStyle = isSpeaking ? 'rgba(56, 189, 248, 0.14)' : 'rgba(56, 189, 248, 0.04)';
+      ctx.beginPath();
+      ctx.arc(cx, 140, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Breathing movement
+      const breathY = Math.sin(t * 2.2) * 2;
+      const baseCy = 205 + breathY;
+
+      // Torso / Suit Jacket
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(cx - 110, h);
+      ctx.lineTo(cx - 90, baseCy + 30);
+      ctx.quadraticCurveTo(cx - 60, baseCy - 18, cx - 28, baseCy - 22);
+      ctx.lineTo(cx + 28, baseCy - 22);
+      ctx.quadraticCurveTo(cx + 60, baseCy - 18, cx + 90, baseCy + 30);
+      ctx.lineTo(cx + 110, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Suit Lapels
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(cx - 30, baseCy - 22);
+      ctx.lineTo(cx - 52, baseCy + 40);
+      ctx.lineTo(cx, baseCy + 90);
+      ctx.lineTo(cx - 20, baseCy - 22);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + 30, baseCy - 22);
+      ctx.lineTo(cx + 48, baseCy + 40);
+      ctx.lineTo(cx, baseCy + 90);
+      ctx.lineTo(cx + 20, baseCy - 22);
+      ctx.fill();
+
+      // Shirt & Red Tie
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(cx - 22, baseCy - 22);
+      ctx.lineTo(cx + 22, baseCy - 22);
+      ctx.lineTo(cx, baseCy + 65);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(cx - 7, baseCy - 16);
+      ctx.lineTo(cx + 7, baseCy - 16);
+      ctx.lineTo(cx + 11, baseCy + 55);
+      ctx.lineTo(cx, baseCy + 75);
+      ctx.lineTo(cx - 11, baseCy + 55);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#e2b897';
+      roundRect(ctx, cx - 18, baseCy - 48, 36, 34, 8);
+      ctx.fill();
+
+      // Head Group
+      ctx.save();
+      ctx.translate(cx, baseCy - 78);
+      ctx.rotate(state.headTilt);
+
+      // Studio Headphones
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(0, -4, 54, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.stroke();
+
+      // Ears
+      ctx.fillStyle = '#ebbfa0';
+      ctx.beginPath();
+      ctx.ellipse(-48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Headphone Ear Cups
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      roundRect(ctx, -58, -14, 14, 32, 6);
+      ctx.fill();
+      ctx.stroke();
+      roundRect(ctx, 44, -14, 14, 32, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Face Shape
+      const faceGrad = ctx.createLinearGradient(0, -48, 0, 48 + state.jawDrop);
+      faceGrad.addColorStop(0, '#f7d3b5');
+      faceGrad.addColorStop(1, '#e8bc9a');
+      ctx.fillStyle = faceGrad;
+      roundRect(ctx, -46, -48, 92, 94 + state.jawDrop * 0.65, 40);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(0, -12, 48, Math.PI * 0.92, Math.PI * 2.08);
+      ctx.quadraticCurveTo(34, -22, -10, -24);
+      ctx.quadraticCurveTo(-38, -24, -47, -8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eyebrows
+      const browLift = isSpeaking ? -2.5 * state.mouthOpen : 0;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-28, -13 + browLift);
+      ctx.quadraticCurveTo(-18, -17 + browLift, -9, -13 + browLift);
+      ctx.moveTo(9, -13 + browLift);
+      ctx.quadraticCurveTo(18, -17 + browLift, 28, -13 + browLift);
+      ctx.stroke();
+
+      // Eyes
+      if (isBlinking) {
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-25, -2);
+        ctx.lineTo(-13, -2);
+        ctx.moveTo(13, -2);
+        ctx.lineTo(25, -2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(-19, -2, 4.5, 0, Math.PI * 2);
+        ctx.arc(19, -2, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-17.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.arc(20.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Nose
+      ctx.strokeStyle = '#c89672';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -1);
+      ctx.lineTo(-2, 10);
+      ctx.lineTo(3, 11);
+      ctx.stroke();
+
+      // Mouth
+      drawNaturalCharacterMouth(ctx, 22 + state.jawDrop * 0.25, state, isSpeaking);
+
+      ctx.restore(); // End head group
+
+      // Boom Mic
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(20, h - 35);
+      ctx.lineTo(cx - 28, h - 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = isSpeaking ? '#38bdf8' : '#475569';
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx - 40, h - 90, 24, 38, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Studio Desk Lower Bar
+      ctx.fillStyle = 'rgba(7, 13, 25, 0.95)';
+      ctx.fillRect(0, h - 45, w, 45);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 45);
+      ctx.lineTo(w, h - 45);
+      ctx.stroke();
+
+      // Name & Equalizer Bars on Desk
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('NGƯỜI PHỎNG VẤN', 16, h - 24);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.fillText(isSpeaking ? '● ON AIR • SPEAKING' : '○ LISTENING', 16, h - 10);
+
+      // Equalizer bars
+      for (let b = 0; b < 7; b++) {
+        const bh = isSpeaking ? Math.max(3, Math.abs(Math.sin(t * 12 + b)) * 22 * (0.4 + audioLevel)) : 3;
+        ctx.fillStyle = isSpeaking ? '#38bdf8' : 'rgba(148, 163, 184, 0.25)';
+        roundRect(ctx, w - 60 + b * 6.5, h - 12 - bh, 4, bh, 2);
+        ctx.fill();
       }
     }
 
-    function startRecording() {
+    // Right Character Canvas: Thái Đỗ Thịnh (Emerald Outfit with Signature Glasses)
+    function drawCandidateCanvas(now, audioLevel) {
+      if (isWebcamActive) return;
+
+      const cvs = document.getElementById('candidateCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+      const t = now * 0.001;
+
+      const isSpeaking = activeSpeaker === 'thinh' && isPlaying;
+      const cx = w / 2;
+
+      const state = animState.thinh;
+      if (isSpeaking) {
+        state.mouthOpen += ((0.25 + audioLevel * 1.8) - state.mouthOpen) * 0.35;
+        state.headTilt = Math.sin(t * 4.2) * 0.04;
+      } else {
+        state.mouthOpen += (0 - state.mouthOpen) * 0.2;
+        state.headTilt = Math.sin(t * 1.6) * 0.015;
+      }
+      state.jawDrop = state.mouthOpen * 3.5;
+
+      const blinkCycle = (t + 0.6) % 3.8;
+      const isBlinking = blinkCycle > 3.65;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Studio Backdrop
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#091816');
+      grad.addColorStop(1, '#050f0e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Backlight Halo
+      ctx.fillStyle = isSpeaking ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.04)';
+      ctx.beginPath();
+      ctx.arc(cx, 140, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Breathing movement
+      const breathY = Math.sin(t * 2.4 + 1) * 2;
+      const baseCy = 205 + breathY;
+
+      // Torso / Emerald Outfit
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath();
+      ctx.moveTo(cx - 110, h);
+      ctx.lineTo(cx - 90, baseCy + 30);
+      ctx.quadraticCurveTo(cx - 60, baseCy - 18, cx - 28, baseCy - 22);
+      ctx.lineTo(cx + 28, baseCy - 22);
+      ctx.quadraticCurveTo(cx + 60, baseCy - 18, cx + 90, baseCy + 30);
+      ctx.lineTo(cx + 110, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner Shirt & Lanyard
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(cx - 20, baseCy - 22);
+      ctx.lineTo(cx + 20, baseCy - 22);
+      ctx.lineTo(cx, baseCy + 55);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.moveTo(cx - 7, baseCy - 16);
+      ctx.lineTo(cx + 7, baseCy - 16);
+      ctx.lineTo(cx + 10, baseCy + 52);
+      ctx.lineTo(cx, baseCy + 68);
+      ctx.lineTo(cx - 10, baseCy + 52);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#e6bc9c';
+      roundRect(ctx, cx - 18, baseCy - 48, 36, 34, 8);
+      ctx.fill();
+
+      // Head Group
+      ctx.save();
+      ctx.translate(cx, baseCy - 78);
+      ctx.rotate(state.headTilt);
+
+      // Ears
+      ctx.fillStyle = '#ebbfa0';
+      ctx.beginPath();
+      ctx.ellipse(-48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Face Shape
+      const faceGrad = ctx.createLinearGradient(0, -48, 0, 48 + state.jawDrop);
+      faceGrad.addColorStop(0, '#fae8d8');
+      faceGrad.addColorStop(1, '#ecc3a3');
+      ctx.fillStyle = faceGrad;
+      roundRect(ctx, -46, -48, 92, 94 + state.jawDrop * 0.65, 40);
+      ctx.fill();
+
+      // Modern Hair
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, -13, 48, Math.PI * 0.9, Math.PI * 2.1);
+      ctx.quadraticCurveTo(25, -26, 0, -20);
+      ctx.quadraticCurveTo(-25, -26, -47, -10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eyebrows
+      const browLift = isSpeaking ? -2.5 * state.mouthOpen : 0;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-28, -14 + browLift);
+      ctx.quadraticCurveTo(-18, -18 + browLift, -9, -14 + browLift);
+      ctx.moveTo(9, -14 + browLift);
+      ctx.quadraticCurveTo(18, -18 + browLift, 28, -14 + browLift);
+      ctx.stroke();
+
+      // Eyes
+      if (isBlinking) {
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-25, -2);
+        ctx.lineTo(-13, -2);
+        ctx.moveTo(13, -2);
+        ctx.lineTo(25, -2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(-19, -2, 4.2, 0, Math.PI * 2);
+        ctx.arc(19, -2, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-17.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.arc(20.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Signature Glasses
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+      roundRect(ctx, -32, -11, 26, 18, 4);
+      ctx.fill();
+      roundRect(ctx, 6, -11, 26, 18, 4);
+      ctx.fill();
+
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2.6;
+      roundRect(ctx, -32, -11, 26, 18, 4);
+      ctx.stroke();
+      roundRect(ctx, 6, -11, 26, 18, 4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-6, -3);
+      ctx.lineTo(6, -3);
+      ctx.stroke();
+
+      // Nose
+      ctx.strokeStyle = '#c89672';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -1);
+      ctx.lineTo(-2, 10);
+      ctx.lineTo(3, 11);
+      ctx.stroke();
+
+      // Mouth
+      drawNaturalCharacterMouth(ctx, 22 + state.jawDrop * 0.25, state, isSpeaking);
+
+      ctx.restore(); // End head group
+
+      // Boom Mic (Right Side)
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(w - 20, h - 35);
+      ctx.lineTo(cx + 28, h - 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = isSpeaking ? '#10b981' : '#475569';
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx + 16, h - 90, 24, 38, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Studio Desk Lower Bar
+      ctx.fillStyle = 'rgba(5, 15, 14, 0.95)';
+      ctx.fillRect(0, h - 45, w, 45);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 45);
+      ctx.lineTo(w, h - 45);
+      ctx.stroke();
+
+      // Name & Equalizer Bars on Desk
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('THÁI ĐỖ THỊNH', 16, h - 24);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.fillText(isSpeaking ? '● ON AIR • SPEAKING' : '○ LISTENING', 16, h - 10);
+
+      // Equalizer bars
+      for (let b = 0; b < 7; b++) {
+        const bh = isSpeaking ? Math.max(3, Math.abs(Math.sin(t * 12 + b)) * 22 * (0.4 + audioLevel)) : 3;
+        ctx.fillStyle = isSpeaking ? '#34d399' : 'rgba(148, 163, 184, 0.25)';
+        roundRect(ctx, w - 60 + b * 6.5, h - 12 - bh, 4, bh, 2);
+        ctx.fill();
+      }
+    }
+
+    // Main Combined Animation Loop
+    function mainAnimationLoop(now) {
+      let audioLevel = 0;
+
+      if (analyser && dataArray && isPlaying && !simTimer) {
+        analyser.getByteFrequencyData(dataArray);
+        let vocalSum = 0;
+        for (let i = 2; i <= 22; i++) vocalSum += dataArray[i];
+        audioLevel = vocalSum / (21 * 255);
+      } else if (isPlaying && simTimer) {
+        const t = now * 0.001;
+        audioLevel = 0.25 + Math.abs(Math.sin(t * 9) * Math.cos(t * 5.5)) * 0.45;
+      }
+
+      // 1. Draw Interviewer Canvas
+      drawInterviewerCanvas(now, audioLevel);
+
+      // 2. Draw Candidate Canvas (when webcam is inactive)
+      if (!isWebcamActive) {
+        drawCandidateCanvas(now, audioLevel);
+      }
+
+      // 3. Animate Mic Wave Bars (when webcam is active)
+      if (isWebcamActive) {
+        const b1 = document.getElementById('waveBar1');
+        const b2 = document.getElementById('waveBar2');
+        const b3 = document.getElementById('waveBar3');
+
+        if (userAnalyser && userDataArray) {
+          userAnalyser.getByteFrequencyData(userDataArray);
+          const v1 = Math.max(4, Math.min(22, (userDataArray[2] || 0) / 10));
+          const v2 = Math.max(6, Math.min(26, (userDataArray[6] || 0) / 8));
+          const v3 = Math.max(4, Math.min(20, (userDataArray[10] || 0) / 12));
+          if (b1) b1.style.height = v1 + 'px';
+          if (b2) b2.style.height = v2 + 'px';
+          if (b3) b3.style.height = v3 + 'px';
+        }
+      }
+
+      requestAnimationFrame(mainAnimationLoop);
+    }
+
+    // Chapter Playlist Drawer
+    function buildChapterDrawer() {
+      if (!interviewData || !interviewData.chapters) return;
+      const container = document.getElementById('chaptersList');
+      container.innerHTML = '';
+
+      interviewData.chapters.forEach((chap, idx) => {
+        if (searchQuery) {
+          const matchText = (chap.title_en + ' ' + chap.title_vi).toLowerCase();
+          if (!matchText.includes(searchQuery)) return;
+        }
+
+        const isActive = idx === currentChapterIndex;
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border transition-all cursor-pointer group ${
+          isActive
+            ? 'active-chapter-card'
+            : 'bg-[#0f111e] hover:bg-[#161a2c] border-[#1d2136] hover:border-[#2d3352]'
+        }`;
+        item.onclick = () => jumpToChapter(idx);
+
+        item.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold ${
+              isActive ? 'bg-blue-500 text-white' : 'bg-slate-800 text-slate-400'
+            }">
+              Câu ${chap.id}
+            </span>
+            ${isActive ? `
+              <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-400 font-mono">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-ping"></span> Đang chọn
+              </span>
+            ` : `<i data-lucide="play-circle" class="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-300 transition"></i>`}
+          </div>
+          <h4 class="text-xs font-bold ${isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'} leading-snug">${chap.title_en}</h4>
+          <p class="text-[11px] ${isActive ? 'text-slate-300' : 'text-slate-400'} leading-snug mt-0.5">${chap.title_vi}</p>
+        `;
+        container.appendChild(item);
+      });
+      lucide.createIcons();
+    }
+
+    function buildTimelineMarkers() {
+      if (!interviewData || !interviewData.chapters) return;
+      const track = document.getElementById('chapterMarkers');
+      const dur = interviewData.duration || 518;
+      track.innerHTML = '';
+
+      interviewData.chapters.forEach((chap) => {
+        if (chap.start === 0 || chap.start > dur) return;
+        const mark = document.createElement('div');
+        mark.className = 'absolute top-0 bottom-0 w-0.5 bg-slate-600/50 pointer-events-none';
+        mark.style.left = (chap.start / dur * 100) + '%';
+        track.appendChild(mark);
+      });
+    }
+
+    function filterChapters(val) {
+      searchQuery = (val || '').toLowerCase().trim();
+      buildChapterDrawer();
+    }
+
+    function jumpToChapter(idx) {
+      if (!interviewData || !interviewData.chapters || !interviewData.chapters[idx]) return;
+      const chap = interviewData.chapters[idx];
       initWebAudio();
-      const stream = canvas.captureStream(60);
+      isUserTurnToAnswer = false;
+      document.getElementById('practiceActionBar').classList.add('hidden');
+      stopAnswerCountdown();
 
-      if (audioCtx) {
-        const audioDest = audioCtx.createMediaStreamDestination();
-        audioSource.connect(audioDest);
-        const audioTrack = audioDest.stream.getAudioTracks()[0];
-        if (audioTrack) {
-          stream.addTrack(audioTrack);
-        }
-      }
+      currentChapterIndex = idx;
+      buildChapterDrawer();
+      syncQuestionCardForChapter(idx);
 
-      let mimeType = 'video/webm;codecs=vp9,opus';
-      if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-        mimeType = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264')) {
-        mimeType = 'video/webm;codecs=h264';
-      }
-
-      recordedChunks = [];
-      mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 6000000 });
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          recordedChunks.push(e.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-        a.download = `Esco_AV_Podcast_${Date.now()}.${ext}`;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        }, 100);
-      };
-
-      mediaRecorder.start(1000);
-      isRecording = true;
-      recStartTime = Date.now();
-
-      // UI: Solid Red pulsing
-      document.getElementById('recText').innerText = 'Dừng & tải MP4';
-      document.getElementById('btnRecord').className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/30 transition active:scale-95 animate-pulse';
-      document.getElementById('recDot').className = 'w-2 h-2 rounded-full bg-white';
-      document.getElementById('recIndicator').classList.remove('hidden');
-
-      recTimerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
-        document.getElementById('recTimer').innerText = formatTime(elapsed);
-      }, 1000);
-
-      if (audio.paused) {
-        audio.play();
+      if (chap.start <= (interviewData.duration || 518)) {
+        setCurrentTime(chap.start);
+        if (!isPlaying) togglePlay();
+      } else {
+        // Situational question without pre-recorded audio: ready for webcam practice!
+        pauseForUserAnswer();
       }
     }
 
-    function stopRecording() {
-      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-        mediaRecorder.stop();
+    function updateActiveChapter(currentTime) {
+      if (!interviewData || !interviewData.chapters) return;
+      let foundIdx = currentChapterIndex;
+      for (let i = 0; i < interviewData.chapters.length; i++) {
+        const c = interviewData.chapters[i];
+        if (currentTime >= c.start && currentTime < c.end) {
+          foundIdx = i;
+          break;
+        }
       }
-      isRecording = false;
-      clearInterval(recTimerInterval);
+      if (foundIdx !== currentChapterIndex) {
+        currentChapterIndex = foundIdx;
+        buildChapterDrawer();
+        syncQuestionCardForChapter(foundIdx);
+      }
+    }
 
-      document.getElementById('recText').innerText = 'Ghi & xuất MP4';
-      document.getElementById('btnRecord').className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 bg-slate-900/80 text-slate-200 hover:text-white hover:border-rose-500/60 shadow-sm transition active:scale-95';
-      document.getElementById('recDot').className = 'w-2 h-2 rounded-full bg-rose-500';
-      document.getElementById('recIndicator').classList.add('hidden');
+    function toggleChapterDrawer() {
+      const drawer = document.getElementById('chapterDrawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    // ============================================================================
+    // SCRIPT VIEWER & CHEAT SHEET MODAL CONTROLLER
+    // ============================================================================
+    function openScriptModal() {
+      const modal = document.getElementById('scriptModal');
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeScriptModal() {
+      const modal = document.getElementById('scriptModal');
+      modal.classList.add('hidden');
+    }
+
+    function switchScriptTab(tabId) {
+      activeScriptTab = tabId;
+      ['Core', 'Situational', 'Technical', 'Cheatsheet'].forEach(t => {
+        const btn = document.getElementById('tab' + t);
+        if (btn) {
+          if (t.toLowerCase() === tabId.toLowerCase()) {
+            btn.className = 'px-2.5 py-1 rounded-lg font-semibold text-white bg-[#22273d] transition whitespace-nowrap shadow-sm';
+          } else {
+            btn.className = 'px-2.5 py-1 rounded-lg font-medium text-slate-400 hover:text-white transition whitespace-nowrap';
+          }
+        }
+      });
+      renderScriptContent();
+    }
+
+    function filterScriptContent(val) {
+      scriptSearchQuery = (val || '').toLowerCase().trim();
+      renderScriptContent();
+    }
+
+    function copyToClipboard(text, btnEl) {
+      navigator.clipboard.writeText(text).then(() => {
+        const oldHtml = btnEl.innerHTML;
+        btnEl.innerHTML = '<span class="text-emerald-400">Đã chép ✓</span>';
+        setTimeout(() => {
+          btnEl.innerHTML = oldHtml;
+        }, 1600);
+      }).catch(err => {
+        console.warn('Copy failed:', err);
+      });
+    }
+
+    function renderScriptContent() {
+      const container = document.getElementById('scriptContentArea');
+      if (!container || !fullScript || !fullScript.sections) return;
+      container.innerHTML = '';
+
+      const section = fullScript.sections.find(s => s.id === activeScriptTab);
+      if (!section) return;
+
+      if (section.id === 'cheatsheet' && section.table) {
+        let rows = section.table;
+        if (scriptSearchQuery) {
+          rows = rows.filter(r => 
+            r.situation.toLowerCase().includes(scriptSearchQuery) ||
+            r.sentence_en.toLowerCase().includes(scriptSearchQuery) ||
+            r.meaning_vi.toLowerCase().includes(scriptSearchQuery)
+          );
+        }
+
+        if (rows.length === 0) {
+          container.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs">Không tìm thấy mẫu câu phù hợp.</div>';
+          return;
+        }
+
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'rounded-2xl border border-[#20253d] overflow-hidden bg-[#0e111d] shadow-lg';
+
+        let tableHtml = `
+          <div class="px-4 py-3 bg-[#131626] border-b border-[#20253d] flex items-center justify-between">
+            <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
+              <i data-lucide="message-square" class="w-4 h-4"></i>
+              Bảng Mẫu Câu Giao Tiếp Tình Huống Phỏng Vấn Thực Tế
+            </h4>
+            <span class="text-[11px] text-slate-400">10 Tình Huống</span>
+          </div>
+          <div class="divide-y divide-[#1e2338]">
+        `;
+
+        rows.forEach((row, idx) => {
+          tableHtml += `
+            <div class="p-4 hover:bg-[#151829] transition flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 group">
+              <div class="flex-1 space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/25">
+                    ${row.situation}
+                  </span>
+                </div>
+                <p class="text-sm font-bold text-white tracking-tight">“${row.sentence_en}”</p>
+                <p class="text-xs text-slate-400">${row.meaning_vi}</p>
+              </div>
+              <button onclick="copyToClipboard('${row.sentence_en.replace(/'/g, "\\'") }', this)" class="px-3 py-1.5 rounded-xl bg-[#1c2138] hover:bg-[#272e4d] text-xs font-medium text-slate-300 hover:text-white transition border border-[#2b3354] flex items-center gap-1.5 flex-shrink-0 active:scale-95 shadow-sm">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Sao chép</span>
+              </button>
+            </div>
+          `;
+        });
+
+        tableHtml += '</div>';
+        tableWrapper.innerHTML = tableHtml;
+        container.appendChild(tableWrapper);
+        lucide.createIcons();
+        return;
+      }
+
+      // Render Question Cards for other sections
+      let items = section.items || [];
+      if (scriptSearchQuery) {
+        items = items.filter(it => 
+          (it.title && it.title.toLowerCase().includes(scriptSearchQuery)) ||
+          (it.answer_en && it.answer_en.toLowerCase().includes(scriptSearchQuery)) ||
+          (it.notes && it.notes.toLowerCase().includes(scriptSearchQuery))
+        );
+      }
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="p-8 text-center text-slate-500 text-xs">Không tìm thấy nội dung phù hợp.</div>';
+        return;
+      }
+
+      items.forEach(it => {
+        const card = document.createElement('div');
+        card.className = 'p-5 rounded-2xl bg-[#0e111d] border border-[#1f243b] hover:border-[#2d3454] transition shadow-md space-y-3';
+
+        const paragraphs = it.answer_en.split('\n\n').map(p => `<p class="leading-relaxed">“${p.replace(/\n/g, '<br>')}”</p>`).join('');
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3 border-b border-[#1b2034] pb-3">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                ${it.num ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/30 font-mono">Câu ${it.num}</span>` : ''}
+                <h4 class="text-sm font-bold text-white">${it.title}</h4>
+              </div>
+              ${it.notes ? `<p class="text-xs text-amber-300/90 font-medium">💡 Ghi nhớ: ${it.notes}</p>` : ''}
+            </div>
+
+            <button onclick="copyToClipboard('${it.answer_en.replace(/'/g, "\\'").replace(/\n/g, ' ') }', this)" class="px-3 py-1.5 rounded-xl bg-[#171b2d] hover:bg-[#222842] text-xs font-medium text-slate-300 hover:text-white transition border border-[#282f4d] flex items-center gap-1.5 flex-shrink-0 active:scale-95 shadow-sm">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span>Sao chép</span>
+            </button>
+          </div>
+
+          <div class="text-xs sm:text-sm font-semibold text-slate-100 space-y-2.5 leading-relaxed bg-[#121524] p-3.5 rounded-xl border border-[#1c2238]">
+            ${paragraphs}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
     }
 
     // Keyboard Shortcuts
@@ -1460,15 +1987,31 @@
       if (e.code === 'Space') {
         e.preventDefault();
         togglePlay();
+      } else if (e.code === 'Enter') {
+        if (isUserTurnToAnswer) {
+          e.preventDefault();
+          finishUserAnswer();
+        }
+      } else if (e.code === 'KeyS') {
+        e.preventDefault();
+        toggleScriptSubtitle();
+      } else if (e.code === 'KeyC') {
+        e.preventDefault();
+        toggleWebcam();
+      } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        replayCurrentSentence();
       } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
-        skipSeconds(-10);
+        skipSeconds(-5);
       } else if (e.code === 'ArrowRight') {
         e.preventDefault();
-        skipSeconds(10);
+        skipSeconds(5);
       } else if (e.code === 'KeyM') {
         e.preventDefault();
         toggleMute();
+      } else if (e.code === 'Escape') {
+        closeScriptModal();
       }
     });
   </script>

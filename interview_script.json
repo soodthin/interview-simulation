@@ -1,0 +1,226 @@
+{
+  "title": "Second-Round Interview Preparation - ESCO AV",
+  "candidate": "Thái Đỗ Thịnh",
+  "role": "IT Support & AV Systems Fresher",
+  "company": "ESCO AV Vietnam",
+  "sections": [
+    {
+      "id": "core",
+      "name": "14 Câu Hỏi Cốt Lõi (Core Interview Questions)",
+      "icon": "list-ordered",
+      "items": [
+        {
+          "num": 1,
+          "title": "Tell me about yourself",
+          "answer_en": "Thank you for meeting with me today. I’m Thinh, a final-year Computer Science student at HCMC Open University. I’ve finished all my classes, so I can start full-time right away.\n\nRecently, I did a six-month internship at BW Industrial. I build two internal web tools: a bank statement parser for 14 banks and an automated cash reporting tool. I also managed user access and helped staff with small tech problems.\n\nAfter our first interview, I understood this job covers both internal IT support and setting up AV systems at client offices. I really enjoy that mix of working with systems and talking directly with users. So I’m very excited about this role.",
+          "notes": "Nhấn mạnh: CS tốt nghiệp sẵn sàng full-time ngay, kinh nghiệm 6 tháng tại BW Industrial (làm tool thực tế cho 14 ngân hàng, hỗ trợ user), hiểu rõ tính chất kết hợp IT Support + AV onsite."
+        },
+        {
+          "num": 2,
+          "title": "Why do you want this position? / Why ESCO AV?",
+          "answer_en": "Well, Ms. Huyen found my profile online, and I was looking for a full-time IT job.\n\nAfter the first interview, I liked it even more. It’s not only desk work. I can visit clients, set up smart meeting rooms, and work with real devices. I also like working with international clients.\n\nI think my IT background and my user support experience can help the team. And of course, I’ll keep learning AV along the way.",
+          "notes": "Lý do chọn: Thích tính chất onsite làm việc với thiết bị phòng họp thông minh thực tế, tiếp xúc khách hàng quốc tế, đóng góp nền tảng IT Support sẵn có và chủ động học thêm mảng AV."
+        },
+        {
+          "num": 3,
+          "title": "Tell me about your working experience",
+          "answer_en": "I did a six-month internship at BW Industrial. My main project was an internal web system for the finance team. Before, they made the cash report by hand, with statements from 14 banks. Now the system does it automatically.\n\nAt the start, I sat next to the staff and watched how they work. I took notes on each bank’s file format, the repeated steps, and how they sort transactions. Then I built the system in Python. While building, I talked to them a lot to get feedback.\n\nWhen it was ready, I tested it myself first. Then I let them try it out. They helped me find real problems, and I fixed them, and I also wrote a clear user guide, so anyone can use the system.\n\nAfter it went live, I managed user access. Basically, I became the first person they asked when they had file errors or system bugs.\n\nSo I learned that in IT support, technical skills matter, but understanding users and their daily work matters just as much. That’s why I think I can work well with your clients and your team.",
+          "notes": "Quy trình làm việc chuẩn: Ngồi cùng user thu thập yêu cầu → code Python → tự test kỹ trước khi giao → viết user guide → quản lý phân quyền và hỗ trợ trực tiếp khi có sự cố."
+        },
+        {
+          "num": 4,
+          "title": "What are your strengths?",
+          "answer_en": "Well, I think two things. First, I’m very patient with users. When someone has a problem, I listen first, and I try to explain in simple words. At BW, I sat next to the finance staff, so they felt comfortable to ask me anything.\n\nSecond, I’m proactive. For example, I tested the system myself before the users touched it, and I wrote a full guide before anyone asked.\n\nAnd if I get stuck, I ask the team right away so things don't get delayed.",
+          "notes": "2 Điểm mạnh lớn nhất: Kiên nhẫn lắng nghe/giải thích dễ hiểu với user + Tính chủ động (proactive, tự test, viết guide trước, gặp khó hỏi ngay tránh delay)."
+        },
+        {
+          "num": 5,
+          "title": "What are your weaknesses?",
+          "answer_en": "Hmm, my background is mostly in software, so I don’t have much experience with enterprise AV equipment yet.\n\nBut at home, I often help friends and family with Wi-Fi, screens, and computer problems. And I learn by doing. I read the manual carefully, take notes, and ask experienced engineers.\n\nIf I’m not sure, I ask first. I don’t guess when working at a client’s office.",
+          "notes": "Điểm cần cải thiện: Chưa có nhiều kinh nghiệm thực chiến với thiết bị AV doanh nghiệp. Cách khắc phục: Ham học hỏi qua thực tế, đọc kỹ manual, hỏi kỹ sư có kinh nghiệm, tuyệt đối không đoán mò khi ở văn phòng khách hàng."
+        },
+        {
+          "num": 6,
+          "title": "What technical skills can you bring?",
+          "answer_en": "Well, I know Python from my internship, and I can build small tools to automate repeated work.\n\nI learned basic networking at university, like IP address, subnets, gateway, and DHCP. If a device doesn’t connect, I check the cable and the port light first, then I use ping to test the connection. I also practice by fixing computer problems myself.\n\nAlso, I use many apps and software every day, so I’m comfortable learning new devices and new software.\n\nActually, I know AV is not only software. Cameras, mics, speakers, and screens must work together. I’m new to professional AV, but my IT base helps me learn quickly.",
+          "notes": "Kỹ năng: Python tự động hóa công việc lặp lại, Networking cơ bản (IP, subnet, gateway, DHCP, ping, port lights), quen thuộc với phần mềm & thiết bị mới, hiểu nguyên lý phối hợp camera-mic-loa-màn hình."
+        },
+        {
+          "num": 7,
+          "title": "Why did you leave your last job?",
+          "answer_en": "It was a fixed six-month internship. We finished the system and handed it over to the finance team with complete documentation, so the internship ended as scheduled.\n\nTo be honest, now I want to start my career. This job fits my skills in IT support, and I want to stay long-term and grow with the company.",
+          "notes": "Lý do: Kỳ thực tập 6 tháng kết thúc đúng hạn sau khi đã hoàn thành dự án và bàn giao tài liệu đầy đủ. Mong muốn hiện tại: Bắt đầu sự nghiệp chính thức, gắn bó lâu dài và phát triển cùng Esco AV."
+        },
+        {
+          "num": 8,
+          "title": "How do you work with non-technical users?",
+          "answer_en": "I try to use simple words, not technical words. I explain step by step, and I show them on the screen.\n\nAt BW, I sat next to the finance staff and showed them how to use the system. I also wrote a user guide, so they could check it again later.\n\nI think good support is not only fixing the problem. It’s also making people feel comfortable to ask, and confident to do it by themselves next time.",
+          "notes": "Triết lý hỗ trợ: Dùng từ ngữ đơn giản, hướng dẫn từng bước trên màn hình, viết tài liệu lưu lại. Hỗ trợ tốt là giúp người dùng thấy thoải mái khi hỏi và tự tin tự làm được lần sau."
+        },
+        {
+          "num": 9,
+          "title": "How do you handle many support requests at once?",
+          "answer_en": "First, I check the urgency. A problem blocking an important meeting or an active client comes first.\n\nAt the same time, I send the other users a quick update so they know I'm on it and nobody feels ignored.\n\nAnd if I'm not sure which one to handle first, I ask my manager right away to confirm.",
+          "notes": "Xử lý quá tải: Đánh giá độ khẩn cấp (cuộc họp VIP hoặc khách hàng đang diễn ra ưu tiên số 1), luôn nhắn tin cập nhật tiến độ cho các user khác để không ai bị bỏ rơi, hỏi quản lý khi chưa rõ thứ tự ưu tiên."
+        },
+        {
+          "num": 10,
+          "title": "How do you work independently with a team in Singapore?",
+          "answer_en": "Yeah, I can work by myself, but communication is important. When I get a task, I make sure I understand the goal, and I keep them updated.\n\nIf I have a problem, I read the documents first. If I still need help, I explain what I already tried.",
+          "notes": "Làm việc từ xa/độc lập: Đảm bảo hiểu rõ mục tiêu, liên tục cập nhật tiến độ. Khi gặp sự cố: đọc tài liệu trước, khi cần hỗ trợ sẽ tóm tắt rõ những cách mình đã thử trước đó."
+        },
+        {
+          "num": 11,
+          "title": "Where do you see yourself in five years?",
+          "answer_en": "Well, in the first year, my goal is to get fully comfortable with both our internal IT systems and on-site AV setups while working closely with my mentor.\n\nAnd I want to collaborate smoothly with senior engineers, communicate well with clients on-site, and gradually handle routine tasks independently.\n\nLooking ahead to five years, I want to grow into a senior engineer, handling larger client deployments and mentoring new freshers joining the team.",
+          "notes": "Lộ trình 5 năm: Năm 1 nắm vững IT nội bộ + AV onsite, phối hợp nhịp nhàng với đàn anh. 5 năm: Trở thành Senior Engineer phụ trách các dự án triển khai lớn và hướng dẫn đàn em mới vào."
+        },
+        {
+          "num": 12,
+          "title": "What do you expect from your manager?",
+          "answer_en": "I think the most helpful thing is clear priorities, especially when many problems come at the same time. Honest direct feedback is also very important to me. If there’s a better way to do something, I appreciate hearing it early so I can improve.\n\nAnd from my side, I’ll ask questions when I’m not sure, and I’ll keep you updated.",
+          "notes": "Kỳ vọng ở sếp: Định hướng ưu tiên rõ ràng khi nhiều việc dồn dập + Phản hồi thẳng thắn, sớm để cải thiện. Bản thân: Chủ động hỏi và cập nhật đều đặn."
+        },
+        {
+          "num": 13,
+          "title": "Salary expectation / When can you start?",
+          "answer_en": "“From my first interview, I understand it’s around 9 to 11 million VND gross per month, and that’s fine for me. But I’m flexible. I’d like to hear what you have in mind for this role.“\n\n“Thank you. That works for me. I’m happy with that, and I’m excited to join the team.“ (nếu cao hơn hoặc đồng ý với gross hiện tại)\n\n“During probation, what percentage of the salary will I receive?”\n\n“Okay, I understand. Thank you for explaining.”\n\n“I can start next week, or any date that works for the team. I’ve finished all my classes, so I’m free.”",
+          "notes": "Mức lương: 9 - 11 triệu Gross/tháng (linh hoạt theo chính sách công ty). Hỏi rõ % lương thử việc. Thời gian bắt đầu: Sẵn sàng đi làm ngay tuần sau vì đã học xong toàn bộ chương trình."
+        },
+        {
+          "num": 14,
+          "title": "Do you have any questions for me?",
+          "answer_en": "Question 1: “What does success look like in the first 2 months for this role?”\n\nQuestion 2: “How does the Vietnam IT team work with the Singapore team, for daily support or for projects?”\n\nOptional: “How do new engineers learn AV equipment here? Do they shadow senior engineers on-site first?”",
+          "notes": "Câu hỏi thông minh hỏi lại nhà tuyển dụng: Tiêu chuẩn đánh giá thành công sau 2 tháng đầu? Cách phối hợp giữa team VN và Singapore? Quy trình đào tạo thiết bị AV thực tế onsite."
+        }
+      ]
+    },
+    {
+      "id": "situational",
+      "name": "Câu Hỏi Tình Huống (Situational Questions Q15 - Q20)",
+      "icon": "zap",
+      "items": [
+        {
+          "num": 15,
+          "title": "What if you can’t fix a problem at a client’s office?",
+          "answer_en": "I stay calm and polite. First, I check the basics: power, cables, connections, and the device status. Then I check the network. If it’s still not working, I read the manual or search for the error. Basically, I don’t keep guessing, because random changes can make things worse. So I call my senior engineer and explain what I already checked. And I tell the client how it’s going.",
+          "notes": "Quy tắc vàng: Bình tĩnh, kiểm tra từ cơ bản (nguồn, dây cáp, mạng, device status) → đọc manual/mã lỗi → tuyệt đối không đoán mò → báo cáo đàn anh kèm những bước đã kiểm tra → cập nhật tình hình cho khách hàng an tâm."
+        },
+        {
+          "num": 16,
+          "title": "Describe a technical problem you solved",
+          "answer_en": "Well, when the tool was ready, I let the finance staff test it. They told me what felt slow or confusing. For example, one problem was file formatting differences across banks. I asked them to show me their steps, then I repeated the same steps myself and checked the workflow. Then I fixed it and asked them to test again. I also updated the guide. So I learned to look at problems from the user’s side, not only from the code.",
+          "notes": "Ví dụ thực tế: Xử lý định dạng file sao kê khác nhau giữa các ngân hàng, tái hiện các bước của user để sửa triệt để, cập nhật hướng dẫn sử dụng."
+        },
+        {
+          "num": 17,
+          "title": "What if a client is unhappy because a system isn’t working?",
+          "answer_en": "First, I stay calm and let them finish. I tell them, ‘I understand, and I’ll do my best to help.’ Then I check the problem, tell them what I know, and tell them how it’s going. If I can’t fix it by myself, I ask a senior engineer quickly. I stay professional and take responsibility.",
+          "notes": "Xử lý khách hàng nóng giận: Lắng nghe không ngắt lời, đồng cảm (‘Em hiểu và sẽ cố gắng hết sức để hỗ trợ’), thông báo tình hình minh bạch, nhờ hỗ trợ nhanh khi cần, giữ tác phong chuyên nghiệp chịu trách nhiệm."
+        },
+        {
+          "num": 18,
+          "title": "Are you comfortable travelling to client sites?",
+          "answer_en": "Yes, of course. I know on-site support is part of the job. I’m happy with that, because I enjoy meeting users face to face. It helps me understand the problem faster.\n\nBesides, I want real experience with different clients and systems. I’m also okay working on weekends or events when the team needs me.",
+          "notes": "Sẵn sàng di chuyển onsite: Thích gặp user trực tiếp để nắm bắt vấn đề nhanh hơn, tích lũy kinh nghiệm hệ thống thực tế, sẵn sàng hỗ trợ cuối tuần hoặc sự kiện đột xuất."
+        },
+        {
+          "num": 19,
+          "title": "What if you don’t understand an instruction from Singapore?",
+          "answer_en": "I try to get the main point first. I mean, if one part is unclear, I ask them politely to explain that part again. Then I say it back to them in my own words, so we agree before I start. Asking early saves time for everyone.",
+          "notes": "Kỹ thuật giao tiếp quốc tế: Xác nhận lại ý chính, lịch sự nhờ giải thích phần chưa rõ, diễn đạt lại bằng từ ngữ của mình (paraphrasing) để đồng thuận trước khi bắt tay làm."
+        },
+        {
+          "num": 20,
+          "title": "Why should we hire you?",
+          "answer_en": "I think I’m a good fit because I already work directly with users. I supported the finance staff, managed user access, and helped with their daily problems. I also test things carefully before users do, so problems come out early. To be honest, I’m still new to AV, but I have a solid IT base, and I’m patient with people. I’m ready to learn from the team and start helping soon.",
+          "notes": "Chốt deal: Đã quen làm việc trực tiếp hỗ trợ user, cẩn thận tự test kỹ, nền tảng IT vững vàng, kiên nhẫn và sẵn sàng học hỏi nhanh mảng AV."
+        }
+      ]
+    },
+    {
+      "id": "technical",
+      "name": "Câu Hỏi Kỹ Thuật Bổ Sung & Lời Kết",
+      "icon": "wrench",
+      "items": [
+        {
+          "title": "If they ask about your AV experience (Kinh nghiệm AV)",
+          "answer_en": "Honestly, I haven’t worked with enterprise AV yet. But I understand what cameras, mics, speakers, and displays do in a meeting room, and I often set up screens at home. I’m ready to learn real installation from the team.",
+          "notes": "Thành thật nhưng tự tin: Hiểu nguyên lý phối hợp các thiết bị phòng họp và sẵn sàng học lắp đặt thực tế."
+        },
+        {
+          "title": "If they ask about networking (Kỹ năng Mạng)",
+          "answer_en": "I know the basics: IP address, subnet, gateway, and DHCP. If a device doesn’t connect, I check the cable and the port light first, then I use ping to test the connection. I’d like more practice with real enterprise networks.",
+          "notes": "Vận dụng: Quy trình troubleshoot mạng từng bước bài bản (vật lý → tín hiệu đèn → ping kiểm tra IP/gateway)."
+        },
+        {
+          "title": "If they ask whether you learn quickly (Khả năng học hỏi)",
+          "answer_en": "I think so. When something is new to me, I try a simple task first. If I get stuck, I read the manual or search for the answer, and I take notes, so I can do it again later. I do this at home too, like when I fix a Wi-Fi problem for my family.",
+          "notes": "Phương pháp: Bắt đầu từ tác vụ đơn giản, đọc manual, ghi chép lại tài liệu để lần sau tự làm nhanh."
+        },
+        {
+          "title": "Closing Statement (Lời cảm ơn và kết thúc buổi phỏng vấn)",
+          "answer_en": "Thank you for your time today. I really enjoyed learning about the role and the team. I’m very interested, and I hope to grow with ESCO AV. I look forward to hearing from you soon. Have a great day!",
+          "notes": "Lời chào kết chuyên nghiệp, thể hiện sự hào hứng và trân trọng cơ hội."
+        }
+      ]
+    },
+    {
+      "id": "cheatsheet",
+      "name": "Bảng Mẫu Câu Giao Tiếp Tình Huống Thực Tế (Cheat Sheet)",
+      "icon": "message-square",
+      "table": [
+        {
+          "situation": "Kiểm tra tín hiệu đầu buổi",
+          "sentence_en": "Good morning/afternoon! Can you hear and see me clearly on your end?",
+          "meaning_vi": "Chào anh/chị! Đầu cầu bên anh/chị có nghe và thấy em rõ không ạ?"
+        },
+        {
+          "situation": "Khi lỡ nói đè tiếng nhau",
+          "sentence_en": "Sorry, please go ahead, I'm listening.",
+          "meaning_vi": "Dạ em xin lỗi, mời anh/chị nói trước ạ, em đang nghe đây."
+        },
+        {
+          "situation": "Xác nhận lại câu hỏi cho chắc",
+          "sentence_en": "Just to make sure I understand correctly, are you asking about [topic]?",
+          "meaning_vi": "Để chắc là em hiểu đúng ý, có phải anh/chị đang hỏi về [chủ đề] đúng không ạ?"
+        },
+        {
+          "situation": "Xin ngắt lời lịch sự",
+          "sentence_en": "Sorry to interrupt, but may I ask a quick clarifying question?",
+          "meaning_vi": "Xin lỗi vì ngắt lời, em có thể xin phép hỏi rõ hơn một chút được không ạ?"
+        },
+        {
+          "situation": "Nhờ lặp lại câu hỏi",
+          "sentence_en": "I’m sorry, would you mind repeating that question once more, please?",
+          "meaning_vi": "Em xin lỗi, anh/chị có phiền nhắc lại câu hỏi đó thêm một lần nữa giúp em được không ạ?"
+        },
+        {
+          "situation": "Xin vài giây suy nghĩ",
+          "sentence_en": "That’s a great question. Let me take a quick second to think about that.",
+          "meaning_vi": "Câu hỏi hay quá ạ. Cho em xin vài giây để sắp xếp lại ý một chút."
+        },
+        {
+          "situation": "Tiếp thu & xác nhận",
+          "sentence_en": "Understood, thank you for clarifying that for me.",
+          "meaning_vi": "Em hiểu rồi ạ, cảm ơn anh/chị đã giải thích rõ giúp em."
+        },
+        {
+          "situation": "Kiểm tra xem trả lời đã đủ ý chưa",
+          "sentence_en": "Does that answer your question, or would you like me to elaborate?",
+          "meaning_vi": "Dạ câu trả lời đó đã đúng ý anh/chị chưa, hay anh/chị có muốn em nói sâu thêm chỗ nào không ạ?"
+        },
+        {
+          "situation": "Bắt đầu đặt câu hỏi ngược lại",
+          "sentence_en": "Yes, definitely! Could you share a bit about [topic]?",
+          "meaning_vi": "Dạ vâng! Anh/chị có thể chia sẻ thêm một chút về [chủ đề] được không ạ? (Vào việc nhanh, tự nhiên)."
+        },
+        {
+          "situation": "Cảm ơn và chốt buổi họp",
+          "sentence_en": "Thank you so much for your time today. It was great speaking with you.",
+          "meaning_vi": "Cảm ơn anh/chị rất nhiều vì buổi hôm nay. Em rất vui vì được trao đổi cùng anh/chị."
+        }
+      ]
+    }
+  ]
+}
