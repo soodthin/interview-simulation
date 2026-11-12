@@ -47,12 +47,12 @@
 
     /* Active Question Card in Sidebar */
     .active-chapter-item {
-      background-color: #1c1c1f !important;
+      background-color: #18181b !important;
       border-left: 4px solid #ef4444 !important;
       border-color: #3f3f46 !important;
     }
 
-    /* Key phrase highlight in script (Black - Red - White theme) */
+    /* Key phrase highlight in script (Podcast Red Accent) */
     .script-highlight {
       color: #ffffff;
       font-weight: 700;
@@ -71,7 +71,7 @@
 
   <!-- 1. TOP HEADER BAR (Pure Black, Red, White Podcast Studio Aesthetic) -->
   <header class="h-14 flex-shrink-0 border-b border-[#27272a] bg-[#0c0c0e] px-4 flex items-center justify-between z-40">
-    <!-- Left: Podcast Show Title & On-Air Badge -->
+    <!-- Left: Podcast Show Title & Mode Badge -->
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-[#18181b] border border-[#27272a] flex items-center justify-center text-red-500">
         <i data-lucide="mic" class="w-4 h-4"></i>
@@ -81,8 +81,10 @@
           <span class="text-xs sm:text-sm font-bold tracking-tight text-white uppercase font-mono">
             ESCO AV PODCAST STUDIO
           </span>
-          <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-white bg-red-600 px-2 py-0.5 rounded tracking-wider uppercase">
-            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> ON AIR
+          <!-- Dynamic Mode Badge: Chế độ nghe vs Chế độ practice -->
+          <span id="appModeBadge" class="inline-flex items-center gap-1.5 text-[10px] font-bold text-white bg-[#1f1f23] border border-[#333338] px-2 py-0.5 rounded tracking-wider uppercase font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" id="modeDot"></span>
+            <span id="modeText">CHẾ ĐỘ NGHE</span>
           </span>
         </div>
         <p class="text-[11px] text-zinc-400 hidden sm:block">
@@ -99,10 +101,10 @@
         <span id="sessionTimerText">00:00</span>
       </div>
 
-      <!-- Toggle Webcam Practice Button -->
-      <button id="btnWebcam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95" title="Bật/Tắt Webcam để luyện nói (Phím C)">
-        <i data-lucide="camera" class="w-3.5 h-3.5 text-zinc-400"></i>
-        <span id="webcamBtnText">Bật Webcam [C]</span>
+      <!-- Toggle Webcam: Bật = Practice (Tắt sound), Tắt = Nghe (Bật sound) -->
+      <button id="btnWebcam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm" title="Bật/Tắt chế độ Practice bằng Webcam (Phím C)">
+        <i data-lucide="camera" class="w-3.5 h-3.5 text-zinc-400" id="webcamIcon"></i>
+        <span id="webcamBtnText">Bật Webcam (Practice) [C]</span>
       </button>
 
       <!-- Toggle Right Question List Drawer -->
@@ -115,33 +117,35 @@
   <!-- 2. MAIN WORKSPACE (STAGE + RIGHT QUESTION DRAWER) -->
   <main class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden w-full relative">
 
-    <!-- CENTER STAGE (2 PODS + CLEAN SCRIPT CARD + AUDIO CONTROLS) -->
+    <!-- CENTER STAGE (2 ORIGINAL CHARACTERS + CLEAN SCRIPT CARD + AUDIO CONTROLS) -->
     <div class="flex-1 min-h-0 flex flex-col items-center justify-between p-3 sm:p-4 overflow-y-auto relative gap-2.5 bg-[#09090b]">
 
       <!-- STAGE CONTAINER -->
       <div class="w-full max-w-[940px] flex-1 flex flex-col justify-center items-center gap-3 my-auto">
 
-        <!-- Status Hint -->
+        <!-- Status Mode Hint -->
         <div class="w-full flex items-center justify-between text-xs px-1">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
-            <span class="text-zinc-400 font-mono text-[11px] uppercase tracking-wider">Interview Practice Mode</span>
+            <span id="stageHintText" class="text-zinc-400 font-mono text-[11px] uppercase tracking-wider">
+              Chế độ nghe: 2 nhân vật hoạt hình nhép môi theo audio
+            </span>
           </div>
           <div class="text-[11px] font-mono text-zinc-500 hidden sm:block">
-            [Space] Dừng/Phát • [Enter] Xong câu tiếp • [C] Bật cam • [R] Nghe lại
+            [Space] Dừng/Phát • [Enter] Xong câu tiếp • [C] Bật cam Practice • [R] Nghe lại
           </div>
         </div>
 
-        <!-- THE 2 VIDEO / AVATAR PODS -->
+        <!-- THE 2 VIDEO / AVATAR PODS (2 NHÂN VẬT GỐC NGUYÊN BẢN!) -->
         <div class="w-full flex items-center justify-center gap-3 sm:gap-5">
           
-          <!-- LEFT POD: INTERVIEWER (2D Cartoon Animation) -->
-          <div id="cardInterviewer" class="relative flex-1 max-w-[420px] aspect-[16/10] sm:aspect-[4/3] max-h-[220px] sm:max-h-[250px] rounded-2xl overflow-hidden bg-[#121214] border border-[#27272a] shadow-xl transition-all duration-200">
-            <!-- 2D Expressive Cartoon Canvas -->
-            <canvas id="interviewerCanvas" class="w-full h-full object-cover cursor-pointer" onclick="togglePlay()"></canvas>
+          <!-- LEFT POD: ORIGINAL INTERVIEWER CARTOON CANVAS -->
+          <div id="cardInterviewer" class="relative flex-1 max-w-[420px] aspect-[4/3] max-h-[240px] sm:max-h-[270px] rounded-2xl overflow-hidden bg-[#0c1322] border border-[#27272a] shadow-xl transition-all duration-200">
+            <!-- Canvas with exact original dimensions 420x315 -->
+            <canvas id="interviewerCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
             
-            <!-- Speaking Red Indicator Border -->
-            <div id="interviewerSpeakingGlow" class="absolute inset-0 border-2 border-red-500 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-150"></div>
+            <!-- Speaking Red Ring Overlay -->
+            <div id="interviewerSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
 
             <!-- Lower Third Label -->
             <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
@@ -157,31 +161,33 @@
             </div>
           </div>
 
-          <!-- RIGHT POD: CANDIDATE (2D Cartoon Animation or Live Webcam) -->
-          <div id="cardCandidate" class="relative flex-1 max-w-[420px] aspect-[16/10] sm:aspect-[4/3] max-h-[220px] sm:max-h-[250px] rounded-2xl overflow-hidden bg-[#121214] border border-[#27272a] shadow-xl transition-all duration-200">
-            <!-- 2D Cartoon Canvas (Default) -->
-            <canvas id="candidateCanvas" class="w-full h-full object-cover cursor-pointer" onclick="togglePlay()"></canvas>
+          <!-- RIGHT POD: ORIGINAL CANDIDATE CARTOON CANVAS (Thái Đỗ Thịnh) OR LIVE WEBCAM -->
+          <div id="cardCandidate" class="relative flex-1 max-w-[420px] aspect-[4/3] max-h-[240px] sm:max-h-[270px] rounded-2xl overflow-hidden bg-[#091816] border border-[#27272a] shadow-xl transition-all duration-200">
+            <!-- Canvas with exact original dimensions 420x315 -->
+            <canvas id="candidateCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
 
             <!-- Live Webcam Video (Active only when user clicks Bật Webcam) -->
             <video id="webcamVideo" autoplay playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
 
-            <!-- Active Glow Border for Candidate -->
-            <div id="candidateSpeakingGlow" class="absolute inset-0 border-2 border-red-500 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-150"></div>
+            <!-- Speaking Ring Overlay for Candidate -->
+            <div id="candidateSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
 
             <!-- Top Right REC Indicator (When webcam is active) -->
             <div id="webcamRecBadge" class="hidden absolute top-2.5 right-2.5 flex items-center gap-1.5 px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold font-mono uppercase tracking-wider">
-              <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> REC
+              <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span> REC ● LIVE
             </div>
 
             <!-- Lower Third Label -->
             <div class="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
               <span class="w-2 h-2 rounded-full bg-zinc-400" id="candidateMicDot"></span>
-              <span>Thái Đỗ Thịnh</span>
+              <span id="candidateLabelText">Thái Đỗ Thịnh</span>
             </div>
 
-            <!-- Live Mic Audio Visualizer Bar -->
-            <div id="candidateAudioBar" class="hidden absolute bottom-2.5 right-2.5 w-16 h-3 bg-[#09090b]/90 rounded px-1 flex items-center border border-[#27272a]">
-              <span id="userMicLevel" class="h-1.5 bg-red-500 rounded-full transition-all duration-75" style="width: 10%;"></span>
+            <!-- Live Mic Audio Visualizer Bars (When webcam is active) -->
+            <div id="waveContainer" class="hidden absolute bottom-2.5 right-2.5 flex items-end gap-1 h-5 px-2 py-1 rounded bg-[#09090b]/90 border border-[#27272a]">
+              <span id="waveBar1" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 6px;"></span>
+              <span id="waveBar2" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 12px;"></span>
+              <span id="waveBar3" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 8px;"></span>
             </div>
           </div>
         </div>
@@ -240,7 +246,7 @@
       </div>
 
       <!-- COMPACT AUDIO CONTROLS (Pure Matte Black, Red, White) -->
-      <div class="w-full max-w-[940px] h-12 flex-shrink-0 bg-[#0c0c0e] border border-[#27272a] rounded-xl px-3.5 flex items-center justify-between gap-3 text-xs">
+      <div id="audioControlsBar" class="w-full max-w-[940px] h-12 flex-shrink-0 bg-[#0c0c0e] border border-[#27272a] rounded-xl px-3.5 flex items-center justify-between gap-3 text-xs">
         
         <!-- Progress Bar & Time Display -->
         <div class="flex-1 flex items-center gap-3">
@@ -337,9 +343,12 @@
     let audio = null;
     let isPlaying = false;
     let currentChapterIndex = 0;
+    let activeSpeaker = 'interviewer'; // 'interviewer' or 'thinh'
     let searchQuery = '';
 
-    // Webcam & Practice State
+    // Webcam & Practice Mode State
+    // FALSE = CHẾ ĐỘ NGHE (Default): Sound bật, 2 nhân vật nhép môi theo audio
+    // TRUE  = CHẾ ĐỘ PRACTICE: Sound tắt hoàn toàn, webcam live, mic visualizer, đếm ngược để người dùng luyện nói!
     let isWebcamActive = false;
     let webcamStream = null;
     let userAudioCtx = null;
@@ -355,14 +364,27 @@
 
     // Web Audio API for Speech Detection & Animation
     let audioContext = null;
-    let analyserNode = null;
-    let sourceNode = null;
+    let analyser = null;
     let dataArray = null;
 
-    // Canvas Characters Animation State
+    // Exact Original Character Animation State
     let animState = {
-      interviewer: { mouthOpen: 0, headTilt: 0 },
-      thinh: { mouthOpen: 0, headTilt: 0 }
+      interviewer: {
+        glow: 0.15,
+        mouthOpen: 0,
+        mouthWidth: 1,
+        mouthRound: 0,
+        jawDrop: 0,
+        headTilt: 0
+      },
+      thinh: {
+        glow: 0.15,
+        mouthOpen: 0,
+        mouthWidth: 1,
+        mouthRound: 0,
+        jawDrop: 0,
+        headTilt: 0
+      }
     };
 
     // Important key phrases to highlight in red
@@ -373,6 +395,583 @@
       "Python", "TCP/IP", "IP address", "subnets", "gateway", "DHCP", "ping",
       "patient with users", "proactive", "learn by doing", "stay calm", "first 2 months"
     ];
+
+    // Helper: Round Rectangle
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    // --- EXACT ORIGINAL CHARACTERS DRAWING CODE ---
+function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
+      const open = isSpeaking ? Math.max(0, Math.min(1, state.mouthOpen)) : 0;
+      const spread = state.mouthWidth || 1.0;
+      const round = state.mouthRound || 0.0;
+
+      ctx.save();
+      ctx.translate(0, yPos);
+
+      const w = (9.6 * spread) * (1 - round * 0.28) + open * (1.2 - round * 0.8);
+      const cornerY = -1.1 * (1 - open * 0.75);
+      const topCtrlY = 1.1 - open * (1.5 + round * 1.8);
+      const botCtrlY = 1.1 + Math.pow(open, 0.95) * 13.8;
+      const cavityHeight = (botCtrlY - topCtrlY) * 0.75;
+
+      if (cavityHeight > 0.45) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(-w, cornerY);
+        ctx.bezierCurveTo(-w * 0.48, topCtrlY, w * 0.48, topCtrlY, w, cornerY);
+        ctx.bezierCurveTo(w * 0.62, botCtrlY, -w * 0.62, botCtrlY, -w, cornerY);
+        ctx.closePath();
+
+        ctx.fillStyle = '#3b0a14';
+        ctx.fill();
+        ctx.clip();
+
+        if (open > 0.12) {
+          const actualBotY = 0.25 * cornerY + 0.75 * botCtrlY;
+          ctx.fillStyle = '#f472b6';
+          ctx.beginPath();
+          ctx.ellipse(0, actualBotY - 0.6, w * 0.64, 2.4 + open * 3.0, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const teethHeight = Math.max(0, (1.8 + open * 2.1) * (1 - round * 0.45));
+        if (teethHeight > 0.3) {
+          const actualTopY = 0.25 * cornerY + 0.75 * topCtrlY;
+          ctx.fillStyle = '#ffffff';
+          roundRect(ctx, -w * 0.78, actualTopY - 0.5, w * 1.56, teethHeight, 1.8);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Lip Outline
+      ctx.strokeStyle = isSpeaking ? '#e11d48' : '#e28b8b';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-w, cornerY);
+      ctx.bezierCurveTo(-w * 0.48, topCtrlY, w * 0.48, topCtrlY, w, cornerY);
+      ctx.stroke();
+
+      if (cavityHeight > 0.45) {
+        ctx.beginPath();
+        ctx.moveTo(w, cornerY);
+        ctx.bezierCurveTo(w * 0.62, botCtrlY, -w * 0.62, botCtrlY, -w, cornerY);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // Left Character Canvas: Interviewer (Navy Suit & Tie)
+    function drawInterviewerCanvas(now, audioLevel) {
+      const cvs = document.getElementById('interviewerCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+      const t = now * 0.001;
+
+      const isSpeaking = activeSpeaker === 'interviewer' && isPlaying;
+      const cx = w / 2;
+
+      const state = animState.interviewer;
+      if (isSpeaking) {
+        state.mouthOpen += ((0.25 + audioLevel * 1.8) - state.mouthOpen) * 0.35;
+        state.headTilt = Math.sin(t * 3.8) * 0.035;
+      } else {
+        state.mouthOpen += (0 - state.mouthOpen) * 0.2;
+        state.headTilt = Math.sin(t * 1.4) * 0.015;
+      }
+      state.jawDrop = state.mouthOpen * 3.5;
+
+      const blinkCycle = (t + 1.2) % 4.0;
+      const isBlinking = blinkCycle > 3.85;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Studio Backdrop
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#0c1322');
+      grad.addColorStop(1, '#070a14');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Backlight Halo
+      ctx.fillStyle = isSpeaking ? 'rgba(56, 189, 248, 0.14)' : 'rgba(56, 189, 248, 0.04)';
+      ctx.beginPath();
+      ctx.arc(cx, 140, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Breathing movement
+      const breathY = Math.sin(t * 2.2) * 2;
+      const baseCy = 205 + breathY;
+
+      // Torso / Suit Jacket
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(cx - 110, h);
+      ctx.lineTo(cx - 90, baseCy + 30);
+      ctx.quadraticCurveTo(cx - 60, baseCy - 18, cx - 28, baseCy - 22);
+      ctx.lineTo(cx + 28, baseCy - 22);
+      ctx.quadraticCurveTo(cx + 60, baseCy - 18, cx + 90, baseCy + 30);
+      ctx.lineTo(cx + 110, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Suit Lapels
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(cx - 30, baseCy - 22);
+      ctx.lineTo(cx - 52, baseCy + 40);
+      ctx.lineTo(cx, baseCy + 90);
+      ctx.lineTo(cx - 20, baseCy - 22);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + 30, baseCy - 22);
+      ctx.lineTo(cx + 48, baseCy + 40);
+      ctx.lineTo(cx, baseCy + 90);
+      ctx.lineTo(cx + 20, baseCy - 22);
+      ctx.fill();
+
+      // Shirt & Red Tie
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(cx - 22, baseCy - 22);
+      ctx.lineTo(cx + 22, baseCy - 22);
+      ctx.lineTo(cx, baseCy + 65);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.moveTo(cx - 7, baseCy - 16);
+      ctx.lineTo(cx + 7, baseCy - 16);
+      ctx.lineTo(cx + 11, baseCy + 55);
+      ctx.lineTo(cx, baseCy + 75);
+      ctx.lineTo(cx - 11, baseCy + 55);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#e2b897';
+      roundRect(ctx, cx - 18, baseCy - 48, 36, 34, 8);
+      ctx.fill();
+
+      // Head Group
+      ctx.save();
+      ctx.translate(cx, baseCy - 78);
+      ctx.rotate(state.headTilt);
+
+      // Studio Headphones
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(0, -4, 54, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.stroke();
+
+      // Ears
+      ctx.fillStyle = '#ebbfa0';
+      ctx.beginPath();
+      ctx.ellipse(-48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Headphone Ear Cups
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2;
+      roundRect(ctx, -58, -14, 14, 32, 6);
+      ctx.fill();
+      ctx.stroke();
+      roundRect(ctx, 44, -14, 14, 32, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Face Shape
+      const faceGrad = ctx.createLinearGradient(0, -48, 0, 48 + state.jawDrop);
+      faceGrad.addColorStop(0, '#f7d3b5');
+      faceGrad.addColorStop(1, '#e8bc9a');
+      ctx.fillStyle = faceGrad;
+      roundRect(ctx, -46, -48, 92, 94 + state.jawDrop * 0.65, 40);
+      ctx.fill();
+
+      // Hair
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(0, -12, 48, Math.PI * 0.92, Math.PI * 2.08);
+      ctx.quadraticCurveTo(34, -22, -10, -24);
+      ctx.quadraticCurveTo(-38, -24, -47, -8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eyebrows
+      const browLift = isSpeaking ? -2.5 * state.mouthOpen : 0;
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 3.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-28, -13 + browLift);
+      ctx.quadraticCurveTo(-18, -17 + browLift, -9, -13 + browLift);
+      ctx.moveTo(9, -13 + browLift);
+      ctx.quadraticCurveTo(18, -17 + browLift, 28, -13 + browLift);
+      ctx.stroke();
+
+      // Eyes
+      if (isBlinking) {
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-25, -2);
+        ctx.lineTo(-13, -2);
+        ctx.moveTo(13, -2);
+        ctx.lineTo(25, -2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(-19, -2, 4.5, 0, Math.PI * 2);
+        ctx.arc(19, -2, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-17.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.arc(20.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Nose
+      ctx.strokeStyle = '#c89672';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -1);
+      ctx.lineTo(-2, 10);
+      ctx.lineTo(3, 11);
+      ctx.stroke();
+
+      // Mouth
+      drawNaturalCharacterMouth(ctx, 22 + state.jawDrop * 0.25, state, isSpeaking);
+
+      ctx.restore(); // End head group
+
+      // Boom Mic
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(20, h - 35);
+      ctx.lineTo(cx - 28, h - 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = isSpeaking ? '#38bdf8' : '#475569';
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx - 40, h - 90, 24, 38, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Studio Desk Lower Bar
+      ctx.fillStyle = 'rgba(7, 13, 25, 0.95)';
+      ctx.fillRect(0, h - 45, w, 45);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 45);
+      ctx.lineTo(w, h - 45);
+      ctx.stroke();
+
+      // Name & Equalizer Bars on Desk
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('NGƯỜI PHỎNG VẤN', 16, h - 24);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.fillText(isSpeaking ? '● ON AIR • SPEAKING' : '○ LISTENING', 16, h - 10);
+
+      // Equalizer bars
+      for (let b = 0; b < 7; b++) {
+        const bh = isSpeaking ? Math.max(3, Math.abs(Math.sin(t * 12 + b)) * 22 * (0.4 + audioLevel)) : 3;
+        ctx.fillStyle = isSpeaking ? '#38bdf8' : 'rgba(148, 163, 184, 0.25)';
+        roundRect(ctx, w - 60 + b * 6.5, h - 12 - bh, 4, bh, 2);
+        ctx.fill();
+      }
+    }
+
+    // Right Character Canvas: Thái Đỗ Thịnh (Emerald Outfit with Signature Glasses)
+    function drawCandidateCanvas(now, audioLevel) {
+      if (isWebcamActive) return;
+
+      const cvs = document.getElementById('candidateCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      const w = cvs.width;
+      const h = cvs.height;
+      const t = now * 0.001;
+
+      const isSpeaking = activeSpeaker === 'thinh' && isPlaying;
+      const cx = w / 2;
+
+      const state = animState.thinh;
+      if (isSpeaking) {
+        state.mouthOpen += ((0.25 + audioLevel * 1.8) - state.mouthOpen) * 0.35;
+        state.headTilt = Math.sin(t * 4.2) * 0.04;
+      } else {
+        state.mouthOpen += (0 - state.mouthOpen) * 0.2;
+        state.headTilt = Math.sin(t * 1.6) * 0.015;
+      }
+      state.jawDrop = state.mouthOpen * 3.5;
+
+      const blinkCycle = (t + 0.6) % 3.8;
+      const isBlinking = blinkCycle > 3.65;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Studio Backdrop
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#091816');
+      grad.addColorStop(1, '#050f0e');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Backlight Halo
+      ctx.fillStyle = isSpeaking ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.04)';
+      ctx.beginPath();
+      ctx.arc(cx, 140, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Breathing movement
+      const breathY = Math.sin(t * 2.4 + 1) * 2;
+      const baseCy = 205 + breathY;
+
+      // Torso / Emerald Outfit
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath();
+      ctx.moveTo(cx - 110, h);
+      ctx.lineTo(cx - 90, baseCy + 30);
+      ctx.quadraticCurveTo(cx - 60, baseCy - 18, cx - 28, baseCy - 22);
+      ctx.lineTo(cx + 28, baseCy - 22);
+      ctx.quadraticCurveTo(cx + 60, baseCy - 18, cx + 90, baseCy + 30);
+      ctx.lineTo(cx + 110, h);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner Shirt & Lanyard
+      ctx.fillStyle = '#f8fafc';
+      ctx.beginPath();
+      ctx.moveTo(cx - 20, baseCy - 22);
+      ctx.lineTo(cx + 20, baseCy - 22);
+      ctx.lineTo(cx, baseCy + 55);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.moveTo(cx - 7, baseCy - 16);
+      ctx.lineTo(cx + 7, baseCy - 16);
+      ctx.lineTo(cx + 10, baseCy + 52);
+      ctx.lineTo(cx, baseCy + 68);
+      ctx.lineTo(cx - 10, baseCy + 52);
+      ctx.closePath();
+      ctx.fill();
+
+      // Neck
+      ctx.fillStyle = '#e6bc9c';
+      roundRect(ctx, cx - 18, baseCy - 48, 36, 34, 8);
+      ctx.fill();
+
+      // Head Group
+      ctx.save();
+      ctx.translate(cx, baseCy - 78);
+      ctx.rotate(state.headTilt);
+
+      // Ears
+      ctx.fillStyle = '#ebbfa0';
+      ctx.beginPath();
+      ctx.ellipse(-48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(48, 2, 8, 14, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Face Shape
+      const faceGrad = ctx.createLinearGradient(0, -48, 0, 48 + state.jawDrop);
+      faceGrad.addColorStop(0, '#fae8d8');
+      faceGrad.addColorStop(1, '#ecc3a3');
+      ctx.fillStyle = faceGrad;
+      roundRect(ctx, -46, -48, 92, 94 + state.jawDrop * 0.65, 40);
+      ctx.fill();
+
+      // Modern Hair
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(0, -13, 48, Math.PI * 0.9, Math.PI * 2.1);
+      ctx.quadraticCurveTo(25, -26, 0, -20);
+      ctx.quadraticCurveTo(-25, -26, -47, -10);
+      ctx.closePath();
+      ctx.fill();
+
+      // Eyebrows
+      const browLift = isSpeaking ? -2.5 * state.mouthOpen : 0;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-28, -14 + browLift);
+      ctx.quadraticCurveTo(-18, -18 + browLift, -9, -14 + browLift);
+      ctx.moveTo(9, -14 + browLift);
+      ctx.quadraticCurveTo(18, -18 + browLift, 28, -14 + browLift);
+      ctx.stroke();
+
+      // Eyes
+      if (isBlinking) {
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(-25, -2);
+        ctx.lineTo(-13, -2);
+        ctx.moveTo(13, -2);
+        ctx.lineTo(25, -2);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(-19, -2, 4.2, 0, Math.PI * 2);
+        ctx.arc(19, -2, 4.2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-17.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.arc(20.5, -3.5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Signature Glasses
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+      roundRect(ctx, -32, -11, 26, 18, 4);
+      ctx.fill();
+      roundRect(ctx, 6, -11, 26, 18, 4);
+      ctx.fill();
+
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 2.6;
+      roundRect(ctx, -32, -11, 26, 18, 4);
+      ctx.stroke();
+      roundRect(ctx, 6, -11, 26, 18, 4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-6, -3);
+      ctx.lineTo(6, -3);
+      ctx.stroke();
+
+      // Nose
+      ctx.strokeStyle = '#c89672';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -1);
+      ctx.lineTo(-2, 10);
+      ctx.lineTo(3, 11);
+      ctx.stroke();
+
+      // Mouth
+      drawNaturalCharacterMouth(ctx, 22 + state.jawDrop * 0.25, state, isSpeaking);
+
+      ctx.restore(); // End head group
+
+      // Boom Mic (Right Side)
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(w - 20, h - 35);
+      ctx.lineTo(cx + 28, h - 65);
+      ctx.stroke();
+
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = isSpeaking ? '#10b981' : '#475569';
+      ctx.lineWidth = 2;
+      roundRect(ctx, cx + 16, h - 90, 24, 38, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Studio Desk Lower Bar
+      ctx.fillStyle = 'rgba(5, 15, 14, 0.95)';
+      ctx.fillRect(0, h - 45, w, 45);
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h - 45);
+      ctx.lineTo(w, h - 45);
+      ctx.stroke();
+
+      // Name & Equalizer Bars on Desk
+      ctx.fillStyle = '#34d399';
+      ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('THÁI ĐỖ THỊNH', 16, h - 24);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 10px "JetBrains Mono", monospace';
+      ctx.fillText(isSpeaking ? '● ON AIR • SPEAKING' : '○ LISTENING', 16, h - 10);
+
+      // Equalizer bars
+      for (let b = 0; b < 7; b++) {
+        const bh = isSpeaking ? Math.max(3, Math.abs(Math.sin(t * 12 + b)) * 22 * (0.4 + audioLevel)) : 3;
+        ctx.fillStyle = isSpeaking ? '#34d399' : 'rgba(148, 163, 184, 0.25)';
+        roundRect(ctx, w - 60 + b * 6.5, h - 12 - bh, 4, bh, 2);
+        ctx.fill();
+      }
+    }
+
+    // Main Combined Animation Loop
+    function mainAnimationLoop(now) {
+      let audioLevel = 0;
+
+      if (analyser && dataArray && isPlaying && !simTimer) {
+        analyser.getByteFrequencyData(dataArray);
+        let vocalSum = 0;
+        for (let i = 2; i <= 22; i++) vocalSum += dataArray[i];
+        audioLevel = vocalSum / (21 * 255);
+      } else if (isPlaying && simTimer) {
+        const t = now * 0.001;
+        audioLevel = 0.25 + Math.abs(Math.sin(t * 9) * Math.cos(t * 5.5)) * 0.45;
+      }
+
+      // 1. Draw Interviewer Canvas
+      drawInterviewerCanvas(now, audioLevel);
+
+      // 2. Draw Candidate Canvas (when webcam is inactive)
+      if (!isWebcamActive) {
+        drawCandidateCanvas(now, audioLevel);
+      }
+
+      // 3. Animate Mic Wave Bars (when webcam is active)
+      if (isWebcamActive) {
+        const b1 = document.getElementById('waveBar1');
+        const b2 = document.getElementById('waveBar2');
+        const b3 = document.getElementById('waveBar3');
+
+        if (userAnalyser && userDataArray) {
+          userAnalyser.getByteFrequencyData(userDataArray);
+          const v1 = Math.max(4, Math.min(22, (userDataArray[2] || 0) / 10));
+          const v2 = Math.max(6, Math.min(26, (userDataArray[6] || 0) / 8));
+          const v3 = Math.max(4, Math.min(20, (userDataArray[10] || 0) / 12));
+          if (b1) b1.style.height = v1 + 'px';
+          if (b2) b2.style.height = v2 + 'px';
+          if (b3) b3.style.height = v3 + 'px';
+        }
+      }
+
+      requestAnimationFrame(mainAnimationLoop);
+    }
+
+    // Chapter Playlist Drawer
+    
 
     // Initialize App
     window.addEventListener('DOMContentLoaded', async () => {
@@ -421,8 +1020,8 @@
         lucide.createIcons();
       });
 
-      // Start 2D Canvas Character Rendering
-      initCanvasAnimations();
+      // Start the Original Animation Loop
+      requestAnimationFrame(mainAnimationLoop);
     });
 
     // Build Right Sidebar Questions
@@ -532,19 +1131,28 @@
     function jumpToChapter(idx) {
       if (!interviewData || !interviewData.chapters[idx]) return;
       const chap = interviewData.chapters[idx];
-      initWebAudio();
-
       currentChapterIndex = idx;
       buildChapterDrawer();
       syncQuestionCardForChapter(idx);
 
-      if (chap.start < 518.0) {
+      if (isWebcamActive) {
+        // In Practice Mode: KEEP SOUND MUTED & STOPPED so candidate can speak!
+        if (audio && !audio.paused) audio.pause();
         if (simTimer) stopSimulatedPlayback();
-        audio.currentTime = chap.start;
-        audio.play().catch(() => {});
+        isPlaying = false;
+        document.getElementById('playIcon').setAttribute('data-lucide', 'play');
+        lucide.createIcons();
       } else {
-        if (!audio.paused) audio.pause();
-        startSimulatedPlayback(chap.start, chap.end);
+        // In Listening Mode: Play pre-recorded audio
+        initWebAudio();
+        if (chap.start < 518.0) {
+          if (simTimer) stopSimulatedPlayback();
+          audio.currentTime = chap.start;
+          audio.play().catch(() => {});
+        } else {
+          if (!audio.paused) audio.pause();
+          startSimulatedPlayback(chap.start, chap.end);
+        }
       }
     }
 
@@ -601,11 +1209,13 @@
       }
     }
 
-    // Simulated Playback for Chapters 15-20
+    // Simulated Playback for Chapters 15-20 (Only in Listening Mode)
     function startSimulatedPlayback(startTime, endTime) {
+      if (isWebcamActive) return; // Do not play in Practice Mode
       stopSimulatedPlayback();
       simCurrentTime = startTime;
       isPlaying = true;
+      activeSpeaker = 'interviewer';
       document.getElementById('playIcon').setAttribute('data-lucide', 'pause');
       lucide.createIcons();
 
@@ -616,6 +1226,7 @@
         simCurrentTime += 0.25;
         if (simCurrentTime >= startTime + 5.0) {
           if (hrGlow) hrGlow.style.opacity = '0';
+          activeSpeaker = 'thinh';
         }
         if (simCurrentTime >= endTime) {
           stopSimulatedPlayback();
@@ -634,7 +1245,11 @@
       lucide.createIcons();
     }
 
-    // Webcam Toggle (Clean, No gradients)
+    // ==========================================
+    // WEBCAM & MODE SWITCHING LOGIC:
+    // Bật WebCam  => CHẾ ĐỘ PRACTICE (TẮT SOUND HOÀN TOÀN)
+    // Tắt WebCam  => CHẾ ĐỘ NGHE (BẬT SOUND TRỞ LẠI)
+    // ==========================================
     async function toggleWebcam() {
       if (isWebcamActive) {
         disableWebcam();
@@ -650,14 +1265,24 @@
           audio: true
         });
         webcamStream = stream;
+
+        // 1. TẮT SOUND NGAY LẬP TỨC ĐỂ BẮT ĐẦU CHẾ ĐỘ PRACTICE!
+        if (audio) {
+          audio.pause();
+          audio.muted = true;
+        }
+        if (simTimer) stopSimulatedPlayback();
+        isPlaying = false;
+
+        // 2. Chuyển đổi Pod Candidate sang Camera Live
         const videoEl = document.getElementById('webcamVideo');
         videoEl.srcObject = stream;
         videoEl.classList.remove('hidden');
         document.getElementById('candidateCanvas').classList.add('hidden');
         document.getElementById('webcamRecBadge').classList.remove('hidden');
-        document.getElementById('candidateAudioBar').classList.remove('hidden');
+        document.getElementById('waveContainer').classList.remove('hidden');
 
-        // Mic audio level detection
+        // 3. Khởi tạo phân tích micro người dùng (Visualizer cho sóng âm)
         try {
           userAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
           const userSrc = userAudioCtx.createMediaStreamSource(stream);
@@ -665,11 +1290,11 @@
           userAnalyser.fftSize = 64;
           userDataArray = new Uint8Array(userAnalyser.frequencyBinCount);
           userSrc.connect(userAnalyser);
-          monitorUserAudio();
         } catch (e) {}
 
         isWebcamActive = true;
-        updateWebcamUI();
+        updateModeUI();
+        startAnswerCountdown(90); // Bắt đầu tính giờ trả lời cho user
       } catch (err) {
         console.warn('Cannot access camera/mic:', err);
         alert('Không thể mở Webcam hoặc Microphone. Vui lòng cấp quyền trong trình duyệt.');
@@ -677,6 +1302,7 @@
     }
 
     function disableWebcam() {
+      // 1. Tắt stream camera
       if (webcamStream) {
         webcamStream.getTracks().forEach(t => t.stop());
         webcamStream = null;
@@ -686,69 +1312,82 @@
         videoEl.srcObject = null;
         videoEl.classList.add('hidden');
       }
+
+      // 2. Trả lại 2D cartoon avatar gốc của Thái Đỗ Thịnh
       document.getElementById('candidateCanvas').classList.remove('hidden');
       document.getElementById('webcamRecBadge').classList.add('hidden');
-      document.getElementById('candidateAudioBar').classList.add('hidden');
+      document.getElementById('waveContainer').classList.add('hidden');
+
       if (userAudioCtx) {
         userAudioCtx.close();
         userAudioCtx = null;
       }
+
+      // 3. BẬT LẠI SOUND (VỀ CHẾ ĐỘ NGHE)
       isWebcamActive = false;
-      updateWebcamUI();
+      if (audio) {
+        audio.muted = false;
+      }
+
+      updateModeUI();
     }
 
-    function updateWebcamUI() {
+    function updateModeUI() {
       const btn = document.getElementById('btnWebcam');
       const txt = document.getElementById('webcamBtnText');
       const micDot = document.getElementById('candidateMicDot');
+      const candLabel = document.getElementById('candidateLabelText');
       const candCard = document.getElementById('cardCandidate');
+      const modeDot = document.getElementById('modeDot');
+      const modeText = document.getElementById('modeText');
+      const stageHint = document.getElementById('stageHintText');
 
       if (isWebcamActive) {
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5 active:scale-95';
-        txt.innerText = 'Tắt Webcam [C]';
+        // CHẾ ĐỘ PRACTICE (WEBCAM LIVE, SOUND TẮT)
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5 active:scale-95 shadow-md';
+        txt.innerText = 'Tắt Webcam (Về Chế Độ Nghe) [C]';
         micDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
-        candCard.className = 'relative flex-1 max-w-[420px] aspect-[16/10] sm:aspect-[4/3] max-h-[220px] sm:max-h-[250px] rounded-2xl overflow-hidden bg-[#121214] border-2 border-red-500 shadow-xl transition-all duration-200';
+        candLabel.innerText = 'Webcam Live (Thái Đỗ Thịnh)';
+        candCard.className = 'relative flex-1 max-w-[420px] aspect-[4/3] max-h-[240px] sm:max-h-[270px] rounded-2xl overflow-hidden bg-[#091816] border-2 border-red-500 shadow-2xl transition-all duration-200';
+        
+        modeDot.className = 'w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse';
+        modeText.innerText = 'CHẾ ĐỘ PRACTICE (SOUND TẮT)';
+        stageHint.innerText = 'Chế độ Practice: Sound đã tắt • Bạn nhìn vào kịch bản & luyện nói qua webcam';
       } else {
-        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95';
-        txt.innerText = 'Bật Webcam [C]';
+        // CHẾ ĐỘ NGHE (SOUND BẬT, 2 NHÂN VẬT GỐC)
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm';
+        txt.innerText = 'Bật Webcam (Practice) [C]';
         micDot.className = 'w-2 h-2 rounded-full bg-zinc-400';
-        candCard.className = 'relative flex-1 max-w-[420px] aspect-[16/10] sm:aspect-[4/3] max-h-[220px] sm:max-h-[250px] rounded-2xl overflow-hidden bg-[#121214] border border-[#27272a] shadow-xl transition-all duration-200';
+        candLabel.innerText = 'Thái Đỗ Thịnh';
+        candCard.className = 'relative flex-1 max-w-[420px] aspect-[4/3] max-h-[240px] sm:max-h-[270px] rounded-2xl overflow-hidden bg-[#091816] border border-[#27272a] shadow-xl transition-all duration-200';
+
+        modeDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+        modeText.innerText = 'CHẾ ĐỘ NGHE';
+        stageHint.innerText = 'Chế độ nghe: Sound đang bật • 2 nhân vật hoạt hình nhép môi theo audio';
       }
       lucide.createIcons();
     }
 
-    function monitorUserAudio() {
-      if (!isWebcamActive || !userAnalyser || !userDataArray) return;
-      userAnalyser.getByteFrequencyData(userDataArray);
-      let sum = 0;
-      for (let i = 0; i < userDataArray.length; i++) sum += userDataArray[i];
-      let avg = sum / userDataArray.length;
-      let pct = Math.min(100, Math.max(5, (avg / 128) * 100));
-
-      const bar = document.getElementById('userMicLevel');
-      if (bar) bar.style.width = pct + '%';
-
-      const glow = document.getElementById('candidateSpeakingGlow');
-      if (glow) glow.style.opacity = avg > 20 ? '1' : '0';
-
-      requestAnimationFrame(monitorUserAudio);
-    }
-
-    // Audio Playback Controls
+    // Audio Playback Controls (In Listening Mode)
     function initWebAudio() {
       if (audioContext) return;
       try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyserNode = audioContext.createAnalyser();
-        analyserNode.fftSize = 256;
-        sourceNode = audioContext.createMediaElementSource(audio);
-        sourceNode.connect(analyserNode);
-        analyserNode.connect(audioContext.destination);
-        dataArray = new Uint8Array(analyserNode.frequencyBinCount);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        const sourceNode = audioContext.createMediaElementSource(audio);
+        sourceNode.connect(analyser);
+        analyser.connect(audioContext.destination);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
       } catch (e) {}
     }
 
     function togglePlay() {
+      if (isWebcamActive) {
+        // In practice mode, clicking interviewer replay the question dialogue or stays quiet
+        replayCurrentSentence();
+        return;
+      }
       initWebAudio();
       if (currentChapterIndex >= 14) {
         if (simTimer) stopSimulatedPlayback();
@@ -765,6 +1404,15 @@
     }
 
     function replayCurrentSentence() {
+      if (isWebcamActive) {
+        // In practice mode, briefly unmute and play interviewer question then stop for candidate
+        audio.muted = false;
+        if (currentChapterIndex < 14) {
+          audio.currentTime = interviewData.chapters[currentChapterIndex].start;
+          audio.play().catch(() => {});
+        }
+        return;
+      }
       if (currentChapterIndex >= 14) {
         jumpToChapter(currentChapterIndex);
         return;
@@ -775,7 +1423,7 @@
     }
 
     function skipSeconds(sec) {
-      if (!audio) return;
+      if (!audio || isWebcamActive) return;
       audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + sec));
     }
 
@@ -812,12 +1460,23 @@
         }
       }
 
-      // Check speech dialogue
+      // Check speech dialogue to set activeSpeaker for character mouth sync
       if (interviewData.dialogues) {
         const d = interviewData.dialogues.find(x => cur >= x.start && cur <= x.end);
         const hrGlow = document.getElementById('interviewerSpeakingGlow');
-        if (hrGlow) {
-          hrGlow.style.opacity = (d && d.speaker === 'interviewer') ? '1' : '0';
+        const thinhGlow = document.getElementById('candidateSpeakingGlow');
+
+        if (d && d.speaker === 'interviewer') {
+          activeSpeaker = 'interviewer';
+          if (hrGlow) hrGlow.style.opacity = '1';
+          if (thinhGlow) thinhGlow.style.opacity = '0';
+        } else if (d && d.speaker === 'thinh') {
+          activeSpeaker = 'thinh';
+          if (hrGlow) hrGlow.style.opacity = '0';
+          if (thinhGlow && !isWebcamActive) thinhGlow.style.opacity = '1';
+        } else {
+          if (hrGlow) hrGlow.style.opacity = '0';
+          if (thinhGlow) thinhGlow.style.opacity = '0';
         }
       }
     }
@@ -830,6 +1489,7 @@
     }
 
     function seekAudio(e) {
+      if (isWebcamActive) return;
       const rect = e.currentTarget.getBoundingClientRect();
       const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       const dur = audio.duration || 518.0;
@@ -868,207 +1528,6 @@
           container.appendChild(mark);
         }
       });
-    }
-
-    // 2D Cartoon Character Canvas Animations (Clean, High Performance)
-    function initCanvasAnimations() {
-      const c1 = document.getElementById('interviewerCanvas');
-      const c2 = document.getElementById('candidateCanvas');
-      if (!c1 || !c2) return;
-
-      const ctx1 = c1.getContext('2d');
-      const ctx2 = c2.getContext('2d');
-
-      function resize() {
-        [c1, c2].forEach(c => {
-          const rect = c.getBoundingClientRect();
-          c.width = rect.width * (window.devicePixelRatio || 1);
-          c.height = rect.height * (window.devicePixelRatio || 1);
-        });
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      function animate() {
-        // Analyze audio for interviewer speaking mouth
-        let audioVol = 0;
-        if (analyserNode && dataArray && isPlaying) {
-          analyserNode.getByteFrequencyData(dataArray);
-          let sum = 0;
-          for (let i = 0; i < 32; i++) sum += dataArray[i];
-          audioVol = (sum / 32) / 128;
-        }
-
-        const curTime = (audio && !audio.paused) ? audio.currentTime : simCurrentTime;
-        const curDialogue = interviewData && interviewData.dialogues
-          ? interviewData.dialogues.find(d => curTime >= d.start && curTime <= d.end)
-          : null;
-
-        const isHrSpeaking = curDialogue && curDialogue.speaker === 'interviewer';
-
-        // Interviewer mouth animation
-        if (isHrSpeaking) {
-          animState.interviewer.mouthOpen = 0.2 + (audioVol * 0.8);
-          animState.interviewer.headTilt = Math.sin(Date.now() / 400) * 0.03;
-        } else {
-          animState.interviewer.mouthOpen = Math.max(0, animState.interviewer.mouthOpen - 0.1);
-          animState.interviewer.headTilt = 0;
-        }
-
-        // Render Interviewer (Esco Interview)
-        renderCharacter(ctx1, c1.width, c1.height, 'interviewer', animState.interviewer);
-
-        // Render Candidate (Thái Đỗ Thịnh)
-        renderCharacter(ctx2, c2.width, c2.height, 'thinh', animState.thinh);
-
-        requestAnimationFrame(animate);
-      }
-
-      requestAnimationFrame(animate);
-    }
-
-    function renderCharacter(ctx, w, h, role, state) {
-      ctx.save();
-      ctx.clearRect(0, 0, w, h);
-
-      // Solid Studio Matte Background
-      ctx.fillStyle = '#121214';
-      ctx.fillRect(0, 0, w, h);
-
-      // Acoustic Studio Grid Texture in Background
-      ctx.strokeStyle = '#1a1a1e';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < w; x += 28) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      }
-
-      const cx = w / 2;
-      const cy = h * 0.65;
-      const scale = Math.min(w / 340, h / 260);
-
-      ctx.translate(cx, cy);
-      ctx.scale(scale, scale);
-      ctx.rotate(state.headTilt || 0);
-
-      // 1. Shoulders & Suit
-      ctx.fillStyle = role === 'interviewer' ? '#18181b' : '#1f1f23';
-      ctx.beginPath();
-      ctx.ellipse(0, 75, 80, 50, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Shirt & Tie
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.moveTo(-16, 35);
-      ctx.lineTo(16, 35);
-      ctx.lineTo(0, 70);
-      ctx.closePath();
-      ctx.fill();
-
-      // Podcast Red Accent Tie
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.moveTo(-5, 42);
-      ctx.lineTo(5, 42);
-      ctx.lineTo(8, 85);
-      ctx.lineTo(0, 95);
-      ctx.lineTo(-8, 85);
-      ctx.closePath();
-      ctx.fill();
-
-      // 2. Head & Face
-      ctx.fillStyle = '#f6d8b8';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 42, 48, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Hair
-      ctx.fillStyle = '#111111';
-      ctx.beginPath();
-      ctx.ellipse(0, -22, 44, 30, 0, Math.PI, Math.PI * 2);
-      ctx.fill();
-
-      // Eyes
-      ctx.fillStyle = '#18181b';
-      ctx.beginPath();
-      ctx.arc(-14, -4, 4.5, 0, Math.PI * 2);
-      ctx.arc(14, -4, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Eye catchlights
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(-13, -5.5, 1.5, 0, Math.PI * 2);
-      ctx.arc(15, -5.5, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Eyebrows
-      ctx.strokeStyle = '#18181b';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(-22, -14);
-      ctx.lineTo(-8, -12);
-      ctx.moveTo(8, -12);
-      ctx.lineTo(22, -14);
-      ctx.stroke();
-
-      // Nose
-      ctx.strokeStyle = '#d4a373';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, -1);
-      ctx.lineTo(-2, 10);
-      ctx.lineTo(3, 10);
-      ctx.stroke();
-
-      // Mouth (Animated)
-      const mouthOpen = Math.min(18, (state.mouthOpen || 0) * 22);
-      ctx.fillStyle = '#991b1b';
-      ctx.beginPath();
-      if (mouthOpen > 2) {
-        ctx.ellipse(0, 22, 12, mouthOpen, 0, 0, Math.PI * 2);
-        ctx.fill();
-        // Teeth
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(-6, 22 - mouthOpen * 0.8, 12, 4);
-      } else {
-        ctx.arc(0, 20, 10, 0.2, Math.PI - 0.2);
-        ctx.stroke();
-      }
-
-      // Studio Headset with Mic
-      ctx.strokeStyle = '#3f3f46';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.arc(0, -10, 48, Math.PI * 0.8, Math.PI * 2.2);
-      ctx.stroke();
-
-      // Headphone earcups
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.roundRect(-50, -18, 10, 24, 4);
-      ctx.roundRect(40, -18, 10, 24, 4);
-      ctx.fill();
-
-      // Boom Microphone
-      ctx.strokeStyle = '#27272a';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(42, -4);
-      ctx.lineTo(26, 24);
-      ctx.lineTo(12, 22);
-      ctx.stroke();
-
-      // Mic pop filter (Red Podcast Tip)
-      ctx.fillStyle = '#ef4444';
-      ctx.beginPath();
-      ctx.arc(10, 22, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
     }
 
     // Keyboard Shortcuts
