@@ -97,7 +97,7 @@
     <div class="flex items-center gap-2.5">
       <!-- Session Live Clock (Click to Reset) -->
       <div onclick="resetSessionTimer()" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#141416] hover:bg-[#1c1c20] border border-[#27272a] text-xs font-mono text-zinc-300 cursor-pointer transition" title="Bấm để đặt lại thời gian phiên về 00:00">
-        <span class="w-2 h-2 rounded-full bg-red-500"></span>
+        <span class="w-2 h-2 rounded-full bg-zinc-600" id="sessionTimerDot"></span>
         <span id="sessionTimerText">00:00</span>
       </div>
 
@@ -349,7 +349,8 @@
     let userAudioCtx = null;
     let userAnalyser = null;
     let userDataArray = null;
-    let sessionStartMs = Date.now();
+    let sessionStartMs = 0;
+    let sessionTimerInterval = null;
     let countdownTimerSec = 90;
     let countdownInterval = null;
 
@@ -1002,16 +1003,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       buildChapterDrawer();
       buildTimelineMarkers();
       syncQuestionCardForChapter(0);
-      startAnswerCountdown(90);
-
-      // Session Live Clock
-      setInterval(() => {
-        const elapsed = Math.floor((Date.now() - sessionStartMs) / 1000);
-        const m = Math.floor(elapsed / 60);
-        const s = elapsed % 60;
-        const el = document.getElementById('sessionTimerText');
-        if (el) el.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      }, 1000);
+      countdownTimerSec = 90;
+      updateCountdownDisplay();
+      const sessionEl = document.getElementById('sessionTimerText');
+      if (sessionEl) sessionEl.innerText = '00:00';
 
       // Audio Event Listeners
       audio.addEventListener('timeupdate', onTimeUpdate);
@@ -1134,8 +1129,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         scriptTextEl.innerHTML = `<p class="text-zinc-400 italic">“${chap.title_en}”</p>`;
       }
 
-      // Reset countdown timer
-      startAnswerCountdown(90);
+      // Reset countdown timer display (chỉ đếm ngược khi HR đọc xong câu hỏi trong chế độ Practice)
+      clearInterval(countdownInterval);
+      countdownTimerSec = 90;
+      updateCountdownDisplay();
     }
 
     // Jump to a Chapter
@@ -1216,13 +1213,52 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function resetAnswerTimer() {
-      startAnswerCountdown(90);
+      if (isWebcamActive) {
+        startAnswerCountdown(90);
+      } else {
+        clearInterval(countdownInterval);
+        countdownTimerSec = 90;
+        updateCountdownDisplay();
+      }
+    }
+
+    // Session Live Clock (CHỈ TÍNH KHI BẬT WEBCAM / PRACTICE)
+    function startSessionTimer() {
+      stopSessionTimer();
+      sessionStartMs = Date.now();
+      updateSessionTimerDisplay();
+      sessionTimerInterval = setInterval(updateSessionTimerDisplay, 1000);
+    }
+
+    function stopSessionTimer() {
+      if (sessionTimerInterval) {
+        clearInterval(sessionTimerInterval);
+        sessionTimerInterval = null;
+      }
     }
 
     function resetSessionTimer() {
-      sessionStartMs = Date.now();
+      if (isWebcamActive) {
+        sessionStartMs = Date.now();
+        updateSessionTimerDisplay();
+      } else {
+        stopSessionTimer();
+        const el = document.getElementById('sessionTimerText');
+        if (el) el.innerText = '00:00';
+      }
+    }
+
+    function updateSessionTimerDisplay() {
       const el = document.getElementById('sessionTimerText');
-      if (el) el.innerText = '00:00';
+      if (!el) return;
+      if (!isWebcamActive) {
+        el.innerText = '00:00';
+        return;
+      }
+      const elapsed = Math.floor((Date.now() - sessionStartMs) / 1000);
+      const m = Math.floor(elapsed / 60);
+      const s = elapsed % 60;
+      el.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
     }
 
     // Simulated Playback for Chapters 15-20 (Only in Listening Mode)
@@ -1314,7 +1350,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         } catch (e) {}
 
         isWebcamActive = true;
-        resetSessionTimer();
+        startSessionTimer();
         updateModeUI();
         // Trong chế độ Practice: Cho HR đọc câu hỏi, sau đó tự dừng để user trả lời!
         jumpToChapter(currentChapterIndex);
@@ -1351,8 +1387,15 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         userAudioCtx = null;
       }
 
-      // 3. BẬT LẠI SOUND (VỀ CHẾ ĐỘ NGHE)
+      // 3. DỪNG ĐỒNG HỒ & BẬT LẠI SOUND (VỀ CHẾ ĐỘ NGHE)
       isWebcamActive = false;
+      stopSessionTimer();
+      const sessionEl = document.getElementById('sessionTimerText');
+      if (sessionEl) sessionEl.innerText = '00:00';
+      clearInterval(countdownInterval);
+      countdownTimerSec = 90;
+      updateCountdownDisplay();
+
       if (audio) {
         audio.muted = false;
       }
@@ -1368,6 +1411,16 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       const candCard = document.getElementById('cardCandidate');
       const modeDot = document.getElementById('modeDot');
       const modeText = document.getElementById('modeText');
+      const sessionDot = document.getElementById('sessionTimerDot');
+
+      if (sessionDot) {
+        if (isWebcamActive) {
+          sessionDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
+        } else {
+          sessionDot.className = 'w-2 h-2 rounded-full bg-zinc-600';
+        }
+      }
+
       if (isWebcamActive) {
         // CHẾ ĐỘ PRACTICE (WEBCAM LIVE, SOUND TẮT)
         btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1.5 active:scale-95 shadow-md';
