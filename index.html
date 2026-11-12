@@ -247,6 +247,15 @@
 </head>
 <body class="h-screen max-h-screen flex flex-col justify-between overflow-hidden bg-[#09090b] text-white select-none">
 
+  <!-- In-App Browser (Zalo / Messenger) Notice Banner -->
+  <div id="inAppBrowserNotice" class="hidden fixed top-0 left-0 right-0 z-[10001] bg-amber-500/95 text-zinc-950 px-3 py-2 text-xs font-medium shadow-lg backdrop-blur flex items-center justify-between gap-2 border-b border-amber-600 transition-all">
+    <div class="flex items-center gap-2">
+      <span class="text-base flex-shrink-0">⚠️</span>
+      <span>Bạn đang mở web trong <b>Zalo/In-App</b>. Hãy chạm icon <b>(•••)</b> góc trên và chọn <b>Mở bằng Safari / Chrome</b> để cấp quyền Camera & Micro nhé!</span>
+    </div>
+    <button onclick="document.getElementById('inAppBrowserNotice').classList.add('hidden')" class="px-2 py-0.5 rounded bg-black/20 hover:bg-black/30 font-bold text-xs flex-shrink-0 cursor-pointer">Đã hiểu</button>
+  </div>
+
   <!-- 1. TOP HEADER BAR (Pure Black, Red, White Podcast Studio Aesthetic) -->
   <header class="h-14 flex-shrink-0 border-b border-[#27272a] bg-[#0c0c0e] px-4 flex items-center justify-between z-40">
     <!-- Left: Podcast Show Title & Mode Badge -->
@@ -3570,6 +3579,18 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
       }
     });
+
+    // Check In-App Browser (Zalo / FB Messenger / TikTok)
+    (function checkInAppBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+      const isInApp = /Zalo|FBAN|FBAV|Instagram|Line|TikTok|Bytedance/i.test(ua);
+      if (isInApp) {
+        window.addEventListener('DOMContentLoaded', () => {
+          const banner = document.getElementById('inAppBrowserNotice');
+          if (banner) banner.classList.remove('hidden');
+        });
+      }
+    })();
 
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
