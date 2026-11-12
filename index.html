@@ -65,6 +65,105 @@
       transform: translate(-50%, -125%);
       transition: opacity 0.15s ease;
     }
+
+    /* TEAMS FULLSCREEN MEETING MODE */
+    body.teams-fullscreen-active {
+      overflow: hidden !important;
+    }
+
+    body.teams-fullscreen-active #teamsMeetingContainer {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: none !important;
+      background-color: #111114 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+    }
+
+    body.teams-fullscreen-active #teamsTopBar {
+      display: flex !important;
+      height: 48px !important;
+      flex-shrink: 0 !important;
+    }
+
+    body.teams-fullscreen-active #teamsVideoGrid {
+      flex: 1 !important;
+      width: 100vw !important;
+      height: calc(100vh - 48px) !important;
+      max-width: none !important;
+      padding: 8px 12px 12px 12px !important;
+      margin: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    body.teams-fullscreen-active #teamsTopRow {
+      width: 100% !important;
+      height: calc(50% - 4px) !important;
+      flex: 0 0 calc(50% - 4px) !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 8px !important;
+      min-height: 0 !important;
+    }
+
+    body.teams-fullscreen-active #teamsBottomRow {
+      width: 100% !important;
+      height: calc(50% - 4px) !important;
+      flex: 0 0 calc(50% - 4px) !important;
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      min-height: 0 !important;
+    }
+
+    body.teams-fullscreen-active #cardCandidate,
+    body.teams-fullscreen-active #cardManager,
+    body.teams-fullscreen-active #cardHR {
+      flex: 0 1 auto !important;
+      height: 100% !important;
+      max-height: 100% !important;
+      aspect-ratio: 16 / 9 !important;
+      max-width: calc((100vw - 32px) / 2) !important;
+      border-radius: 8px !important;
+      background-color: #1e1e24 !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+
+    body.teams-fullscreen-active .teams-badge-hide {
+      display: none !important;
+    }
+
+    body.teams-fullscreen-active #candidateBadgeNormal,
+    body.teams-fullscreen-active #managerBadgeNormal,
+    body.teams-fullscreen-active #hrBadgeNormal {
+      display: none !important;
+    }
+
+    body.teams-fullscreen-active #candidateBadgeTeams,
+    body.teams-fullscreen-active #managerBadgeTeams,
+    body.teams-fullscreen-active #hrBadgeTeams {
+      display: flex !important;
+    }
+
+    body.teams-fullscreen-active #teamsCaptionsCard.hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body class="h-screen max-h-screen flex flex-col justify-between overflow-hidden bg-[#09090b] text-white select-none">
@@ -113,6 +212,13 @@
         <span id="recBtnText">Ghi Video [G]</span>
       </button>
 
+      <!-- Toggle Full Teams Meeting Mode (Interview thực tế 3 người) -->
+      <button id="btnToggleTeamsFull" onclick="toggleTeamsFullMode()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm" title="Mở chế độ phỏng vấn thật toàn màn hình như Microsoft Teams (Phím F)">
+        <i data-lucide="maximize" class="w-3.5 h-3.5 text-zinc-300" id="teamsFullIcon"></i>
+        <span class="hidden sm:inline">Phỏng Vấn Thật (Teams) [F]</span>
+        <span class="sm:hidden">Teams [F]</span>
+      </button>
+
       <!-- Toggle Right Question List Drawer -->
       <button id="btnToggleDrawer" onclick="toggleChapterDrawer()" class="p-2 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] text-zinc-300 hover:text-white transition active:scale-95" title="Ẩn/Hiện danh sách câu hỏi">
         <i data-lucide="list" class="w-4 h-4"></i>
@@ -131,79 +237,233 @@
 
 
         <!-- 3-PARTICIPANT ONLINE MEETING GRID (MICROSOFT TEAMS STYLE) -->
-        <div class="w-full max-w-[940px] flex flex-col items-center gap-2.5 sm:gap-3">
+        <div id="teamsMeetingContainer" class="w-full max-w-[940px] flex flex-col items-center gap-2.5 sm:gap-3 transition-all duration-300">
           
-          <!-- TOP ROW: 2 PODS SIDE BY SIDE -->
-          <!-- LEFT: BẠN (THÁI ĐỖ THỊNH) | RIGHT: QUẢN LÝ JOB (LINE MANAGER) -->
-          <div class="w-full grid grid-cols-2 gap-2.5 sm:gap-4">
-            
-            <!-- TOP-LEFT: THÁI ĐỖ THỊNH (CANDIDATE / LIVE WEBCAM) -->
-            <div id="cardCandidate" class="relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#091816] border border-[#27272a] shadow-xl transition-all duration-200">
-              <!-- Canvas with exact original dimensions 420x315 -->
-              <canvas id="candidateCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
-
-              <!-- Live Webcam Video (Active only when user clicks Bật Webcam) -->
-              <video id="webcamVideo" autoplay playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
-
-              <!-- Speaking Ring Overlay for Candidate -->
-              <div id="candidateSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
-
-              <!-- Top Right REC Indicator / Quick Record Button -->
-              <button id="webcamRecBadge" onclick="toggleRecordPractice()" class="hidden absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#18181b]/90 hover:bg-red-600/90 border border-red-500/60 text-white text-[10px] font-bold font-mono uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md" title="Bấm để Bắt đầu/Dừng ghi hình & tải video (Phím G)">
-                <span class="w-2 h-2 rounded-full bg-red-500" id="podRecDot"></span>
-                <span id="podRecText">REC ● LIVE</span>
-              </button>
-
-              <!-- Lower Third Label -->
-              <div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
-                <span class="w-2 h-2 rounded-full bg-zinc-400" id="candidateMicDot"></span>
-                <span id="candidateLabelText">Thái Đỗ Thịnh (Bạn)</span>
+          <!-- TEAMS NATIVE TOP BAR (Active in Full Teams Mode) -->
+          <div id="teamsTopBar" class="hidden w-full h-12 bg-[#1f1f23] border-b border-[#2b2b32] px-3 sm:px-4 items-center justify-between z-30 select-none text-zinc-300">
+            <!-- Left: Meeting title & Running Timer -->
+            <div class="flex items-center gap-2.5 sm:gap-3">
+              <span class="text-xs sm:text-sm font-semibold text-white tracking-wide">Meeting with Thịnh Thái</span>
+              <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#292930] text-zinc-300 font-mono text-xs">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" id="teamsTimerDot"></span>
+                <span id="teamsTimerText">00:00</span>
               </div>
-
-              <!-- Live Mic Audio Visualizer Bars (When webcam is active) -->
-              <div id="waveContainer" class="hidden absolute bottom-2 right-2 flex items-end gap-1 h-5 px-2 py-1 rounded bg-[#09090b]/90 border border-[#27272a]">
-                <span id="waveBar1" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 6px;"></span>
-                <span id="waveBar2" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 12px;"></span>
-                <span id="waveBar3" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 8px;"></span>
+              <div id="teamsRecBadge" class="hidden flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-bold">
+                REC
               </div>
             </div>
 
-            <!-- TOP-RIGHT: QUẢN LÝ JOB (LINE MANAGER / TECHNICAL LEAD) -->
-            <div id="cardManager" class="relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#0c1322] border border-[#27272a] shadow-xl transition-all duration-200">
-              <!-- Canvas with dimensions 420x315 -->
-              <canvas id="managerCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
-              
-              <!-- Speaking Red Ring Overlay -->
-              <div id="managerSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
+            <!-- Center / Actions Toolbar -->
+            <div class="flex items-center gap-1 sm:gap-1.5">
+              <!-- Record Action -->
+              <button onclick="toggleRecordPractice()" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2b2b36] hover:bg-[#383846] text-zinc-200 transition active:scale-95 text-xs font-medium" title="Ghi video buổi tập [G]">
+                <span class="w-2 h-2 rounded-full bg-red-500" id="teamsRecBtnDot"></span>
+                <span class="hidden sm:inline" id="teamsRecBtnText">Ghi hình [G]</span>
+              </button>
 
-              <!-- Top Right Role Tag -->
-              <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#09090b]/80 border border-[#27272a] text-[10px] font-mono text-zinc-300">
-                Primary Interviewer
+              <!-- View Mode Toggle: Teams Avatar / Cartoon -->
+              <button onclick="toggleTeamsAvatarStyle()" class="flex items-center gap-1 px-2 py-1 rounded bg-[#2b2b36] hover:bg-[#383846] text-zinc-200 transition active:scale-95 text-xs font-medium" title="Đổi giao diện: Avatar Teams / Nhân vật hoạt hình [Phím A]">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-zinc-300"></i>
+                <span class="hidden md:inline" id="teamsAvatarModeText">Avatar Teams [A]</span>
+                <span class="md:hidden">Avatar [A]</span>
+              </button>
+
+              <!-- Captions / Script Teleprompter Toggle -->
+              <button id="btnToggleCaptions" onclick="toggleTeamsCaptions()" class="flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-zinc-300 hover:text-white bg-[#2b2b36] hover:bg-[#383846] transition active:scale-95" title="Bật/Tắt Kịch bản phụ đề [Phím T]">
+                <i data-lucide="subtitles" class="w-3.5 h-3.5"></i>
+                <span class="hidden sm:inline">Kịch bản [T]</span>
+              </button>
+
+              <div class="w-px h-5 bg-[#33333f] mx-1"></div>
+
+              <!-- Camera Button (Practice Mode) -->
+              <button id="teamsCamBtn" onclick="toggleWebcam()" class="p-1.5 rounded hover:bg-[#2b2b36] text-zinc-300 hover:text-white transition active:scale-95" title="Bật/Tắt Webcam (Practice) [Phím C]">
+                <i data-lucide="video" class="w-4 h-4"></i>
+              </button>
+
+              <!-- Mic Button (Mute/Unmute candidate mic in Teams mode) -->
+              <button id="teamsMicBtn" onclick="toggleCandidateMic()" class="p-1.5 rounded hover:bg-[#2b2b36] text-zinc-300 hover:text-white transition active:scale-95" title="Bật/Tắt Mic của bạn [M]">
+                <i data-lucide="mic" class="w-4 h-4"></i>
+              </button>
+
+              <!-- Red Leave Meeting Button -->
+              <button onclick="toggleTeamsFullMode(false)" class="ml-1 sm:ml-2 px-3 py-1 rounded text-xs font-bold text-white bg-[#c4314b] hover:bg-[#a82a40] transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Thoát chế độ phỏng vấn thật [F / Esc]">
+                <i data-lucide="phone-off" class="w-3.5 h-3.5"></i>
+                <span>Rời họp [Esc]</span>
+              </button>
+            </div>
+
+            <!-- Right: Simulated Windows / Teams Header Controls -->
+            <div class="hidden xl:flex items-center gap-3 pl-2 border-l border-[#2e2e38] text-zinc-400 text-xs">
+              <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded-full bg-[#f6d0c5] text-[10px] text-[#1b1b1e] font-bold flex items-center justify-center">T</span>
+                <span class="text-[11px] text-zinc-300">Personal</span>
+              </div>
+              <div class="flex items-center gap-2 text-zinc-500 font-mono">
+                <span class="cursor-pointer hover:text-white" onclick="toggleTeamsFullMode(false)">—</span>
+                <span class="cursor-pointer hover:text-white" onclick="toggleTeamsFullMode(false)">□</span>
+                <span class="cursor-pointer hover:text-red-400" onclick="toggleTeamsFullMode(false)">✕</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- VIDEO GRID -->
+          <div id="teamsVideoGrid" class="w-full flex flex-col items-center gap-2.5 sm:gap-3">
+            <!-- TOP ROW: 2 PODS SIDE BY SIDE -->
+            <!-- LEFT: BẠN (THÁI ĐỖ THỊNH) | RIGHT: QUẢN LÝ JOB (LINE MANAGER) -->
+            <div id="teamsTopRow" class="w-full grid grid-cols-2 gap-2.5 sm:gap-4">
+              
+              <!-- TOP-LEFT: THÁI ĐỖ THỊNH (CANDIDATE / LIVE WEBCAM) -->
+              <div id="cardCandidate" class="relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#091816] border border-[#27272a] shadow-xl transition-all duration-200">
+                <!-- Canvas with exact original dimensions 420x315 -->
+                <canvas id="candidateCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+
+                <!-- Teams Mode Candidate Avatar (when camera is off in Teams mode) -->
+                <div id="candidateTeamsAvatar" class="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#25252c] to-[#1c1c22]">
+                  <div id="candidateAvatarCircle" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200">
+                    T
+                  </div>
+                </div>
+
+                <!-- Live Webcam Video (Active only when user clicks Bật Webcam) -->
+                <video id="webcamVideo" autoplay playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
+
+                <!-- Speaking Ring Overlay for Candidate -->
+                <div id="candidateSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
+
+                <!-- Top Right REC Indicator / Quick Record Button -->
+                <button id="webcamRecBadge" onclick="toggleRecordPractice()" class="hidden absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#18181b]/90 hover:bg-red-600/90 border border-red-500/60 text-white text-[10px] font-bold font-mono uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md" title="Bấm để Bắt đầu/Dừng ghi hình & tải video (Phím G)">
+                  <span class="w-2 h-2 rounded-full bg-red-500" id="podRecDot"></span>
+                  <span id="podRecText">REC ● LIVE</span>
+                </button>
+
+                <!-- Normal Lower Third Badge (Podcast Mode) -->
+                <div id="candidateBadgeNormal" class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
+                  <span class="w-2 h-2 rounded-full bg-zinc-400" id="candidateMicDot"></span>
+                  <span id="candidateLabelText">Thái Đỗ Thịnh (Bạn)</span>
+                </div>
+
+                <!-- Teams Authentic Lower-Third Pill Badge (Teams Mode) -->
+                <div id="candidateBadgeTeams" class="hidden absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#121216]/80 backdrop-blur-sm text-xs font-medium text-white shadow-sm border border-white/5">
+                  <span class="flex items-end gap-0.5 h-3">
+                    <span class="w-0.5 bg-white rounded-full transition-all duration-75" style="height: 6px;" id="teamsWave1"></span>
+                    <span class="w-0.5 bg-white rounded-full transition-all duration-75" style="height: 10px;" id="teamsWave2"></span>
+                    <span class="w-0.5 bg-white rounded-full transition-all duration-75" style="height: 4px;" id="teamsWave3"></span>
+                  </span>
+                  <span>Thịnh Thái</span>
+                </div>
+
+                <!-- Live Mic Audio Visualizer Bars (When webcam is active in podcast mode) -->
+                <div id="waveContainer" class="hidden absolute bottom-2 right-2 flex items-end gap-1 h-5 px-2 py-1 rounded bg-[#09090b]/90 border border-[#27272a]">
+                  <span id="waveBar1" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 6px;"></span>
+                  <span id="waveBar2" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 12px;"></span>
+                  <span id="waveBar3" class="w-1 bg-red-500 rounded-full transition-all duration-75" style="height: 8px;"></span>
+                </div>
               </div>
 
-              <!-- Lower Third Label -->
-              <div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
-                <span class="w-2 h-2 rounded-full bg-red-500" id="managerMicDot"></span>
-                <span>Quản Lý Kỹ Thuật (Line Manager)</span>
+              <!-- TOP-RIGHT: QUẢN LÝ JOB (LINE MANAGER / TECHNICAL LEAD) -->
+              <div id="cardManager" class="relative w-full aspect-[4/3] max-h-[195px] sm:max-h-[220px] rounded-2xl overflow-hidden bg-[#0c1322] border border-[#27272a] shadow-xl transition-all duration-200">
+                <!-- Canvas with dimensions 420x315 -->
+                <canvas id="managerCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+                
+                <!-- Teams Mode Manager Avatar (Circle 'H' like Teams screenshot) -->
+                <div id="managerTeamsAvatar" class="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#25252c] to-[#1c1c22]">
+                  <div id="managerAvatarCircle" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200">
+                    H
+                  </div>
+                </div>
+
+                <!-- Speaking Red Ring Overlay (for Cartoon mode) -->
+                <div id="managerSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
+
+                <!-- Top Right Role Tag (hidden in Teams mode) -->
+                <div class="teams-badge-hide absolute top-2 right-2 px-2 py-0.5 rounded bg-[#09090b]/80 border border-[#27272a] text-[10px] font-mono text-zinc-300">
+                  Primary Interviewer
+                </div>
+
+                <!-- Normal Lower Third Badge (Podcast Mode) -->
+                <div id="managerBadgeNormal" class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
+                  <span class="w-2 h-2 rounded-full bg-red-500" id="managerMicDot"></span>
+                  <span>Quản Lý Kỹ Thuật (Line Manager)</span>
+                </div>
+
+                <!-- Teams Authentic Lower-Third Pill Badge (Teams Mode) -->
+                <div id="managerBadgeTeams" class="hidden absolute bottom-2.5 left-2.5 flex items-center gap-2 px-2.5 py-1 rounded bg-[#121216]/80 backdrop-blur-sm text-xs font-medium text-white shadow-sm border border-white/5">
+                  <span id="teamsManagerName">hihi (Guest)</span>
+                  <span id="teamsManagerMicIcon" class="text-zinc-400">
+                    <i data-lucide="mic-off" class="w-3.5 h-3.5"></i>
+                  </span>
+                  <span class="text-zinc-400 font-bold tracking-tighter text-[10px]">•••</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- BOTTOM ROW: 1 POD CENTERED -->
+            <!-- BOTTOM-CENTER: NGƯỜI HR (HR RECRUITER) -->
+            <div id="teamsBottomRow" class="w-full flex justify-center">
+              <div id="cardHR" class="relative w-full max-w-[420px] aspect-[4/3] max-h-[160px] sm:max-h-[185px] rounded-2xl overflow-hidden bg-[#140d16] border border-[#27272a] shadow-xl transition-all duration-200">
+                <!-- Canvas with dimensions 420x315 -->
+                <canvas id="hrCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
+                
+                <!-- Teams Mode HR Avatar (Circle 'H' like Teams screenshot) -->
+                <div id="hrTeamsAvatar" class="hidden absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#25252c] to-[#1c1c22]">
+                  <div id="hrAvatarCircle" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200">
+                    H
+                  </div>
+                </div>
+
+                <!-- Speaking Red Ring Overlay (for Cartoon mode) -->
+                <div id="hrSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
+
+                <!-- Normal Lower Third Badge (Podcast Mode) -->
+                <div id="hrBadgeNormal" class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
+                  <span class="w-2 h-2 rounded-full bg-rose-500" id="hrMicDot"></span>
+                  <span>HR Recruiter • Esco AV</span>
+                </div>
+
+                <!-- Teams Authentic Lower-Third Pill Badge (Teams Mode) -->
+                <div id="hrBadgeTeams" class="hidden absolute bottom-2.5 left-2.5 flex items-center gap-2 px-2.5 py-1 rounded bg-[#121216]/80 backdrop-blur-sm text-xs font-medium text-white shadow-sm border border-white/5">
+                  <span id="teamsHRName">haha (Guest)</span>
+                  <span id="teamsHRMicIcon" class="text-zinc-400">
+                    <i data-lucide="mic-off" class="w-3.5 h-3.5"></i>
+                  </span>
+                </div>
               </div>
             </div>
 
           </div>
 
-          <!-- BOTTOM ROW: 1 POD CENTERED -->
-          <!-- BOTTOM-CENTER: NGƯỜI HR (HR RECRUITER) -->
-          <div class="w-full flex justify-center">
-            <div id="cardHR" class="relative w-full max-w-[420px] aspect-[4/3] max-h-[160px] sm:max-h-[185px] rounded-2xl overflow-hidden bg-[#140d16] border border-[#27272a] shadow-xl transition-all duration-200">
-              <!-- Canvas with dimensions 420x315 -->
-              <canvas id="hrCanvas" width="420" height="315" class="w-full h-full block cursor-pointer" onclick="togglePlay()"></canvas>
-              
-              <!-- Speaking Red Ring Overlay -->
-              <div id="hrSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
-
-              <!-- Lower Third Label -->
-              <div class="absolute bottom-2 left-2 flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#09090b]/90 border border-[#27272a] text-xs font-semibold text-white">
-                <span class="w-2 h-2 rounded-full bg-rose-500" id="hrMicDot"></span>
-                <span>HR Recruiter • Esco AV</span>
+          <!-- TEAMS FLOATING LIVE CAPTIONS / TELEPROMPTER (Shown in Full Teams Mode) -->
+          <div id="teamsCaptionsCard" class="hidden absolute bottom-3 left-1/2 -translate-x-1/2 w-full max-w-[880px] px-3 z-30 pointer-events-auto">
+            <div class="rounded-xl bg-[#0d0d11]/92 backdrop-blur-md border border-[#2b2b36] p-3.5 sm:p-4 shadow-2xl transition-all">
+              <!-- Captions Top Bar -->
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#22222b]">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold font-mono uppercase flex-shrink-0" id="teamsCaptionsBadge">
+                    CÂU 1 / 20
+                  </span>
+                  <span class="text-xs sm:text-sm font-semibold text-zinc-200 truncate" id="teamsCaptionsTitle">
+                    1. Introduction & Background
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                  <div class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#18181f] text-xs font-mono text-zinc-300">
+                    <i data-lucide="clock" class="w-3 h-3 text-red-500"></i>
+                    <span id="teamsCaptionsTimer">01:30</span>
+                  </div>
+                  <button onclick="finishUserAnswer()" class="px-3 py-1 rounded-md text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition flex items-center gap-1 shadow-sm active:scale-95" title="Xong câu này và sang câu tiếp (Enter)">
+                    <span>Xong • Tiếp [Enter]</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="toggleTeamsCaptions()" class="p-1 rounded text-zinc-400 hover:text-white" title="Ẩn phụ đề kịch bản (Phím T)">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+              </div>
+              <!-- Captions Script Text -->
+              <div id="teamsCaptionsText" class="text-xs sm:text-sm text-zinc-100 leading-relaxed max-h-24 overflow-y-auto pr-1">
+                <!-- Dynamically synced with scriptAnswerText -->
               </div>
             </div>
           </div>
@@ -1250,6 +1510,19 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           if (b1) b1.style.height = v1 + 'px';
           if (b2) b2.style.height = v2 + 'px';
           if (b3) b3.style.height = v3 + 'px';
+
+          // Teams Mode candidate wave bars
+          const tw1 = document.getElementById('teamsWave1');
+          const tw2 = document.getElementById('teamsWave2');
+          const tw3 = document.getElementById('teamsWave3');
+          if (tw1 && tw2 && tw3 && !isCandidateMicMuted) {
+            const w1 = Math.max(3, Math.min(12, (userDataArray[2] || 0) / 18));
+            const w2 = Math.max(4, Math.min(14, (userDataArray[6] || 0) / 14));
+            const w3 = Math.max(2, Math.min(10, (userDataArray[10] || 0) / 22));
+            tw1.style.height = w1 + 'px';
+            tw2.style.height = w2 + 'px';
+            tw3.style.height = w3 + 'px';
+          }
         }
       }
 
@@ -1399,9 +1672,18 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }).join('');
 
         scriptTextEl.innerHTML = paragraphs;
+        const capTextEl = document.getElementById('teamsCaptionsText');
+        if (capTextEl) capTextEl.innerHTML = paragraphs;
       } else if (scriptTextEl) {
         scriptTextEl.innerHTML = `<p class="text-zinc-400 italic">“${chap.title_en}”</p>`;
+        const capTextEl = document.getElementById('teamsCaptionsText');
+        if (capTextEl) capTextEl.innerHTML = `<p class="text-zinc-400 italic">“${chap.title_en}”</p>`;
       }
+
+      const capBadge = document.getElementById('teamsCaptionsBadge');
+      if (capBadge) capBadge.innerText = `CÂU ${chap.id} / ${interviewData.chapters.length}`;
+      const capTitle = document.getElementById('teamsCaptionsTitle');
+      if (capTitle) capTitle.innerText = chap.title_en;
 
       // Reset countdown timer display (chỉ đếm ngược khi HR đọc xong câu hỏi trong chế độ Practice)
       clearInterval(countdownInterval);
@@ -1418,6 +1700,17 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       syncQuestionCardForChapter(idx);
 
       initWebAudio();
+
+      // PHỎNG VẤN THẬT: TUYỆT ĐỐI KHÔNG CÓ SOUND!
+      if (isTeamsFullMode) {
+        if (audio) {
+          audio.pause();
+          audio.muted = true;
+        }
+        stopSimulatedPlayback();
+        isPlaying = false;
+        return;
+      }
 
       // Cả 2 chế độ đều phát câu hỏi của HR:
       // - Chế độ nghe: tiếp tục phát câu trả lời mẫu của candidate
@@ -1475,14 +1768,26 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
     function updateCountdownDisplay() {
       const el = document.getElementById('answerTimerText');
-      if (!el) return;
+      const capTimer = document.getElementById('teamsCaptionsTimer');
       const m = Math.floor(countdownTimerSec / 60);
       const s = countdownTimerSec % 60;
-      el.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-      if (countdownTimerSec <= 15) {
-        el.className = 'text-red-500 font-bold animate-pulse';
-      } else {
-        el.className = 'text-zinc-200';
+      const timeStr = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+
+      if (el) {
+        el.innerText = timeStr;
+        if (isWebcamActive && countdownTimerSec <= 15) {
+          el.className = 'text-red-500 font-bold animate-pulse';
+        } else {
+          el.className = 'text-zinc-200';
+        }
+      }
+      if (capTimer) {
+        capTimer.innerText = timeStr;
+        if (isWebcamActive && countdownTimerSec <= 15) {
+          capTimer.className = 'text-red-500 font-bold animate-pulse';
+        } else {
+          capTimer.className = 'text-zinc-200';
+        }
       }
     }
 
@@ -1518,25 +1823,180 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       } else {
         stopSessionTimer();
         const el = document.getElementById('sessionTimerText');
+        const teamsEl = document.getElementById('teamsTimerText');
         if (el) el.innerText = '00:00';
+        if (teamsEl) teamsEl.innerText = '00:00';
       }
     }
 
     function updateSessionTimerDisplay() {
       const el = document.getElementById('sessionTimerText');
-      if (!el) return;
+      const teamsEl = document.getElementById('teamsTimerText');
+      const teamsDot = document.getElementById('teamsTimerDot');
+
       if (!isWebcamActive) {
-        el.innerText = '00:00';
+        if (el) el.innerText = '00:00';
+        if (teamsEl) teamsEl.innerText = '00:00';
+        if (teamsDot) teamsDot.className = 'w-2 h-2 rounded-full bg-zinc-500';
         return;
       }
       const elapsed = Math.floor((Date.now() - sessionStartMs) / 1000);
       const m = Math.floor(elapsed / 60);
       const s = elapsed % 60;
-      el.innerText = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      const timeStr = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      if (el) el.innerText = timeStr;
+      if (teamsEl) teamsEl.innerText = timeStr;
+      if (teamsDot) teamsDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
     }
+
+    // ==========================================
+    // MICROSOFT TEAMS FULLSCREEN MEETING MODE (PHỎNG VẤN THẬT - NO SOUND)
+    // ==========================================
+    let isTeamsFullMode = false;
+    let isTeamsCaptionsVisible = false; // Mặc định ẩn để chỉ còn 3 màn hình
+    let teamsAvatarStyle = 'teams'; // 'teams' (Circle avatars like screenshot) or 'cartoon'
+    let isCandidateMicMuted = false;
+
+    function toggleTeamsFullMode(force) {
+      if (typeof force === 'boolean') {
+        isTeamsFullMode = force;
+      } else {
+        isTeamsFullMode = !isTeamsFullMode;
+      }
+
+      if (isTeamsFullMode) {
+        // 1. PHỎNG VẤN THẬT: TẮT HOÀN TOÀN SOUND & AUDIO
+        if (audio) {
+          audio.pause();
+          audio.muted = true;
+        }
+        stopSimulatedPlayback();
+        isPlaying = false;
+        const playIcon = document.getElementById('playIcon');
+        if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+
+        // 2. Kích hoạt giao diện Teams Fullscreen
+        document.body.classList.add('teams-fullscreen-active');
+        if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        }
+
+        // 3. Mặc định ẩn kịch bản để chỉ còn duy nhất 3 màn hình phỏng vấn
+        isTeamsCaptionsVisible = false;
+        const cap = document.getElementById('teamsCaptionsCard');
+        if (cap) cap.classList.add('hidden');
+        const capBtn = document.getElementById('btnToggleCaptions');
+        if (capBtn) capBtn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-zinc-300 hover:text-white bg-[#2b2b36] hover:bg-[#383846] transition active:scale-95';
+
+        // 4. Cập nhật giao diện Teams
+        updateTeamsAvatarDisplay();
+      } else {
+        // Thoát chế độ phỏng vấn thật: mở lại âm thanh cho chế độ nghe
+        if (audio) {
+          audio.muted = false;
+        }
+        document.body.classList.remove('teams-fullscreen-active');
+        if (document.exitFullscreen && document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        }
+        updateTeamsAvatarDisplay();
+      }
+
+      updateTeamsFullUI();
+      lucide.createIcons();
+    }
+
+    function toggleTeamsCaptions() {
+      isTeamsCaptionsVisible = !isTeamsCaptionsVisible;
+      const cap = document.getElementById('teamsCaptionsCard');
+      const btn = document.getElementById('btnToggleCaptions');
+      if (cap) {
+        if (isTeamsCaptionsVisible) {
+          cap.classList.remove('hidden');
+          if (btn) btn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-white bg-[#6264a7] hover:bg-[#7274bd] transition active:scale-95';
+        } else {
+          cap.classList.add('hidden');
+          if (btn) btn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-zinc-300 hover:text-white bg-[#2b2b36] hover:bg-[#383846] transition active:scale-95';
+        }
+      }
+    }
+
+    function toggleTeamsAvatarStyle(style) {
+      if (style) {
+        teamsAvatarStyle = style;
+      } else {
+        teamsAvatarStyle = (teamsAvatarStyle === 'teams') ? 'cartoon' : 'teams';
+      }
+      updateTeamsAvatarDisplay();
+    }
+
+    function updateTeamsAvatarDisplay() {
+      const cAv = document.getElementById('candidateTeamsAvatar');
+      const mAv = document.getElementById('managerTeamsAvatar');
+      const hAv = document.getElementById('hrTeamsAvatar');
+      const lbl = document.getElementById('teamsAvatarModeText');
+
+      if (isTeamsFullMode && teamsAvatarStyle === 'teams') {
+        if (mAv) mAv.classList.remove('hidden');
+        if (hAv) hAv.classList.remove('hidden');
+        if (cAv) {
+          if (!isWebcamActive) {
+            cAv.classList.remove('hidden');
+          } else {
+            cAv.classList.add('hidden');
+          }
+        }
+        if (lbl) lbl.innerText = 'Avatar Teams [A]';
+      } else {
+        if (mAv) mAv.classList.add('hidden');
+        if (hAv) hAv.classList.add('hidden');
+        if (cAv) cAv.classList.add('hidden');
+        if (lbl) lbl.innerText = 'Hoạt hình [A]';
+      }
+    }
+
+    function toggleCandidateMic() {
+      isCandidateMicMuted = !isCandidateMicMuted;
+      const btn = document.getElementById('teamsMicBtn');
+      if (webcamStream) {
+        const audioTracks = webcamStream.getAudioTracks();
+        audioTracks.forEach(t => { t.enabled = !isCandidateMicMuted; });
+      }
+      if (btn) {
+        if (isCandidateMicMuted) {
+          btn.innerHTML = '<i data-lucide="mic-off" class="w-4 h-4 text-red-500"></i>';
+          btn.title = 'Mic đang tắt (Bấm để bật mic)';
+        } else {
+          btn.innerHTML = '<i data-lucide="mic" class="w-4 h-4 text-white"></i>';
+          btn.title = 'Mic đang bật (Bấm để tắt mic)';
+        }
+        lucide.createIcons();
+      }
+    }
+
+    function updateTeamsFullUI() {
+      const btn = document.getElementById('btnToggleTeamsFull');
+      const icon = document.getElementById('teamsFullIcon');
+      if (!btn) return;
+
+      if (isTeamsFullMode) {
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#6264a7] hover:bg-[#7274bd] transition flex items-center gap-1.5 active:scale-95 shadow-md';
+        if (icon) icon.setAttribute('data-lucide', 'minimize');
+      } else {
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm';
+        if (icon) icon.setAttribute('data-lucide', 'maximize');
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement && isTeamsFullMode) {
+        toggleTeamsFullMode(false);
+      }
+    });
 
     // Simulated Playback for Chapters 15-20 (Only in Listening Mode)
     function startSimulatedPlayback(startTime, endTime) {
+      if (isTeamsFullMode) return; // PHỎNG VẤN THẬT: KHÔNG PHÁT SOUND
       stopSimulatedPlayback();
       simCurrentTime = startTime;
       isPlaying = true;
@@ -1643,7 +2103,6 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         jumpToChapter(currentChapterIndex);
       } catch (err) {
         console.warn('Cannot access camera/mic:', err);
-        alert('Không thể mở Webcam hoặc Microphone. Vui lòng cấp quyền trong trình duyệt.');
       }
     }
 
@@ -1860,6 +2319,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
         if (podTxt) podTxt.innerText = `REC ${timeFormatted}`;
         if (podDot) podDot.className = 'w-2 h-2 rounded-full bg-white';
+
+        const teamsRecBadge = document.getElementById('teamsRecBadge');
+        const teamsRecBtnDot = document.getElementById('teamsRecBtnDot');
+        const teamsRecBtnText = document.getElementById('teamsRecBtnText');
+        if (teamsRecBadge) teamsRecBadge.classList.remove('hidden');
+        if (teamsRecBtnDot) teamsRecBtnDot.className = 'w-2 h-2 rounded-full bg-white animate-pulse';
+        if (teamsRecBtnText) teamsRecBtnText.innerText = `Dừng (${timeFormatted}) [G]`;
       } else {
         btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1f1f23] hover:bg-[#29292e] border border-[#3f3f46] transition flex items-center gap-1.5 active:scale-95 shadow-sm';
         if (txt) txt.innerText = 'Ghi Video [G]';
@@ -1871,6 +2337,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
         if (podTxt) podTxt.innerText = 'REC ● LIVE';
         if (podDot) podDot.className = 'w-2 h-2 rounded-full bg-red-500';
+
+        const teamsRecBadge = document.getElementById('teamsRecBadge');
+        const teamsRecBtnDot = document.getElementById('teamsRecBtnDot');
+        const teamsRecBtnText = document.getElementById('teamsRecBtnText');
+        if (teamsRecBadge) teamsRecBadge.classList.add('hidden');
+        if (teamsRecBtnDot) teamsRecBtnDot.className = 'w-2 h-2 rounded-full bg-red-500';
+        if (teamsRecBtnText) teamsRecBtnText.innerText = 'Ghi hình [G]';
       }
     }
 
@@ -1889,6 +2362,11 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function togglePlay() {
+      if (isTeamsFullMode) {
+        // Trong chế độ Phỏng vấn thật: KHÔNG CÓ SOUND! Toggle mic của bạn
+        toggleCandidateMic();
+        return;
+      }
       if (isWebcamActive) {
         // In practice mode, clicking interviewer replay the question dialogue or stays quiet
         replayCurrentSentence();
@@ -1910,6 +2388,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function replayCurrentSentence() {
+      if (isTeamsFullMode) return; // PHỎNG VẤN THẬT: KHÔNG CÓ SOUND
       if (isWebcamActive) {
         // In practice mode, briefly unmute and play interviewer question then stop for candidate
         audio.muted = false;
@@ -2068,7 +2547,21 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
       if (e.code === 'Space') {
         e.preventDefault();
-        togglePlay();
+        if (isTeamsFullMode) {
+          toggleCandidateMic();
+        } else {
+          togglePlay();
+        }
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        if (isTeamsFullMode) {
+          toggleCandidateMic();
+        }
+      } else if (e.code === 'KeyA') {
+        e.preventDefault();
+        if (isTeamsFullMode) {
+          toggleTeamsAvatarStyle();
+        }
       } else if (e.code === 'Enter') {
         e.preventDefault();
         finishUserAnswer();
@@ -2087,6 +2580,17 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       } else if (e.code === 'ArrowRight') {
         e.preventDefault();
         skipSeconds(5);
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        toggleTeamsFullMode();
+      } else if (e.code === 'KeyT') {
+        e.preventDefault();
+        toggleTeamsCaptions();
+      } else if (e.code === 'Escape') {
+        if (isTeamsFullMode) {
+          e.preventDefault();
+          toggleTeamsFullMode(false);
+        }
       }
     });
   </script>
