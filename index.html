@@ -90,6 +90,8 @@
       display: flex !important;
       height: 48px !important;
       flex-shrink: 0 !important;
+      z-index: 50 !important;
+      position: relative !important;
     }
 
     body.teams-fullscreen-active #teamsVideoGrid {
@@ -161,8 +163,32 @@
       display: flex !important;
     }
 
+    body.teams-fullscreen-active #teamsCaptionsCard {
+      position: fixed !important;
+      z-index: 10000 !important;
+      width: min(840px, calc(100vw - 24px)) !important;
+      max-width: 840px !important;
+      touch-action: none;
+    }
+
     body.teams-fullscreen-active #teamsCaptionsCard.hidden {
       display: none !important;
+    }
+
+    #teamsCaptionsHeader {
+      cursor: grab;
+      user-select: none;
+    }
+    #teamsCaptionsHeader:active {
+      cursor: grabbing;
+    }
+
+    #teamsTopicDropdown::-webkit-scrollbar {
+      width: 5px;
+    }
+    #teamsTopicDropdown::-webkit-scrollbar-thumb {
+      background: #38384a;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -240,23 +266,64 @@
         <div id="teamsMeetingContainer" class="w-full max-w-[940px] flex flex-col items-center gap-2.5 sm:gap-3 transition-all duration-300">
           
           <!-- TEAMS NATIVE TOP BAR (Active in Full Teams Mode) -->
-          <div id="teamsTopBar" class="hidden w-full h-12 bg-[#1f1f23] border-b border-[#2b2b32] px-3 sm:px-4 items-center justify-between z-30 select-none text-zinc-300">
-            <!-- Left: Meeting title & Running Timer -->
-            <div class="flex items-center gap-2.5 sm:gap-3">
-              <span class="text-xs sm:text-sm font-semibold text-white tracking-wide">Meeting with Thịnh Thái</span>
-              <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#292930] text-zinc-300 font-mono text-xs">
+          <div id="teamsTopBar" class="hidden w-full h-12 bg-[#1f1f23] border-b border-[#2b2b32] px-2 sm:px-4 items-center justify-between z-30 select-none text-zinc-300">
+            <!-- Left: Meeting title & Running Timer & TOPIC NAV -->
+            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span class="text-xs sm:text-sm font-semibold text-white tracking-wide hidden xl:inline flex-shrink-0">Meeting with Thịnh Thái</span>
+              <div class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#292930] text-zinc-300 font-mono text-xs flex-shrink-0">
                 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" id="teamsTimerDot"></span>
                 <span id="teamsTimerText">00:00</span>
               </div>
-              <div id="teamsRecBadge" class="hidden flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-bold">
+              <div id="teamsRecBadge" class="hidden flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-bold flex-shrink-0">
                 REC
+              </div>
+
+              <!-- NAV CHỦ ĐỀ CÂU HỎI (Dropdown Topic & Question Selector) -->
+              <div class="relative flex items-center" id="teamsTopicNavWrapper">
+                <button id="btnTeamsTopicNav" onclick="toggleTeamsTopicMenu()" class="flex items-center gap-1.5 px-2 py-1 rounded bg-[#292930] hover:bg-[#34343d] border border-[#3b3b45] text-xs font-medium text-white transition active:scale-95 shadow-sm min-w-0" title="Chọn chủ đề & câu hỏi phỏng vấn (Phím Q)">
+                  <i data-lucide="layers" class="w-3.5 h-3.5 text-[#8b8df8] flex-shrink-0"></i>
+                  <span class="max-w-[120px] sm:max-w-[170px] md:max-w-[210px] truncate" id="teamsCurrentTopicLabel">Q1: Giới thiệu bản thân</span>
+                  <i data-lucide="chevron-down" class="w-3 h-3 text-zinc-400 flex-shrink-0"></i>
+                </button>
+
+                <!-- Quick Prev / Next Buttons -->
+                <div class="inline-flex items-center gap-0.5 ml-1 bg-[#222228] p-0.5 rounded border border-[#33333d] flex-shrink-0">
+                  <button onclick="prevTeamsQuestion()" class="p-1 rounded hover:bg-[#33333f] text-zinc-300 hover:text-white transition active:scale-90" title="Câu trước [Mũi tên trái]">
+                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                  </button>
+                  <button onclick="nextTeamsQuestion()" class="p-1 rounded hover:bg-[#33333f] text-zinc-300 hover:text-white transition active:scale-90" title="Câu tiếp theo [Mũi tên phải]">
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                  </button>
+                </div>
+
+                <!-- Teams Topic Dropdown Menu -->
+                <div id="teamsTopicDropdown" class="hidden absolute top-full left-0 mt-2 w-[340px] sm:w-[420px] max-h-[75vh] overflow-y-auto rounded-xl bg-[#141419]/98 backdrop-blur-xl border border-[#30303c] shadow-2xl p-2.5 z-50 text-white animate-fade-in">
+                  <div class="px-2 py-1.5 border-b border-[#262632] flex items-center justify-between mb-2">
+                    <span class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                      <i data-lucide="list-tree" class="w-3.5 h-3.5 text-[#8b8df8]"></i>
+                      CHỦ ĐỀ PHỎNG VẤN (5 CHỦ ĐỀ • 20 CÂU)
+                    </span>
+                    <span class="text-[10px] text-zinc-400 font-mono" id="teamsTopicProgress">CÂU 1 / 20</span>
+                  </div>
+
+                  <!-- 5 Topic Groups Accordion / List -->
+                  <div class="space-y-1.5" id="teamsTopicList">
+                    <!-- Populated dynamically via JS -->
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Center / Actions Toolbar -->
-            <div class="flex items-center gap-1 sm:gap-1.5">
+            <div class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+              <!-- Pre-Interview Quick Start in Header (if banner is closed) -->
+              <button id="btnHeaderStart" onclick="startTeamsInterview()" class="hidden px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white transition active:scale-95 text-xs font-bold items-center gap-1 shadow-sm" title="Bắt đầu vào phỏng vấn">
+                <i data-lucide="play" class="w-3 h-3 fill-white"></i>
+                <span class="hidden md:inline">Bắt đầu</span>
+              </button>
+
               <!-- Record Action -->
-              <button onclick="toggleRecordPractice()" class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2b2b36] hover:bg-[#383846] text-zinc-200 transition active:scale-95 text-xs font-medium" title="Ghi video buổi tập [G]">
+              <button onclick="toggleRecordPractice()" class="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded bg-[#2b2b36] hover:bg-[#383846] text-zinc-200 transition active:scale-95 text-xs font-medium" title="Ghi video buổi tập [G]">
                 <span class="w-2 h-2 rounded-full bg-red-500" id="teamsRecBtnDot"></span>
                 <span class="hidden sm:inline" id="teamsRecBtnText">Ghi hình [G]</span>
               </button>
@@ -303,6 +370,47 @@
                 <span class="cursor-pointer hover:text-white" onclick="toggleTeamsFullMode(false)">—</span>
                 <span class="cursor-pointer hover:text-white" onclick="toggleTeamsFullMode(false)">□</span>
                 <span class="cursor-pointer hover:text-red-400" onclick="toggleTeamsFullMode(false)">✕</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PRE-INTERVIEW READINESS & START BANNER (KHI MỞ CAM & MIC RỒI BẤM BẮT ĐẦU) -->
+          <div id="teamsPreInterviewBanner" class="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-full max-w-[680px] px-3 pointer-events-auto transition-all duration-300">
+            <div class="rounded-xl bg-[#121217]/95 backdrop-blur-md border border-[#30303c] p-3.5 sm:p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-white">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-[#6264a7]/20 border border-[#6264a7]/50 flex items-center justify-center text-[#8b8df8] flex-shrink-0">
+                  <i data-lucide="video" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <div class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                    <span>Sẵn Sàng Phỏng Vấn Trực Tuyến</span>
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-semibold border border-emerald-500/30">Teams Live</span>
+                  </div>
+                  <div class="text-xs text-zinc-300 mt-1 flex items-center gap-2.5" id="teamsDeviceStatusRow">
+                    <span id="teamsCamStatus" class="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+                      <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" id="camStatusDot"></span>
+                      <span id="camStatusText">Camera: Chưa bật</span>
+                    </span>
+                    <span class="text-zinc-600">•</span>
+                    <span id="teamsMicStatus" class="flex items-center gap-1.5 text-zinc-400 text-[11px]">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500" id="micStatusDot"></span>
+                      <span id="micStatusText">Mic: Sẵn sàng</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+                <button id="btnBannerCam" onclick="toggleWebcam()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#22222a] hover:bg-[#2c2c36] border border-[#3b3b47] text-zinc-200 transition flex items-center gap-1.5 active:scale-95" title="Mở Webcam [C]">
+                  <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                  <span id="btnBannerCamText">Mở Cam [C]</span>
+                </button>
+
+                <button id="btnStartInterview" onclick="startTeamsInterview()" class="px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center gap-1.5 shadow-lg active:scale-95 cursor-pointer">
+                  <i data-lucide="play" class="w-3.5 h-3.5 fill-white"></i>
+                  <span>Bắt đầu phỏng vấn</span>
+                </button>
               </div>
             </div>
           </div>
@@ -434,12 +542,15 @@
 
           </div>
 
-          <!-- TEAMS FLOATING LIVE CAPTIONS / TELEPROMPTER (Shown in Full Teams Mode) -->
-          <div id="teamsCaptionsCard" class="hidden absolute bottom-3 left-1/2 -translate-x-1/2 w-full max-w-[880px] px-3 z-30 pointer-events-auto">
-            <div class="rounded-xl bg-[#0d0d11]/92 backdrop-blur-md border border-[#2b2b36] p-3.5 sm:p-4 shadow-2xl transition-all">
-              <!-- Captions Top Bar -->
-              <div class="flex items-center justify-between pb-2 mb-2 border-b border-[#22222b]">
-                <div class="flex items-center gap-2 min-w-0">
+          <!-- TEAMS DRAGGABLE FLOATING LIVE CAPTIONS / TELEPROMPTER -->
+          <div id="teamsCaptionsCard" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-[840px] px-3 z-40 pointer-events-auto">
+            <div class="rounded-xl bg-[#0d0d11]/95 backdrop-blur-md border border-[#2b2b36] p-3.5 sm:p-4 shadow-2xl transition-all">
+              <!-- Draggable Header -->
+              <div id="teamsCaptionsHeader" class="flex items-center justify-between pb-2 mb-2 border-b border-[#22222b] cursor-grab select-none active:cursor-grabbing" title="Giữ chuột và kéo để di chuyển vị trí kịch bản tùy ý">
+                <div class="flex items-center gap-2 min-w-0 pointer-events-none">
+                  <span class="text-zinc-500 hover:text-zinc-300 transition" title="Kéo thả kịch bản">
+                    <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+                  </span>
                   <span class="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold font-mono uppercase flex-shrink-0" id="teamsCaptionsBadge">
                     CÂU 1 / 20
                   </span>
@@ -447,7 +558,7 @@
                     1. Introduction & Background
                   </span>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="flex items-center gap-2 flex-shrink-0 pointer-events-auto">
                   <div class="flex items-center gap-1 px-2 py-0.5 rounded bg-[#18181f] text-xs font-mono text-zinc-300">
                     <i data-lucide="clock" class="w-3 h-3 text-red-500"></i>
                     <span id="teamsCaptionsTimer">01:30</span>
@@ -462,7 +573,7 @@
                 </div>
               </div>
               <!-- Captions Script Text -->
-              <div id="teamsCaptionsText" class="text-xs sm:text-sm text-zinc-100 leading-relaxed max-h-24 overflow-y-auto pr-1">
+              <div id="teamsCaptionsText" class="text-xs sm:text-sm text-zinc-100 leading-relaxed max-h-36 sm:max-h-44 overflow-y-auto pr-1 select-text">
                 <!-- Dynamically synced with scriptAnswerText -->
               </div>
             </div>
@@ -1550,6 +1661,9 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       buildChapterDrawer();
       buildTimelineMarkers();
       syncQuestionCardForChapter(0);
+      initCaptionsDrag();
+      buildTeamsTopicMenu();
+      updateTeamsTopicLabel();
       countdownTimerSec = 90;
       updateCountdownDisplay();
       const sessionEl = document.getElementById('sessionTimerText');
@@ -1698,6 +1812,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       currentChapterIndex = idx;
       buildChapterDrawer();
       syncQuestionCardForChapter(idx);
+      updateTeamsTopicLabel();
 
       initWebAudio();
 
@@ -1709,6 +1824,8 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
         stopSimulatedPlayback();
         isPlaying = false;
+        countdownTimerSec = 90;
+        updateCountdownDisplay();
         return;
       }
 
@@ -1853,9 +1970,49 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     // MICROSOFT TEAMS FULLSCREEN MEETING MODE (PHỎNG VẤN THẬT - NO SOUND)
     // ==========================================
     let isTeamsFullMode = false;
-    let isTeamsCaptionsVisible = false; // Mặc định ẩn để chỉ còn 3 màn hình
+    let isTeamsInterviewStarted = false; // Trạng thái đã bấm "Bắt đầu phỏng vấn" hay chưa
+    let isTeamsCaptionsVisible = false;
     let teamsAvatarStyle = 'teams'; // 'teams' (Circle avatars like screenshot) or 'cartoon'
     let isCandidateMicMuted = false;
+
+    // 5 Nhóm chủ đề câu hỏi phỏng vấn Esco AV
+    const INTERVIEW_TOPICS = [
+      {
+        id: 'intro',
+        title: '1. Giới thiệu & Động lực',
+        desc: 'Lý do chọn Esco AV & Giới thiệu bản thân',
+        icon: 'user-check',
+        qIds: [1, 2]
+      },
+      {
+        id: 'exp',
+        title: '2. Kinh nghiệm thực tế & Kỹ năng AV',
+        desc: 'Thực tập BW Industrial, Networking, Python, AV Systems',
+        icon: 'briefcase',
+        qIds: [3, 4, 5, 6, 7]
+      },
+      {
+        id: 'scenarios',
+        title: '3. Xử lý tình huống & Khách hàng',
+        desc: 'Hỗ trợ khách hàng onsite, sự cố kỹ thuật, áp lực công việc',
+        icon: 'wrench',
+        qIds: [8, 9, 10, 15, 16, 17]
+      },
+      {
+        id: 'onsite',
+        title: '4. Tác phong Onsite & Phối hợp vùng',
+        desc: 'Di chuyển văn phòng khách hàng & làm việc với Singapore',
+        icon: 'globe',
+        qIds: [18, 19]
+      },
+      {
+        id: 'vision',
+        title: '5. Tầm nhìn & Chốt vị trí',
+        desc: 'Lương kỳ vọng, định hướng 5 năm & chào kết thúc',
+        icon: 'target',
+        qIds: [11, 12, 13, 14, 20]
+      }
+    ];
 
     function toggleTeamsFullMode(force) {
       if (typeof force === 'boolean') {
@@ -1881,15 +2038,23 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           document.documentElement.requestFullscreen().catch(() => {});
         }
 
-        // 3. Mặc định ẩn kịch bản để chỉ còn duy nhất 3 màn hình phỏng vấn
-        isTeamsCaptionsVisible = false;
-        const cap = document.getElementById('teamsCaptionsCard');
-        if (cap) cap.classList.add('hidden');
-        const capBtn = document.getElementById('btnToggleCaptions');
-        if (capBtn) capBtn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-zinc-300 hover:text-white bg-[#2b2b36] hover:bg-[#383846] transition active:scale-95';
+        // 3. Khởi tạo chức năng kéo thả kịch bản
+        initCaptionsDrag();
 
-        // 4. Cập nhật giao diện Teams
+        // 4. Cập nhật thanh chủ đề & banner sẵn sàng
+        updateTeamsTopicLabel();
+        updateTeamsReadinessUI();
         updateTeamsAvatarDisplay();
+
+        // Mặc định ẩn kịch bản nếu chưa bấm Bắt đầu phỏng vấn
+        const cap = document.getElementById('teamsCaptionsCard');
+        if (cap) {
+          if (isTeamsCaptionsVisible && isTeamsInterviewStarted) {
+            cap.classList.remove('hidden');
+          } else {
+            cap.classList.add('hidden');
+          }
+        }
       } else {
         // Thoát chế độ phỏng vấn thật: mở lại âm thanh cho chế độ nghe
         if (audio) {
@@ -1906,6 +2071,282 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       lucide.createIcons();
     }
 
+    // BẮT ĐẦU PHỎNG VẤN TRỰC TUYẾN
+    async function startTeamsInterview() {
+      // 1. Mở webcam nếu chưa mở
+      if (!isWebcamActive) {
+        try {
+          await enableWebcam();
+        } catch (e) {}
+      }
+
+      // 2. Mở mic nếu đang tắt
+      if (isCandidateMicMuted) {
+        toggleCandidateMic();
+      }
+
+      isTeamsInterviewStarted = true;
+      updateTeamsReadinessUI();
+
+      // 3. Bắt đầu đếm giờ cuộc họp từ 00:00
+      sessionStartMs = Date.now();
+      startSessionTimer();
+      updateSessionTimerDisplay();
+
+      // 4. Bắt đầu vào câu hỏi số 1 (hoặc câu hiện tại)
+      jumpToChapter(currentChapterIndex || 0);
+
+      // 5. Mở card kịch bản câu hỏi để ứng viên nhìn và luyện nói
+      isTeamsCaptionsVisible = true;
+      const cap = document.getElementById('teamsCaptionsCard');
+      const capBtn = document.getElementById('btnToggleCaptions');
+      if (cap) {
+        cap.classList.remove('hidden');
+        if (!cap.style.top) {
+          cap.style.bottom = '16px';
+          cap.style.left = '50%';
+          cap.style.transform = 'translateX(-50%)';
+        }
+      }
+      if (capBtn) {
+        capBtn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-white bg-[#6264a7] hover:bg-[#7274bd] transition active:scale-95';
+      }
+
+      updateTeamsTopicLabel();
+      lucide.createIcons();
+    }
+
+    // Cập nhật trạng thái Cam & Mic trong Banner
+    function updateTeamsReadinessUI() {
+      const banner = document.getElementById('teamsPreInterviewBanner');
+      const headerStartBtn = document.getElementById('btnHeaderStart');
+      const camDot = document.getElementById('camStatusDot');
+      const camTxt = document.getElementById('camStatusText');
+      const micDot = document.getElementById('micStatusDot');
+      const micTxt = document.getElementById('micStatusText');
+      const btnCam = document.getElementById('btnBannerCam');
+      const btnCamText = document.getElementById('btnBannerCamText');
+      const btnStart = document.getElementById('btnStartInterview');
+
+      if (isTeamsInterviewStarted) {
+        if (banner) banner.classList.add('hidden');
+        if (headerStartBtn) headerStartBtn.classList.add('hidden');
+        return;
+      } else {
+        if (banner) banner.classList.remove('hidden');
+        if (headerStartBtn) headerStartBtn.classList.remove('hidden');
+      }
+
+      // Trạng thái Camera
+      if (isWebcamActive) {
+        if (camDot) camDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        if (camTxt) camTxt.innerText = 'Camera: Đã sẵn sàng ✓';
+        if (btnCam) btnCam.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 transition flex items-center gap-1.5 active:scale-95';
+        if (btnCamText) btnCamText.innerText = 'Tắt Cam [C]';
+      } else {
+        if (camDot) camDot.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
+        if (camTxt) camTxt.innerText = 'Camera: Chưa bật';
+        if (btnCam) btnCam.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#22222a] hover:bg-[#2c2c36] border border-[#3b3b47] text-zinc-200 transition flex items-center gap-1.5 active:scale-95';
+        if (btnCamText) btnCamText.innerText = 'Mở Cam [C]';
+      }
+
+      // Trạng thái Micro
+      if (!isCandidateMicMuted) {
+        if (micDot) micDot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        if (micTxt) micTxt.innerText = 'Mic: Sẵn sàng ✓';
+      } else {
+        if (micDot) micDot.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
+        if (micTxt) micTxt.innerText = 'Mic: Đang tắt (Mute)';
+      }
+
+      // Nút bắt đầu sáng khi cả cam và mic đã sẵn sàng
+      if (btnStart) {
+        if (isWebcamActive && !isCandidateMicMuted) {
+          btnStart.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition flex items-center gap-1.5 shadow-lg active:scale-95 ring-2 ring-emerald-500/50 animate-pulse cursor-pointer';
+        } else {
+          btnStart.className = 'px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-[#505294] to-[#6264a7] hover:from-[#5b5da8] hover:to-[#7274bd] transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer';
+        }
+      }
+    }
+
+    // ==========================================
+    // NAV CHỦ ĐỀ CÂU HỎI (QUESTION TOPIC NAVIGATION)
+    // ==========================================
+    function buildTeamsTopicMenu() {
+      const container = document.getElementById('teamsTopicList');
+      if (!container || !interviewData || !interviewData.chapters) return;
+
+      let html = '';
+      INTERVIEW_TOPICS.forEach((t, tIdx) => {
+        const currentQId = currentChapterIndex + 1;
+        const isTopicActive = t.qIds.includes(currentQId);
+
+        html += `
+          <div class="rounded-lg bg-[#1a1a22] border ${isTopicActive ? 'border-[#6264a7]' : 'border-[#272733]'} overflow-hidden">
+            <div class="px-2.5 py-1.5 bg-[#20202b] flex items-center justify-between cursor-pointer hover:bg-[#282836] transition" onclick="toggleTopicAccordion(${tIdx})">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full ${isTopicActive ? 'bg-red-500 animate-pulse' : 'bg-zinc-500'}"></span>
+                <span class="text-xs font-bold text-white">${t.title}</span>
+                <span class="text-[10px] text-zinc-400 font-mono">(${t.qIds.length} câu)</span>
+              </div>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-zinc-400 transition-transform ${isTopicActive ? 'rotate-180' : ''}" id="topicChevron${tIdx}"></i>
+            </div>
+            <div class="p-1 space-y-1 ${isTopicActive ? 'block' : 'hidden'}" id="topicContent${tIdx}">
+        `;
+
+        t.qIds.forEach(qId => {
+          const qIdx = qId - 1;
+          const chap = interviewData.chapters[qIdx];
+          if (!chap) return;
+          const isCur = currentChapterIndex === qIdx;
+          html += `
+            <button onclick="selectTeamsQuestion(${qIdx})" class="w-full text-left px-2 py-1.5 rounded-md text-xs transition flex items-center justify-between ${isCur ? 'bg-[#6264a7] text-white font-semibold' : 'text-zinc-300 hover:bg-[#2b2b38] hover:text-white'}">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="font-mono text-[10px] px-1 py-0.5 rounded ${isCur ? 'bg-white/20 text-white' : 'bg-zinc-800 text-zinc-400'}">Q${qId}</span>
+                <span class="truncate">${chap.title_vi || chap.title_en}</span>
+              </div>
+              ${isCur ? '<span class="text-[9px] bg-red-600 text-white px-1 py-0.5 rounded font-mono font-bold">LIVE</span>' : ''}
+            </button>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    function toggleTopicAccordion(tIdx) {
+      const content = document.getElementById('topicContent' + tIdx);
+      const chev = document.getElementById('topicChevron' + tIdx);
+      if (!content) return;
+      const isHidden = content.classList.contains('hidden');
+      if (isHidden) {
+        content.classList.remove('hidden');
+        if (chev) chev.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        if (chev) chev.classList.remove('rotate-180');
+      }
+    }
+
+    function toggleTeamsTopicMenu() {
+      const dd = document.getElementById('teamsTopicDropdown');
+      if (!dd) return;
+      const isHidden = dd.classList.contains('hidden');
+      if (isHidden) {
+        buildTeamsTopicMenu();
+        dd.classList.remove('hidden');
+      } else {
+        dd.classList.add('hidden');
+      }
+    }
+
+    function selectTeamsQuestion(qIdx) {
+      jumpToChapter(qIdx);
+      const dd = document.getElementById('teamsTopicDropdown');
+      if (dd) dd.classList.add('hidden');
+      updateTeamsTopicLabel();
+    }
+
+    function updateTeamsTopicLabel() {
+      const lbl = document.getElementById('teamsCurrentTopicLabel');
+      const prog = document.getElementById('teamsTopicProgress');
+      const currentQId = currentChapterIndex + 1;
+      const chap = interviewData && interviewData.chapters ? interviewData.chapters[currentChapterIndex] : null;
+
+      if (lbl && chap) {
+        lbl.innerText = `Q${currentQId}: ${chap.title_vi || chap.title_en}`;
+      }
+      if (prog) {
+        prog.innerText = `CÂU ${currentQId} / 20`;
+      }
+    }
+
+    function prevTeamsQuestion() {
+      if (!interviewData || !interviewData.chapters) return;
+      const prevIdx = (currentChapterIndex > 0) ? currentChapterIndex - 1 : interviewData.chapters.length - 1;
+      selectTeamsQuestion(prevIdx);
+    }
+
+    function nextTeamsQuestion() {
+      if (!interviewData || !interviewData.chapters) return;
+      const nextIdx = (currentChapterIndex < interviewData.chapters.length - 1) ? currentChapterIndex + 1 : 0;
+      selectTeamsQuestion(nextIdx);
+    }
+
+    // ==========================================
+    // KÉO THẢ CARD KỊCH BẢN (DRAGGABLE TELEPROMPTER)
+    // ==========================================
+    let captionsDragInitialized = false;
+    function initCaptionsDrag() {
+      if (captionsDragInitialized) return;
+      const card = document.getElementById('teamsCaptionsCard');
+      const header = document.getElementById('teamsCaptionsHeader');
+      if (!card || !header) return;
+
+      captionsDragInitialized = true;
+      let isDragging = false;
+      let startX = 0, startY = 0;
+      let initLeft = 0, initTop = 0;
+
+      header.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('button')) return;
+
+        isDragging = true;
+        try { header.setPointerCapture(e.pointerId); } catch(err) {}
+
+        const rect = card.getBoundingClientRect();
+        card.style.bottom = 'auto';
+        card.style.right = 'auto';
+        card.style.transform = 'none';
+        card.style.left = rect.left + 'px';
+        card.style.top = rect.top + 'px';
+
+        startX = e.clientX;
+        startY = e.clientY;
+        initLeft = rect.left;
+        initTop = rect.top;
+
+        header.style.cursor = 'grabbing';
+      });
+
+      header.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        let newLeft = initLeft + dx;
+        let newTop = initTop + dy;
+
+        const cardW = card.offsetWidth;
+        const cardH = card.offsetHeight;
+        const maxLeft = Math.max(8, window.innerWidth - cardW - 8);
+        const maxTop = Math.max(48, window.innerHeight - cardH - 8);
+
+        newLeft = Math.max(8, Math.min(maxLeft, newLeft));
+        newTop = Math.max(48, Math.min(maxTop, newTop));
+
+        card.style.left = newLeft + 'px';
+        card.style.top = newTop + 'px';
+      });
+
+      const onPointerEnd = (e) => {
+        if (isDragging) {
+          isDragging = false;
+          try { header.releasePointerCapture(e.pointerId); } catch(err) {}
+          header.style.cursor = 'grab';
+        }
+      };
+
+      header.addEventListener('pointerup', onPointerEnd);
+      header.addEventListener('pointercancel', onPointerEnd);
+    }
+
     function toggleTeamsCaptions() {
       isTeamsCaptionsVisible = !isTeamsCaptionsVisible;
       const cap = document.getElementById('teamsCaptionsCard');
@@ -1913,6 +2354,11 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       if (cap) {
         if (isTeamsCaptionsVisible) {
           cap.classList.remove('hidden');
+          if (!cap.style.top) {
+            cap.style.bottom = '16px';
+            cap.style.left = '50%';
+            cap.style.transform = 'translateX(-50%)';
+          }
           if (btn) btn.className = 'flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium text-white bg-[#6264a7] hover:bg-[#7274bd] transition active:scale-95';
         } else {
           cap.classList.add('hidden');
@@ -1972,7 +2418,19 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
         lucide.createIcons();
       }
+      updateTeamsReadinessUI();
     }
+
+    // Close topic dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const wrapper = document.getElementById('teamsTopicNavWrapper');
+      const dd = document.getElementById('teamsTopicDropdown');
+      if (dd && !dd.classList.contains('hidden')) {
+        if (wrapper && !wrapper.contains(e.target)) {
+          dd.classList.add('hidden');
+        }
+      }
+    });
 
     function updateTeamsFullUI() {
       const btn = document.getElementById('btnToggleTeamsFull');
@@ -2099,8 +2557,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         isWebcamActive = true;
         startSessionTimer();
         updateModeUI();
-        // Trong chế độ Practice: Cho HR đọc câu hỏi, sau đó tự dừng để user trả lời!
-        jumpToChapter(currentChapterIndex);
+        updateTeamsReadinessUI();
+        updateTeamsAvatarDisplay();
+        // Trong chế độ Practice thông thường: Cho HR đọc câu hỏi, sau đó tự dừng để user trả lời!
+        // Trong chế độ Phỏng vấn thật (Teams): TUYỆT ĐỐI KHÔNG CÓ SOUND
+        if (!isTeamsFullMode) {
+          jumpToChapter(currentChapterIndex);
+        }
       } catch (err) {
         console.warn('Cannot access camera/mic:', err);
       }
@@ -2142,11 +2605,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       countdownTimerSec = 90;
       updateCountdownDisplay();
 
-      if (audio) {
+      if (audio && !isTeamsFullMode) {
         audio.muted = false;
       }
 
       updateModeUI();
+      updateTeamsReadinessUI();
+      updateTeamsAvatarDisplay();
     }
 
     function updateModeUI() {
@@ -2562,6 +3027,11 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         if (isTeamsFullMode) {
           toggleTeamsAvatarStyle();
         }
+      } else if (e.code === 'KeyQ') {
+        e.preventDefault();
+        if (isTeamsFullMode) {
+          toggleTeamsTopicMenu();
+        }
       } else if (e.code === 'Enter') {
         e.preventDefault();
         finishUserAnswer();
@@ -2576,10 +3046,18 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         replayCurrentSentence();
       } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
-        skipSeconds(-5);
+        if (isTeamsFullMode) {
+          prevTeamsQuestion();
+        } else {
+          skipSeconds(-5);
+        }
       } else if (e.code === 'ArrowRight') {
         e.preventDefault();
-        skipSeconds(5);
+        if (isTeamsFullMode) {
+          nextTeamsQuestion();
+        } else {
+          skipSeconds(5);
+        }
       } else if (e.code === 'KeyF') {
         e.preventDefault();
         toggleTeamsFullMode();
