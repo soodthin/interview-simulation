@@ -1816,11 +1816,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
       initWebAudio();
 
-      // PHỎNG VẤN THẬT: TUYỆT ĐỐI KHÔNG CÓ SOUND!
-      if (isTeamsFullMode) {
+      // Nếu đang ở giao diện Teams nhưng CHƯA bấm "Bắt đầu phỏng vấn" thì tạm dừng chờ người dùng bấm bắt đầu
+      if (isTeamsFullMode && !isTeamsInterviewStarted) {
         if (audio) {
           audio.pause();
-          audio.muted = true;
         }
         stopSimulatedPlayback();
         isPlaying = false;
@@ -1829,17 +1828,91 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         return;
       }
 
-      // Cả 2 chế độ đều phát câu hỏi của HR:
-      // - Chế độ nghe: tiếp tục phát câu trả lời mẫu của candidate
-      // - Chế độ practice: onTimeUpdate sẽ tự động DỪNG SOUND ngay khi HR đọc xong câu hỏi!
+      // PHÁT SOUND CÂU HỎI CỦA NGƯỜI PHỎNG VẤN (Cả Chế độ Practice & Phỏng Vấn Thật Teams):
+      // - Người phỏng vấn (HR / Quản lý) sẽ phát âm thanh đọc câu hỏi.
+      // - onTimeUpdate sẽ tự động DỪNG SOUND ngay khi đọc xong câu hỏi để ứng viên trả lời!
+      // - Chế độ nghe (không bật cam): sẽ tiếp tục phát cả phần trả lời mẫu.
       if (chap.start < 518.0) {
         if (simTimer) stopSimulatedPlayback();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         audio.currentTime = chap.start;
-        audio.muted = false; // Bật sound để nghe câu hỏi của HR!
-        audio.play().catch(() => {});
+        audio.muted = false; // BẬT SOUND ĐỂ PHÁT ÂM THANH CÂU HỎI!
+        isPlaying = true;
+
+        if (audioContext && audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => console.warn('Audio play prevented:', e));
+        }
+        const playIcon = document.getElementById('playIcon');
+        if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
+        lucide.createIcons();
       } else {
         if (!audio.paused) audio.pause();
-        startSimulatedPlayback(chap.start, chap.end);
+        playSituationalQuestion(idx);
+      }
+    }
+
+    // Đọc câu hỏi tình huống (Chapters 15-20) bằng SpeechSynthesis tự nhiên
+    function playSituationalQuestion(idx) {
+      if (!interviewData || !interviewData.chapters || !interviewData.chapters[idx]) return;
+      const chap = interviewData.chapters[idx];
+      const role = getInterviewerRole(idx);
+      activeSpeaker = role;
+      isPlaying = true;
+
+      const managerGlow = document.getElementById('managerSpeakingGlow');
+      const hrGlow = document.getElementById('hrSpeakingGlow');
+      if (role === 'hr') {
+        if (hrGlow) hrGlow.style.opacity = '1';
+        if (managerGlow) managerGlow.style.opacity = '0';
+        updateInterviewerMicUI('hr');
+      } else {
+        if (managerGlow) managerGlow.style.opacity = '1';
+        if (hrGlow) hrGlow.style.opacity = '0';
+        updateInterviewerMicUI('manager');
+      }
+
+      const d = interviewData.dialogues ? interviewData.dialogues.find(x => x.start >= chap.start && x.start < chap.end) : null;
+      const textToRead = d ? d.text_en : (chap.slide ? chap.slide.headline : chap.title_en);
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(textToRead);
+        utter.lang = 'en-US';
+        utter.rate = 0.95;
+
+        utter.onend = () => {
+          activeSpeaker = null;
+          if (hrGlow) hrGlow.style.opacity = '0';
+          if (managerGlow) managerGlow.style.opacity = '0';
+          updateInterviewerMicUI(null);
+          isPlaying = false;
+          startAnswerCountdown(90);
+        };
+
+        utter.onerror = () => {
+          activeSpeaker = null;
+          if (hrGlow) hrGlow.style.opacity = '0';
+          if (managerGlow) managerGlow.style.opacity = '0';
+          updateInterviewerMicUI(null);
+          isPlaying = false;
+          startAnswerCountdown(90);
+        };
+
+        window.speechSynthesis.speak(utter);
+      } else {
+        setTimeout(() => {
+          activeSpeaker = null;
+          if (hrGlow) hrGlow.style.opacity = '0';
+          if (managerGlow) managerGlow.style.opacity = '0';
+          updateInterviewerMicUI(null);
+          isPlaying = false;
+          startAnswerCountdown(90);
+        }, 4000);
       }
     }
 
@@ -2022,10 +2095,9 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       }
 
       if (isTeamsFullMode) {
-        // 1. PHỎNG VẤN THẬT: TẮT HOÀN TOÀN SOUND & AUDIO
+        // Tạm dừng audio trước khi bắt đầu phỏng vấn
         if (audio) {
           audio.pause();
-          audio.muted = true;
         }
         stopSimulatedPlayback();
         isPlaying = false;
@@ -2847,14 +2919,17 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function togglePlay() {
-      if (isTeamsFullMode) {
-        // Trong chế độ Phỏng vấn thật: KHÔNG CÓ SOUND! Toggle mic của bạn
-        toggleCandidateMic();
-        return;
-      }
-      if (isWebcamActive) {
-        // In practice mode, clicking interviewer replay the question dialogue or stays quiet
-        replayCurrentSentence();
+      if (isTeamsFullMode || isWebcamActive) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          isPlaying = false;
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          const playIcon = document.getElementById('playIcon');
+          if (playIcon) playIcon.setAttribute('data-lucide', 'play');
+          lucide.createIcons();
+        } else {
+          replayCurrentSentence();
+        }
         return;
       }
       initWebAudio();
@@ -2873,23 +2948,21 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function replayCurrentSentence() {
-      if (isTeamsFullMode) return; // PHỎNG VẤN THẬT: KHÔNG CÓ SOUND
-      if (isWebcamActive) {
-        // In practice mode, briefly unmute and play interviewer question then stop for candidate
-        audio.muted = false;
-        if (currentChapterIndex < 14) {
+      if (currentChapterIndex < 14) {
+        if (simTimer) stopSimulatedPlayback();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (audio) {
           audio.currentTime = interviewData.chapters[currentChapterIndex].start;
+          audio.muted = false;
+          isPlaying = true;
           audio.play().catch(() => {});
+          const playIcon = document.getElementById('playIcon');
+          if (playIcon) playIcon.setAttribute('data-lucide', 'pause');
+          lucide.createIcons();
         }
-        return;
+      } else {
+        playSituationalQuestion(currentChapterIndex);
       }
-      if (currentChapterIndex >= 14) {
-        jumpToChapter(currentChapterIndex);
-        return;
-      }
-      if (!interviewData || !interviewData.chapters[currentChapterIndex]) return;
-      audio.currentTime = interviewData.chapters[currentChapterIndex].start;
-      audio.play().catch(() => {});
     }
 
     function skipSeconds(sec) {
@@ -2930,13 +3003,19 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         }
       }
 
-      // PRACTICE MODE: CHỈ MỞ ĐỌC CÂU HỎI CỦA HR, HẾT CÂU HỎI TỰ DỪNG SOUND ĐỂ USER TRẢ LỜI!
-      if (isWebcamActive) {
+      // PRACTICE / TEAMS MODE: CHỈ MỞ ĐỌC CÂU HỎI CỦA HR/QUẢN LÝ, HẾT CÂU HỎI TỰ DỪNG SOUND ĐỂ USER TRẢ LỜI!
+      if (isWebcamActive || isTeamsFullMode) {
         const intD = getChapterInterviewerDialogue(currentChapterIndex);
         if (intD && cur >= intD.end - 0.12) {
           if (!audio.paused) {
             audio.pause();
             isPlaying = false;
+            activeSpeaker = null;
+            const managerGlow = document.getElementById('managerSpeakingGlow');
+            const hrGlow = document.getElementById('hrSpeakingGlow');
+            if (managerGlow) managerGlow.style.opacity = '0';
+            if (hrGlow) hrGlow.style.opacity = '0';
+            updateInterviewerMicUI(null);
             document.getElementById('playIcon').setAttribute('data-lucide', 'play');
             lucide.createIcons();
             startAnswerCountdown(90);
@@ -2958,10 +3037,12 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
             activeSpeaker = 'hr';
             if (hrGlow) hrGlow.style.opacity = '1';
             if (managerGlow) managerGlow.style.opacity = '0';
+            updateInterviewerMicUI('hr');
           } else {
             activeSpeaker = 'manager';
             if (managerGlow) managerGlow.style.opacity = '1';
             if (hrGlow) hrGlow.style.opacity = '0';
+            updateInterviewerMicUI('manager');
           }
           if (thinhGlow) thinhGlow.style.opacity = '0';
         } else if (d && d.speaker === 'thinh') {
@@ -2969,12 +3050,40 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           if (managerGlow) managerGlow.style.opacity = '0';
           if (hrGlow) hrGlow.style.opacity = '0';
           if (thinhGlow && !isWebcamActive) thinhGlow.style.opacity = '1';
+          updateInterviewerMicUI(null);
         } else {
           if (managerGlow) managerGlow.style.opacity = '0';
           if (hrGlow) hrGlow.style.opacity = '0';
           if (thinhGlow) thinhGlow.style.opacity = '0';
+          updateInterviewerMicUI(null);
         }
       }
+    }
+
+    // Hiển thị mic & viền sáng Teams khi người phỏng vấn đang đọc câu hỏi
+    function updateInterviewerMicUI(speaker) {
+      const mgrMic = document.getElementById('teamsManagerMicIcon');
+      const hrMic = document.getElementById('teamsHRMicIcon');
+      const mgrCircle = document.getElementById('managerAvatarCircle');
+      const hrCircle = document.getElementById('hrAvatarCircle');
+
+      if (speaker === 'manager') {
+        if (mgrMic) mgrMic.innerHTML = '<span class="flex items-center text-emerald-400"><i data-lucide="mic" class="w-3.5 h-3.5"></i></span>';
+        if (hrMic) hrMic.innerHTML = '<i data-lucide="mic-off" class="w-3.5 h-3.5 text-zinc-400"></i>';
+        if (mgrCircle) mgrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none ring-4 ring-emerald-500/70 transition-all duration-200';
+        if (hrCircle) hrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200';
+      } else if (speaker === 'hr') {
+        if (hrMic) hrMic.innerHTML = '<span class="flex items-center text-emerald-400"><i data-lucide="mic" class="w-3.5 h-3.5"></i></span>';
+        if (mgrMic) mgrMic.innerHTML = '<i data-lucide="mic-off" class="w-3.5 h-3.5 text-zinc-400"></i>';
+        if (hrCircle) hrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none ring-4 ring-emerald-500/70 transition-all duration-200';
+        if (mgrCircle) mgrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200';
+      } else {
+        if (mgrMic) mgrMic.innerHTML = '<i data-lucide="mic-off" class="w-3.5 h-3.5 text-zinc-400"></i>';
+        if (hrMic) hrMic.innerHTML = '<i data-lucide="mic-off" class="w-3.5 h-3.5 text-zinc-400"></i>';
+        if (mgrCircle) mgrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200';
+        if (hrCircle) hrCircle.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#f6d0c5] flex items-center justify-center text-3xl sm:text-4xl font-bold font-sans text-[#1b1b1e] shadow-lg select-none transition-all duration-200';
+      }
+      lucide.createIcons();
     }
 
     function formatTime(sec) {
