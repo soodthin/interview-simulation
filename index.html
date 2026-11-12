@@ -2,7 +2,7 @@
 <html lang="vi" class="h-full dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Mô Phỏng Phỏng Vấn Esco AV — Thái Đỗ Thịnh (Podcast Studio)</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,15 +15,26 @@
     * {
       box-sizing: border-box;
     }
+    :root {
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --sal: env(safe-area-inset-left, 0px);
+      --sar: env(safe-area-inset-right, 0px);
+    }
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: #09090b;
       color: #ffffff;
+      min-height: 100vh;
+      min-height: 100dvh;
       height: 100vh;
-      max-height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
       overflow: hidden;
       margin: 0;
       padding: 0;
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
     }
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
@@ -179,9 +190,44 @@
     #teamsCaptionsHeader {
       cursor: grab;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
     }
     #teamsCaptionsHeader:active {
       cursor: grabbing;
+    }
+    #teamsCaptionsResizeHandle {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #timelineContainer {
+      touch-action: none;
+    }
+
+    /* Safe Area & Mobile Notch Support */
+    header {
+      padding-top: env(safe-area-inset-top, 0px) !important;
+      height: calc(3.5rem + env(safe-area-inset-top, 0px)) !important;
+    }
+    body.teams-fullscreen-active #teamsTopBar {
+      padding-top: env(safe-area-inset-top, 0px) !important;
+      height: calc(48px + env(safe-area-inset-top, 0px)) !important;
+    }
+    body.teams-fullscreen-active #teamsVideoGrid {
+      height: calc(100dvh - 48px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+    }
+    body.teams-fullscreen-active #teamsMeetingContainer {
+      height: 100vh !important;
+      height: 100dvh !important;
+      padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+      box-sizing: border-box !important;
+    }
+    #audioControlsBar {
+      margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    #chapterDrawer {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     #teamsTopicDropdown::-webkit-scrollbar {
@@ -424,7 +470,7 @@
                 </div>
 
                 <!-- Live Webcam Video (Active only when user clicks Bật Webcam) -->
-                <video id="webcamVideo" autoplay playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
+                <video id="webcamVideo" autoplay playsinline webkit-playsinline muted class="hidden w-full h-full object-cover -scale-x-100"></video>
 
                 <!-- Speaking Ring Overlay for Candidate -->
                 <div id="candidateSpeakingGlow" class="absolute inset-0 rounded-2xl pointer-events-none border-2 border-red-500 transition-opacity duration-200 opacity-0"></div>
@@ -537,7 +583,7 @@
             <div id="teamsCaptionsInner" class="relative rounded-xl bg-[#0d0d11]/95 backdrop-blur-md border border-[#2b2b36] p-3.5 sm:p-4 shadow-2xl transition-all flex flex-col">
               
               <!-- Draggable Header -->
-              <div id="teamsCaptionsHeader" class="flex items-center justify-between pb-2 mb-2 border-b border-[#22222b] cursor-grab select-none active:cursor-grabbing flex-shrink-0" title="Giữ chuột và kéo để di chuyển vị trí kịch bản tùy ý">
+              <div id="teamsCaptionsHeader" style="touch-action: none;" class="flex items-center justify-between pb-2 mb-2 border-b border-[#22222b] cursor-grab select-none active:cursor-grabbing flex-shrink-0" title="Giữ chuột và kéo để di chuyển vị trí kịch bản tùy ý">
                 <div class="flex items-center gap-2 min-w-0 pointer-events-none">
                   <span class="text-zinc-500 hover:text-zinc-300 transition" title="Kéo thả kịch bản">
                     <i data-lucide="grip-vertical" class="w-4 h-4"></i>
@@ -594,7 +640,7 @@
               </div>
 
               <!-- Bottom-Right Resize Handle (Kéo để phóng to / thu nhỏ tự do) -->
-              <div id="teamsCaptionsResizeHandle" class="absolute bottom-1 right-1 w-5 h-5 cursor-nwse-resize flex items-end justify-end p-0.5 text-zinc-500 hover:text-red-400 transition select-none z-20 pointer-events-auto" title="Giữ chuột và kéo để phóng to / thu nhỏ kích thước kịch bản tùy thích">
+              <div id="teamsCaptionsResizeHandle" style="touch-action: none;" class="absolute bottom-1 right-1 w-5 h-5 cursor-nwse-resize flex items-end justify-end p-0.5 text-zinc-500 hover:text-red-400 transition select-none z-20 pointer-events-auto" title="Giữ chuột và kéo để phóng to / thu nhỏ kích thước kịch bản tùy thích">
                 <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                   <line x1="19" y1="7" x2="7" y2="19"></line>
                   <line x1="19" y1="13" x2="13" y2="19"></line>
@@ -665,7 +711,7 @@
         <!-- Progress Bar & Time Display -->
         <div class="flex-1 flex items-center gap-3">
           <span id="currentTime" class="font-mono text-zinc-400 text-[11px] w-9">00:00</span>
-          <div id="timelineContainer" class="relative flex-1 h-1.5 bg-[#1f1f23] rounded-full cursor-pointer group" onclick="seekAudio(event)" onmousemove="showTimelineTooltip(event)" onmouseleave="hideTimelineTooltip()">
+          <div id="timelineContainer" style="touch-action: none;" class="relative flex-1 h-1.5 bg-[#1f1f23] rounded-full cursor-pointer group" onclick="seekAudio(event)" onmousemove="showTimelineTooltip(event)" onmouseleave="hideTimelineTooltip()">
             <!-- Red Progress Bar -->
             <div id="timelineProgress" class="absolute left-0 top-0 bottom-0 bg-red-600 rounded-full" style="width: 0%;"></div>
             <div id="timelineHoverBar" class="absolute left-0 top-0 bottom-0 bg-white/20 rounded-full hidden"></div>
@@ -1685,8 +1731,10 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
       buildChapterDrawer();
       buildTimelineMarkers();
+      initTimelineTouchScrubber();
       syncQuestionCardForChapter(0);
       initCaptionsDrag();
+      initCaptionsResize();
       buildTeamsTopicMenu();
       updateTeamsTopicLabel();
       countdownTimerSec = 90;
@@ -2397,8 +2445,38 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       let startX = 0, startY = 0;
       let initLeft = 0, initTop = 0;
 
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        let newLeft = initLeft + dx;
+        let newTop = initTop + dy;
+
+        const cardW = card.offsetWidth;
+        const cardH = card.offsetHeight;
+        const maxLeft = Math.max(8, window.innerWidth - cardW - 8);
+        const maxTop = Math.max(48, window.innerHeight - cardH - 8);
+
+        newLeft = Math.max(8, Math.min(maxLeft, newLeft));
+        newTop = Math.max(48, Math.min(maxTop, newTop));
+
+        card.style.left = newLeft + 'px';
+        card.style.top = newTop + 'px';
+      };
+
+      const onPointerEnd = (e) => {
+        if (isDragging) {
+          isDragging = false;
+          try { header.releasePointerCapture(e.pointerId); } catch(err) {}
+          header.style.cursor = 'grab';
+        }
+      };
+
       header.addEventListener('pointerdown', (e) => {
         if (e.target.closest('button')) return;
+        if (e.cancelable) e.preventDefault();
 
         isDragging = true;
         try { header.setPointerCapture(e.pointerId); } catch(err) {}
@@ -2418,36 +2496,9 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         header.style.cursor = 'grabbing';
       });
 
-      header.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-
-        let newLeft = initLeft + dx;
-        let newTop = initTop + dy;
-
-        const cardW = card.offsetWidth;
-        const cardH = card.offsetHeight;
-        const maxLeft = Math.max(8, window.innerWidth - cardW - 8);
-        const maxTop = Math.max(48, window.innerHeight - cardH - 8);
-
-        newLeft = Math.max(8, Math.min(maxLeft, newLeft));
-        newTop = Math.max(48, Math.min(maxTop, newTop));
-
-        card.style.left = newLeft + 'px';
-        card.style.top = newTop + 'px';
-      });
-
-      const onPointerEnd = (e) => {
-        if (isDragging) {
-          isDragging = false;
-          try { header.releasePointerCapture(e.pointerId); } catch(err) {}
-          header.style.cursor = 'grab';
-        }
-      };
-
-      header.addEventListener('pointerup', onPointerEnd);
-      header.addEventListener('pointercancel', onPointerEnd);
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
+      window.addEventListener('pointerup', onPointerEnd);
+      window.addEventListener('pointercancel', onPointerEnd);
     }
 
     // ==========================================
@@ -2490,6 +2541,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
       window.addEventListener('pointermove', (e) => {
         if (!isResizing) return;
+        if (e.cancelable) e.preventDefault();
         const dw = e.clientX - startX;
         const dh = e.clientY - startY;
 
@@ -2506,7 +2558,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           textEl.style.maxHeight = newTextH + 'px';
           textEl.style.height = newTextH + 'px';
         }
-      });
+      }, { passive: false });
 
       const onResizeEnd = (e) => {
         if (isResizing) {
@@ -2815,8 +2867,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
         // 2. Chuyển đổi Pod Candidate sang Camera Live
         const videoEl = document.getElementById('webcamVideo');
-        videoEl.srcObject = stream;
-        videoEl.classList.remove('hidden');
+        if (videoEl) {
+          videoEl.setAttribute('playsinline', '');
+          videoEl.setAttribute('webkit-playsinline', '');
+          videoEl.srcObject = stream;
+          videoEl.play().catch(() => {});
+          videoEl.classList.remove('hidden');
+        }
         document.getElementById('candidateCanvas').classList.add('hidden');
         document.getElementById('webcamRecBadge').classList.remove('hidden');
         document.getElementById('waveContainer').classList.remove('hidden');
@@ -2957,26 +3014,44 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       if (!webcamStream) return;
       recordedChunks = [];
 
-      // Determine best supported MIME type
-      let mime = 'video/webm;codecs=vp9,opus';
-      if (typeof MediaRecorder !== 'undefined') {
-        if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-          mime = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
-        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=h264,opus')) {
-          mime = 'video/webm;codecs=h264,opus';
-        } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
-          mime = 'video/webm;codecs=vp8,opus';
-        } else if (MediaRecorder.isTypeSupported('video/webm')) {
-          mime = 'video/webm';
+      // Negotiate cross-platform MIME types using MediaRecorder.isTypeSupported()
+      let mime = '';
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
+        const candidateTypes = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+          'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+          'video/mp4;codecs=avc1',
+          'video/mp4'
+        ];
+        for (const candidate of candidateTypes) {
+          if (MediaRecorder.isTypeSupported(candidate)) {
+            mime = candidate;
+            break;
+          }
         }
       }
-      recordedMimeType = mime;
+      recordedMimeType = mime || 'video/webm';
+
+      const options = { videoBitsPerSecond: 2500000 };
+      if (mime) {
+        options.mimeType = mime;
+      }
 
       try {
-        mediaRecorder = new MediaRecorder(webcamStream, { mimeType: mime, videoBitsPerSecond: 2500000 });
+        mediaRecorder = new MediaRecorder(webcamStream, options);
       } catch (e) {
-        mediaRecorder = new MediaRecorder(webcamStream);
-        recordedMimeType = mediaRecorder.mimeType || 'video/webm';
+        try {
+          mediaRecorder = new MediaRecorder(webcamStream);
+        } catch (e2) {
+          console.error('MediaRecorder initialization failed:', e2);
+          alert('Thiết bị hoặc trình duyệt không hỗ trợ MediaRecorder ghi hình.');
+          return;
+        }
+      }
+      if (mediaRecorder.mimeType) {
+        recordedMimeType = mediaRecorder.mimeType;
       }
 
       mediaRecorder.ondataavailable = (e) => {
@@ -2993,7 +3068,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
         if (recordedChunks.length === 0) return;
 
-        const blob = new Blob(recordedChunks, { type: recordedMimeType });
+        const blob = new Blob(recordedChunks, { type: recordedMimeType || 'video/webm' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -3001,7 +3076,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         const now = new Date();
         const dateStr = now.toISOString().slice(0, 10);
         const timeStr = String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
-        const ext = recordedMimeType.includes('mp4') ? 'mp4' : 'webm';
+        const ext = (recordedMimeType && recordedMimeType.includes('mp4')) ? 'mp4' : 'webm';
         a.download = `Esco_AV_Interview_Practice_${dateStr}_${timeStr}_ThaiDoThinh.${ext}`;
         document.body.appendChild(a);
         a.click();
@@ -3106,6 +3181,37 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         dataArray = new Uint8Array(analyser.frequencyBinCount);
       } catch (e) {}
     }
+
+    // Web Audio API unlock for iOS Safari & mobile touch devices
+    function unlockWebAudioOnTouch() {
+      if (!audioContext) {
+        initWebAudio();
+      }
+      if (audioContext) {
+        if (audioContext.state === 'suspended') {
+          audioContext.resume().catch(() => {});
+        }
+        // iOS Safari empty buffer play unlock technique
+        try {
+          const buffer = audioContext.createBuffer(1, 1, 22050);
+          const source = audioContext.createBufferSource();
+          source.buffer = buffer;
+          source.connect(audioContext.destination);
+          source.start(0);
+        } catch (e) {}
+      }
+      if (typeof userAudioCtx !== 'undefined' && userAudioCtx && userAudioCtx.state === 'suspended') {
+        userAudioCtx.resume().catch(() => {});
+      }
+      if (audioContext && audioContext.state === 'running') {
+        ['touchstart', 'touchend'].forEach(evt => {
+          document.removeEventListener(evt, unlockWebAudioOnTouch, true);
+        });
+      }
+    }
+    ['touchstart', 'touchend'].forEach(evt => {
+      document.addEventListener(evt, unlockWebAudioOnTouch, { capture: true, passive: true });
+    });
 
     function togglePlay() {
       if (isTeamsFullMode || isWebcamActive) {
@@ -3282,29 +3388,94 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
     }
 
+    function getTimelinePct(e, container) {
+      const rect = container.getBoundingClientRect();
+      let clientX = e.clientX;
+      if (clientX === undefined && e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      } else if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+      }
+      if (clientX === undefined) return 0;
+      return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    }
+
     function seekAudio(e) {
       if (isWebcamActive) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const container = document.getElementById('timelineContainer');
+      if (!container) return;
+      const pct = getTimelinePct(e, container);
       const dur = audio.duration || 518.0;
       audio.currentTime = pct * dur;
     }
 
     function showTimelineTooltip(e) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const container = document.getElementById('timelineContainer');
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const pct = getTimelinePct(e, container);
       const dur = audio.duration || 518.0;
       const time = pct * dur;
 
+      let clientX = e.clientX;
+      if (clientX === undefined && e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+      } else if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+      }
+
       const tip = document.getElementById('progressTooltip');
-      tip.style.left = e.clientX + 'px';
-      tip.style.top = (rect.top - 10) + 'px';
-      tip.innerText = formatTime(time);
-      tip.classList.remove('hidden');
+      if (tip && clientX !== undefined) {
+        tip.style.left = clientX + 'px';
+        tip.style.top = (rect.top - 10) + 'px';
+        tip.innerText = formatTime(time);
+        tip.classList.remove('hidden');
+      }
     }
 
     function hideTimelineTooltip() {
-      document.getElementById('progressTooltip').classList.add('hidden');
+      const tip = document.getElementById('progressTooltip');
+      if (tip) tip.classList.add('hidden');
+    }
+
+    // Touch scrubber for mobile & tablet devices
+    let isTimelineTouchScrubbing = false;
+    function initTimelineTouchScrubber() {
+      const container = document.getElementById('timelineContainer');
+      if (!container) return;
+
+      const onTouchScrub = (e) => {
+        if (!isTimelineTouchScrubbing || isWebcamActive) return;
+        if (e.cancelable) e.preventDefault();
+        const pct = getTimelinePct(e, container);
+        const dur = audio.duration || 518.0;
+        audio.currentTime = pct * dur;
+
+        // Smooth UI progress update
+        const prog = document.getElementById('timelineProgress');
+        if (prog) prog.style.width = (pct * 100) + '%';
+        const curr = document.getElementById('currentTime');
+        if (curr) curr.innerText = formatTime(pct * dur);
+
+        // Tooltip update
+        showTimelineTooltip(e);
+      };
+
+      const onTouchEnd = (e) => {
+        if (!isTimelineTouchScrubbing) return;
+        isTimelineTouchScrubbing = false;
+        hideTimelineTooltip();
+      };
+
+      container.addEventListener('touchstart', (e) => {
+        if (isWebcamActive) return;
+        isTimelineTouchScrubbing = true;
+        onTouchScrub(e);
+      }, { passive: false });
+
+      window.addEventListener('touchmove', onTouchScrub, { passive: false });
+      window.addEventListener('touchend', onTouchEnd, { passive: true });
+      window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     }
 
     function buildTimelineMarkers() {
