@@ -16,7 +16,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="fix-webm-duration.js"></script>
 
   <style>
     * {
@@ -841,7 +840,7 @@
     let isRecording = false;
     let recStartTime = 0;
     let recTimerInterval = null;
-    let recordedMimeType = 'video/webm';
+    let recordedMimeType = 'video/mp4';
 
     // Simulation Timer for Chapters without Pre-recorded Audio
     let simTimer = null;
@@ -1683,15 +1682,14 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         audioLevel = 0.25 + Math.abs(Math.sin(t * 9) * Math.cos(t * 5.5)) * 0.45;
       }
 
-      // 1. Draw Manager Canvas (Top-Right)
-      drawManagerCanvas(now, audioLevel);
-
-      // 2. Draw HR Canvas (Bottom-Center)
-      drawHRCanvas(now, audioLevel);
-
-      // 3. Draw Candidate Canvas (Top-Left, when webcam is inactive)
-      if (!isWebcamActive) {
-        drawCandidateCanvas(now, audioLevel);
+      // Draw 2D Cartoon Canvases only when not using Teams avatar style to conserve CPU while recording
+      const hideCartoonCanvases = isTeamsFullMode && teamsAvatarStyle === 'teams';
+      if (!hideCartoonCanvases) {
+        drawManagerCanvas(now, audioLevel);
+        drawHRCanvas(now, audioLevel);
+        if (!isWebcamActive) {
+          drawCandidateCanvas(now, audioLevel);
+        }
       }
 
       // 3. Animate Mic Wave Bars (when webcam is active)
@@ -2920,16 +2918,16 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
     }
 
     function disableWebcam() {
-      // 0. Nếu đang ghi hình thì dừng và tải video về máy trước khi tắt camera
+      // 0. Nếu đang ghi hình thì dừng và tải video về máy, hoãn tắt camera tracks để MediaRecorder kịp lưu
+      const tracksToStop = webcamStream ? webcamStream.getTracks() : [];
+      webcamStream = null;
       if (isRecording) {
         stopRecordingAndDownload();
+        setTimeout(() => tracksToStop.forEach(t => t.stop()), 400);
+      } else {
+        tracksToStop.forEach(t => t.stop());
       }
 
-      // 1. Tắt stream camera
-      if (webcamStream) {
-        webcamStream.getTracks().forEach(t => t.stop());
-        webcamStream = null;
-      }
       const videoEl = document.getElementById('webcamVideo');
       if (videoEl) {
         videoEl.srcObject = null;
@@ -3034,12 +3032,11 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       let mime = '';
       if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported) {
         const candidateTypes = [
-          'video/webm;codecs=vp9,opus',
-          'video/webm;codecs=vp8,opus',
-          'video/webm',
           'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
           'video/mp4;codecs=avc1',
-          'video/mp4'
+          'video/mp4',
+          'video/webm;codecs=vp8,opus',
+          'video/webm'
         ];
         for (const candidate of candidateTypes) {
           if (MediaRecorder.isTypeSupported(candidate)) {
@@ -3048,7 +3045,7 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           }
         }
       }
-      recordedMimeType = mime || 'video/webm';
+      recordedMimeType = mime || 'video/mp4';
 
       const options = { videoBitsPerSecond: 2500000 };
       if (mime) {
@@ -3074,7 +3071,6 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       };
 
       mediaRecorder.onstop = () => {
-        const durationMs = Date.now() - recStartTime;
         clearInterval(recTimerInterval);
         recTimerInterval = null;
         isRecording = false;
@@ -3082,40 +3078,30 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
         if (recordedChunks.length === 0) return;
 
-        const actualType = (recordedChunks[0] && recordedChunks[0].type) || recordedMimeType || 'video/webm';
-        const rawBlob = new Blob(recordedChunks, { type: actualType });
-
-        const downloadBlob = (finalBlob) => {
-          const url = URL.createObjectURL(finalBlob);
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = url;
-          const now = new Date();
-          const dateStr = now.toISOString().slice(0, 10);
-          const timeStr = String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
-          const ext = actualType.includes('mp4') ? 'mp4' : 'webm';
-          a.download = `Esco_AV_Interview_Practice_${dateStr}_${timeStr}_ThaiDoThinh.${ext}`;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-          }, 200);
-        };
-
-        if (!actualType.includes('mp4') && typeof ysFixWebmDuration === 'function') {
-          ysFixWebmDuration(rawBlob, durationMs, (fixedBlob) => {
-            downloadBlob(fixedBlob);
-          });
-        } else {
-          downloadBlob(rawBlob);
-        }
+        const actualType = (recordedChunks[0] && recordedChunks[0].type) || recordedMimeType || 'video/mp4';
+        const finalBlob = new Blob(recordedChunks, { type: actualType });
+        const url = URL.createObjectURL(finalBlob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10);
+        const timeStr = String(now.getHours()).padStart(2, '0') + '-' + String(now.getMinutes()).padStart(2, '0');
+        const ext = actualType.includes('mp4') ? 'mp4' : 'webm';
+        a.download = `Esco_AV_Interview_Practice_${dateStr}_${timeStr}_ThaiDoThinh.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        }, 200);
       };
 
-      mediaRecorder.start(1000);
+      mediaRecorder.start();
       if (mediaRecorder.mimeType) {
         recordedMimeType = mediaRecorder.mimeType;
       }
+      console.log('Recording mime:', recordedMimeType);
       isRecording = true;
       recStartTime = Date.now();
       updateRecordUI();
