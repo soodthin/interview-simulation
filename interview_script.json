@@ -36,8 +36,8 @@
         {
           "num": 5,
           "title": "What are your weaknesses?",
-          "answer_en": "Hmm, my background is mostly in software, so I don’t have much experience with enterprise AV equipment yet.\n\nBut at home, I often help friends and family with Wi-Fi, screens, and computer problems. And I learn by doing. I read the manual carefully, take notes, and ask experienced engineers.\n\nIf I’m not sure, I ask first. I don’t guess when working at a client’s office.",
-          "notes": "Điểm cần cải thiện: Chưa có nhiều kinh nghiệm thực chiến với thiết bị AV doanh nghiệp. Cách khắc phục: Ham học hỏi qua thực tế, đọc kỹ manual, hỏi kỹ sư có kinh nghiệm, tuyệt đối không đoán mò khi ở văn phòng khách hàng."
+          "answer_en": "Hmm, my background is mostly in software, so I don’t have much experience with enterprise AV equipment yet, like conference rooms with multiple mics and displays.\n\nMy experience is mostly basic setup at school, I often set up projectors and troubleshoot no-signal issues by checking the cables, ports, and display mode. I know a client’s meeting room is much more complex.\n\nSo to catch up quickly, I’ll read the manuals, take notes, and learn directly from the team. And at a client’s office, I’ll follow the checklist and always ask first if I’m not sure.",
+          "notes": "Điểm cần cải thiện: Chưa có nhiều kinh nghiệm với thiết bị AV doanh nghiệp phức tạp (nhiều mic & màn hình). Kinh nghiệm sẵn có: Setup máy chiếu tại trường, xử lý lỗi no-signal (cáp, cổng, display mode). Giải pháp: Đọc manual, ghi chú, học hỏi từ team, tuân thủ checklist và luôn hỏi trước khi chưa chắc chắn tại văn phòng khách hàng."
         },
         {
           "num": 6,
