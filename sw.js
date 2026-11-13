@@ -6,12 +6,13 @@
    - HTTP Range (206) support for offline audio/video playback
    ========================================================================== */
 
-const CACHE_NAME = 'esco-av-pwa-v1';
+const CACHE_NAME = 'esco-av-pwa-v2';
 
 // App Shell & Static Assets to Precache
 const PRECACHE_ASSETS = [
   './',
   './index.html',
+  './fix-webm-duration.js',
   './manifest.json',
   './icon.svg',
   './icon-192.png',
