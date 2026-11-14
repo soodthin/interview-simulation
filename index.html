@@ -623,6 +623,12 @@
                 </div>
 
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 pointer-events-auto">
+                  <!-- Edit Script Button in Teams Mode -->
+                  <button id="btnTeamsEditScript" onclick="toggleTeamsScriptEditor()" class="px-2 py-0.5 rounded bg-[#181820] hover:bg-[#282836] border border-[#2b2b38] text-zinc-200 hover:text-white text-[11px] font-medium transition flex items-center gap-1 active:scale-95" title="Sửa nhanh câu trả lời hiện tại (Phím E)">
+                    <i data-lucide="pencil" class="w-3 h-3 text-red-400"></i>
+                    <span class="hidden sm:inline">Sửa</span>
+                  </button>
+
                   <!-- Font Size Controls (A- / A+) -->
                   <div class="flex items-center bg-[#181820] rounded border border-[#2b2b38] p-0.5 text-zinc-300" title="Phóng to / Thu nhỏ cỡ chữ kịch bản">
                     <button onclick="changeCaptionsFontSize(-1)" class="px-1.5 py-0.5 hover:bg-[#282836] hover:text-white rounded text-[10px] font-bold transition active:scale-95" title="Giảm cỡ chữ (A-)">A-</button>
@@ -665,6 +671,29 @@
                 <!-- Dynamically synced with scriptAnswerText -->
               </div>
 
+              <!-- Teams Mode Inline Editor -->
+              <div id="teamsCaptionsEditorBox" class="hidden space-y-2 select-text pointer-events-auto">
+                <textarea
+                  id="teamsCaptionsTextarea"
+                  rows="5"
+                  class="w-full rounded-lg bg-[#09090b] border border-[#3f3f46] focus:border-red-500 focus:outline-none p-2.5 text-sm text-white leading-relaxed resize-y select-text"
+                ></textarea>
+                <div class="flex items-center justify-between gap-2 pr-4">
+                  <button onclick="resetCurrentQuestionAnswer()" class="px-2 py-1 rounded bg-[#181820] hover:bg-[#282836] border border-[#2b2b38] text-zinc-300 text-[11px] transition">
+                    Khôi phục câu gốc
+                  </button>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="closeTeamsScriptEditor()" class="px-2.5 py-1 rounded bg-[#181820] hover:bg-[#282836] text-zinc-300 text-xs transition">
+                      Hủy
+                    </button>
+                    <button onclick="saveTeamsScriptEditor()" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1">
+                      <i data-lucide="save" class="w-3 h-3"></i>
+                      <span>Lưu [Ctrl+S]</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <!-- Bottom-Right Resize Handle (Kéo để phóng to / thu nhỏ tự do) -->
               <div id="teamsCaptionsResizeHandle" style="touch-action: none;" class="absolute bottom-1 right-1 w-5 h-5 cursor-nwse-resize flex items-end justify-end p-0.5 text-zinc-500 hover:text-red-400 transition select-none z-20 pointer-events-auto" title="Giữ chuột và kéo để phóng to / thu nhỏ kích thước kịch bản tùy thích">
                 <svg class="w-3.5 h-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -700,6 +729,12 @@
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
               </button>
 
+              <!-- Edit Script Button -->
+              <button id="btnEditScript" onclick="toggleNormalScriptEditor()" class="px-2.5 py-1 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-200 hover:text-white border border-[#3f3f46] text-xs font-medium transition flex items-center gap-1 active:scale-95" title="Sửa câu trả lời hiện tại (Phím E)">
+                <i data-lucide="pencil" class="w-3 h-3 text-red-400"></i>
+                <span class="hidden sm:inline">Sửa [E]</span>
+              </button>
+
               <!-- Copy Script Button -->
               <button onclick="copyCurrentScriptAnswer(this)" class="px-2.5 py-1 rounded-lg bg-[#18181b] hover:bg-[#27272a] text-zinc-300 hover:text-white border border-[#27272a] text-xs font-medium transition flex items-center gap-1 active:scale-95" title="Sao chép kịch bản">
                 <i data-lucide="copy" class="w-3 h-3"></i>
@@ -725,6 +760,49 @@
             <div id="scriptAnswerText" class="text-sm sm:text-base lg:text-[18px] font-medium text-white space-y-3 leading-relaxed max-h-56 sm:max-h-64 overflow-y-auto pr-2">
               <!-- Injected dynamically from user's prepared script! -->
             </div>
+
+            <!-- Inline Script Editor Box -->
+            <div id="scriptEditorBox" class="hidden space-y-2.5 select-text">
+              <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
+                <span>Đang chỉnh sửa câu trả lời (<b class="text-zinc-200">Ctrl+S</b> để lưu • <b class="text-zinc-200">Esc</b> để hủy)</span>
+                <span>Mẹo: Bọc <code class="text-red-400 font-mono">**từ khóa**</code> để tự gạch chân đỏ</span>
+              </div>
+
+              <textarea
+                id="scriptEditorTextarea"
+                rows="8"
+                placeholder="Nhập kịch bản trả lời tiếng Anh của bạn tại đây (nhấn Enter 2 lần để tách đoạn)..."
+                class="w-full rounded-xl bg-[#09090b] border border-[#3f3f46] focus:border-red-500 focus:outline-none p-3 text-sm sm:text-base text-white leading-relaxed resize-y select-text"
+              ></textarea>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button onclick="resetCurrentQuestionAnswer()" class="px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] text-zinc-300 hover:text-white text-xs transition active:scale-95" title="Đưa câu này về kịch bản mặc định ban đầu">
+                    Khôi phục câu gốc
+                  </button>
+                  <button onclick="exportFullScriptJson()" class="px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] text-zinc-300 hover:text-white text-xs transition active:scale-95" title="Tải toàn bộ file interview_script.json về máy">
+                    Xuất JSON
+                  </button>
+                  <button onclick="document.getElementById('importScriptInput').click()" class="px-2.5 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] text-zinc-300 hover:text-white text-xs transition active:scale-95" title="Nạp file interview_script.json có sẵn">
+                    Nhập JSON
+                  </button>
+                  <input type="file" id="importScriptInput" accept=".json" class="hidden" onchange="importFullScriptJson(event)">
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button onclick="closeNormalScriptEditor()" class="px-3 py-1.5 rounded-lg bg-[#18181b] hover:bg-[#27272a] border border-[#3f3f46] text-zinc-300 text-xs font-medium transition active:scale-95">
+                    Hủy [Esc]
+                  </button>
+                  <button onclick="saveNormalScriptEditor()" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                    <span>Lưu kịch bản [Ctrl+S]</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Save Status Toast -->
+            <div id="scriptSaveStatus" class="hidden mt-2 text-xs font-medium text-emerald-400 flex items-center gap-1.5"></div>
           </div>
 
         </div>
@@ -826,6 +904,11 @@
     // State Variables
     let interviewData = DEFAULT_INTERVIEW_DATA;
     let fullScript = FULL_SCRIPT_DATA;
+    const SCRIPT_STORAGE_KEY = 'esco_av_custom_script_v1';
+    const DEFAULT_SCRIPT_BACKUP = JSON.parse(JSON.stringify(FULL_SCRIPT_DATA));
+    let hasBackendServer = false;
+    let isEditingNormalScript = false;
+    let isEditingTeamsScript = false;
     let audio = null;
     let isPlaying = false;
     let currentChapterIndex = 0;
@@ -1751,9 +1834,31 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       } catch (e) {}
 
       try {
-        const sResp = await fetch('interview_script.json');
-        if (sResp.ok) fullScript = await sResp.json();
+        const sResp = await fetch('interview_script.json?t=' + Date.now(), { cache: 'no-store' });
+        if (sResp.ok) {
+          hasBackendServer = sResp.headers.get('X-Esco-Backend') === '1';
+          const fetchedScript = await sResp.json();
+          if (fetchedScript && fetchedScript.sections) {
+            fullScript = fetchedScript;
+          }
+        }
       } catch (e) {}
+
+      if (!hasBackendServer) {
+        loadScriptFromLocalStorage();
+      } else {
+        // Nếu trước đó user có sửa offline, tự động đẩy đồng bộ xuống file interview_script.json
+        try {
+          const savedRaw = localStorage.getItem(SCRIPT_STORAGE_KEY);
+          if (savedRaw) {
+            const parsed = JSON.parse(savedRaw);
+            if (parsed && parsed.pendingSync && parsed.data && parsed.data.sections) {
+              fullScript = parsed.data;
+              await persistScriptToStorageAndFile(fullScript, true);
+            }
+          }
+        } catch (e) {}
+      }
 
       buildChapterDrawer();
       buildTimelineMarkers();
@@ -1843,54 +1948,95 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       }
     }
 
+    function getScriptItemByQuestionNum(qNum) {
+      if (!fullScript || !fullScript.sections) return null;
+      for (const sec of fullScript.sections) {
+        if (sec.items) {
+          const found = sec.items.find(it => it.num === qNum);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function getDefaultScriptItemByQuestionNum(qNum) {
+      if (!DEFAULT_SCRIPT_BACKUP || !DEFAULT_SCRIPT_BACKUP.sections) return null;
+      for (const sec of DEFAULT_SCRIPT_BACKUP.sections) {
+        if (sec.items) {
+          const found = sec.items.find(it => it.num === qNum);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function escapeHtml(str) {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatScriptAnswerHtml(answerText) {
+      const blocks = (answerText || '')
+        .split(/\n\s*\n/)
+        .map(p => p.trim())
+        .filter(Boolean);
+
+      if (blocks.length === 0) {
+        return '<p class="text-zinc-500 italic">Chưa có nội dung trả lời. Bấm "Sửa" để nhập kịch bản mới...</p>';
+      }
+
+      const sortedPhrases = [...IMPORTANT_PHRASES]
+        .sort((a, b) => b.length - a.length)
+        .map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      const phraseRegex = new RegExp(`(${sortedPhrases.join('|')})`, 'gi');
+
+      return blocks.map(p => {
+        const cleanP = p.replace(/^[“”"]+|[”"]+$/g, '').trim();
+        let html = escapeHtml(cleanP);
+
+        // Hỗ trợ tự đánh dấu nhấn mạnh bằng **từ khóa**
+        html = html.replace(/\*\*(.+?)\*\*/g, '<span class="script-highlight">$1</span>');
+
+        // Tự động highlight các cụm từ khóa (bỏ qua phần đã nằm trong thẻ <span>)
+        html = html.replace(/(<span class="script-highlight">[\s\S]*?<\/span>)|(<[^>]+>)|([^<]+)/g, (m, hi, tag, text) => {
+          if (hi) return hi;
+          if (tag) return tag;
+          return text.replace(phraseRegex, '<span class="script-highlight">$1</span>');
+        });
+
+        html = html.replace(/\n/g, '<br>');
+        return `<p class="leading-relaxed">“${html}”</p>`;
+      }).join('');
+    }
+
     // Sync Question & Script Card for Chapter (CHỈ ĐỂ PHẦN KỊCH BẢN THÔI!)
     function syncQuestionCardForChapter(idx) {
       if (!interviewData || !interviewData.chapters || !interviewData.chapters[idx]) return;
       const chap = interviewData.chapters[idx];
       currentChapterIndex = idx;
 
-      // Update Top Status Bar of Card
+      if (isEditingNormalScript) closeNormalScriptEditor();
+      if (isEditingTeamsScript) closeTeamsScriptEditor();
+
       document.getElementById('questionNumBadge').innerText = `CÂU ${chap.id} / ${interviewData.chapters.length}`;
       document.getElementById('questionTitleBar').innerText = chap.title_en;
 
-      // Find Prepared Script Item
-      const qNum = chap.id;
-      let scriptItem = null;
-      if (fullScript && fullScript.sections) {
-        for (const sec of fullScript.sections) {
-          if (sec.items) {
-            const found = sec.items.find(it => it.num === qNum);
-            if (found) {
-              scriptItem = found;
-              break;
-            }
-          }
-        }
-      }
-
-      // Populate PURE SCRIPT TEXT (Clean, High Contrast, Large Font)
+      const scriptItem = getScriptItemByQuestionNum(chap.id);
       const scriptTextEl = document.getElementById('scriptAnswerText');
-      if (scriptItem && scriptTextEl) {
-        const paragraphs = scriptItem.answer_en.split('\n\n').map(p => {
-          const cleanP = p.replace(/^[“"]+|[”"]+$/g, '').trim();
-          let highlighted = cleanP;
-          
-          // Highlight key phrases in red underline
-          const sortedPhrases = [...IMPORTANT_PHRASES].sort((a, b) => b.length - a.length);
-          sortedPhrases.forEach(phrase => {
-            const regex = new RegExp(`(${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-            highlighted = highlighted.replace(regex, `<span class="script-highlight">$1</span>`);
-          });
-          return `<p class="leading-relaxed">“${highlighted}”</p>`;
-        }).join('');
+      const capTextEl = document.getElementById('teamsCaptionsText');
 
-        scriptTextEl.innerHTML = paragraphs;
-        const capTextEl = document.getElementById('teamsCaptionsText');
-        if (capTextEl) capTextEl.innerHTML = paragraphs;
+      if (scriptItem && scriptTextEl) {
+        const html = formatScriptAnswerHtml(scriptItem.answer_en);
+        scriptTextEl.innerHTML = html;
+        if (capTextEl) capTextEl.innerHTML = html;
       } else if (scriptTextEl) {
-        scriptTextEl.innerHTML = `<p class="text-zinc-400 italic">“${chap.title_en}”</p>`;
-        const capTextEl = document.getElementById('teamsCaptionsText');
-        if (capTextEl) capTextEl.innerHTML = `<p class="text-zinc-400 italic">“${chap.title_en}”</p>`;
+        const fallbackHtml = `<p class="text-zinc-400 italic">“${escapeHtml(chap.title_en)}”</p>`;
+        scriptTextEl.innerHTML = fallbackHtml;
+        if (capTextEl) capTextEl.innerHTML = fallbackHtml;
       }
 
       const capBadge = document.getElementById('teamsCaptionsBadge');
@@ -1898,7 +2044,6 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
       const capTitle = document.getElementById('teamsCaptionsTitle');
       if (capTitle) capTitle.innerText = chap.title_en;
 
-      // Reset countdown timer display (chỉ đếm ngược khi HR đọc xong câu hỏi trong chế độ Practice)
       clearInterval(countdownInterval);
       countdownTimerSec = 90;
       updateCountdownDisplay();
@@ -2029,9 +2174,13 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
     // Copy Current Script Answer
     function copyCurrentScriptAnswer(btn) {
-      const scriptTextEl = document.getElementById('scriptAnswerText');
-      if (!scriptTextEl) return;
-      const plainText = scriptTextEl.innerText;
+      const chap = interviewData.chapters[currentChapterIndex];
+      const scriptItem = chap ? getScriptItemByQuestionNum(chap.id) : null;
+      const plainText = isEditingNormalScript
+        ? document.getElementById('scriptEditorTextarea').value
+        : (scriptItem ? scriptItem.answer_en : document.getElementById('scriptAnswerText').innerText);
+      if (!plainText) return;
+
       navigator.clipboard.writeText(plainText).then(() => {
         const origHtml = btn.innerHTML;
         btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-red-500"></i><span class="hidden sm:inline">Đã chép</span>`;
@@ -2041,6 +2190,217 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           lucide.createIcons();
         }, 1800);
       });
+    }
+
+    // ==========================================
+    // SCRIPT EDITOR & PERSISTENCE (EDIT & SAVE)
+    // ==========================================
+    function loadScriptFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem(SCRIPT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.data && parsed.data.sections) {
+          fullScript = parsed.data;
+        }
+      } catch (e) {
+        console.warn('Cannot load script from localStorage:', e);
+      }
+    }
+
+    async function persistScriptToStorageAndFile(scriptObj, isBackgroundSync = false) {
+      let savedToFile = false;
+
+      if (hasBackendServer) {
+        try {
+          const res = await fetch('/api/save-script', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(scriptObj)
+          });
+          if (res.ok) {
+            const json = await res.json();
+            savedToFile = !!json.ok;
+          }
+        } catch (e) {
+          console.warn('Save to file failed, fallback to localStorage:', e);
+        }
+      }
+
+      try {
+        localStorage.setItem(SCRIPT_STORAGE_KEY, JSON.stringify({
+          updatedAt: Date.now(),
+          pendingSync: !savedToFile,
+          data: scriptObj
+        }));
+      } catch (e) {
+        console.warn('localStorage save error:', e);
+      }
+
+      if (!isBackgroundSync) {
+        if (savedToFile) {
+          showScriptSaveNotice('✓ Đã lưu thẳng vào file interview_script.json & trình duyệt!');
+        } else {
+          showScriptSaveNotice('✓ Đã lưu kịch bản trên trình duyệt (localStorage)!');
+        }
+      }
+    }
+
+    function showScriptSaveNotice(msg) {
+      const el = document.getElementById('scriptSaveStatus');
+      if (!el) return;
+      el.innerText = msg;
+      el.classList.remove('hidden');
+      clearTimeout(window._saveNoticeTimeout);
+      window._saveNoticeTimeout = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 3500);
+    }
+
+    // --- Normal Mode Editor ---
+    function toggleNormalScriptEditor() {
+      if (isEditingNormalScript) closeNormalScriptEditor();
+      else openNormalScriptEditor();
+    }
+
+    function openNormalScriptEditor() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      if (!chap) return;
+      const item = getScriptItemByQuestionNum(chap.id);
+      const ta = document.getElementById('scriptEditorTextarea');
+      const view = document.getElementById('scriptAnswerText');
+      const box = document.getElementById('scriptEditorBox');
+      if (!ta || !view || !box) return;
+
+      ta.value = item ? item.answer_en : '';
+      view.classList.add('hidden');
+      box.classList.remove('hidden');
+      isEditingNormalScript = true;
+      ta.focus();
+      lucide.createIcons();
+    }
+
+    function closeNormalScriptEditor() {
+      const view = document.getElementById('scriptAnswerText');
+      const box = document.getElementById('scriptEditorBox');
+      if (view) view.classList.remove('hidden');
+      if (box) box.classList.add('hidden');
+      isEditingNormalScript = false;
+    }
+
+    async function saveNormalScriptEditor() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      const ta = document.getElementById('scriptEditorTextarea');
+      if (!chap || !ta) return;
+
+      const item = getScriptItemByQuestionNum(chap.id);
+      if (item) {
+        item.answer_en = ta.value.trim();
+        await persistScriptToStorageAndFile(fullScript);
+        closeNormalScriptEditor();
+        syncQuestionCardForChapter(currentChapterIndex);
+      }
+    }
+
+    // --- Teams Mode Editor ---
+    function toggleTeamsScriptEditor() {
+      if (isEditingTeamsScript) closeTeamsScriptEditor();
+      else openTeamsScriptEditor();
+    }
+
+    function openTeamsScriptEditor() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      if (!chap) return;
+      if (typeof isCaptionsMinimized !== 'undefined' && isCaptionsMinimized) {
+        toggleCaptionsMinimize();
+      }
+      const item = getScriptItemByQuestionNum(chap.id);
+      const ta = document.getElementById('teamsCaptionsTextarea');
+      const view = document.getElementById('teamsCaptionsText');
+      const box = document.getElementById('teamsCaptionsEditorBox');
+      if (!ta || !view || !box) return;
+
+      ta.value = item ? item.answer_en : '';
+      view.classList.add('hidden');
+      box.classList.remove('hidden');
+      isEditingTeamsScript = true;
+      ta.focus();
+      lucide.createIcons();
+    }
+
+    function closeTeamsScriptEditor() {
+      const view = document.getElementById('teamsCaptionsText');
+      const box = document.getElementById('teamsCaptionsEditorBox');
+      if (view) view.classList.remove('hidden');
+      if (box) box.classList.add('hidden');
+      isEditingTeamsScript = false;
+    }
+
+    async function saveTeamsScriptEditor() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      const ta = document.getElementById('teamsCaptionsTextarea');
+      if (!chap || !ta) return;
+
+      const item = getScriptItemByQuestionNum(chap.id);
+      if (item) {
+        item.answer_en = ta.value.trim();
+        await persistScriptToStorageAndFile(fullScript);
+        closeTeamsScriptEditor();
+        syncQuestionCardForChapter(currentChapterIndex);
+      }
+    }
+
+    // --- Khôi phục câu gốc / Xuất / Nhập JSON ---
+    async function resetCurrentQuestionAnswer() {
+      const chap = interviewData.chapters[currentChapterIndex];
+      if (!chap) return;
+      const origItem = getDefaultScriptItemByQuestionNum(chap.id);
+      const curItem = getScriptItemByQuestionNum(chap.id);
+      if (!origItem || !curItem) return;
+
+      if (!confirm(`Khôi phục câu trả lời của Câu ${chap.id} về bản gốc mặc định?`)) return;
+
+      curItem.answer_en = origItem.answer_en;
+      await persistScriptToStorageAndFile(fullScript);
+      closeNormalScriptEditor();
+      closeTeamsScriptEditor();
+      syncQuestionCardForChapter(currentChapterIndex);
+    }
+
+    function exportFullScriptJson() {
+      const blob = new Blob([JSON.stringify(fullScript, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'interview_script.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importFullScriptJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!imported || !imported.sections) {
+            alert('File JSON không đúng định dạng interview_script.json!');
+            return;
+          }
+          fullScript = imported;
+          await persistScriptToStorageAndFile(fullScript);
+          closeNormalScriptEditor();
+          closeTeamsScriptEditor();
+          syncQuestionCardForChapter(currentChapterIndex);
+        } catch (err) {
+          alert('Không đọc được file JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+      event.target.value = '';
     }
 
     // Answer Countdown Timer
@@ -3538,7 +3898,34 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
 
     // Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
+      // Cho phép bấm Ctrl+S để lưu và Esc để hủy ngay khi đang gõ trong ô sửa kịch bản
+      if (e.target.id === 'scriptEditorTextarea' || e.target.id === 'teamsCaptionsTextarea') {
+        if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') {
+          e.preventDefault();
+          if (e.target.id === 'scriptEditorTextarea') saveNormalScriptEditor();
+          else saveTeamsScriptEditor();
+          return;
+        }
+        if (e.code === 'Escape') {
+          e.preventDefault();
+          if (e.target.id === 'scriptEditorTextarea') closeNormalScriptEditor();
+          else closeTeamsScriptEditor();
+          return;
+        }
+        return; // Chặn các phím tắt khác (Space, Enter, F, T...) khi đang gõ chữ
+      }
+
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.code === 'KeyE' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        if (isTeamsFullMode && isTeamsCaptionsVisible) {
+          toggleTeamsScriptEditor();
+        } else if (!isTeamsFullMode) {
+          toggleNormalScriptEditor();
+        }
+        return;
+      }
 
       if (e.code === 'Space') {
         e.preventDefault();
