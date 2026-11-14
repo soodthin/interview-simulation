@@ -679,9 +679,14 @@
                   class="w-full rounded-lg bg-[#09090b] border border-[#3f3f46] focus:border-red-500 focus:outline-none p-2.5 text-sm text-white leading-relaxed resize-y select-text"
                 ></textarea>
                 <div class="flex items-center justify-between gap-2 pr-4">
-                  <button onclick="resetCurrentQuestionAnswer()" class="px-2 py-1 rounded bg-[#181820] hover:bg-[#282836] border border-[#2b2b38] text-zinc-300 text-[11px] transition">
-                    Khôi phục câu gốc
-                  </button>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="resetCurrentQuestionAnswer()" class="px-2 py-1 rounded bg-[#181820] hover:bg-[#282836] border border-[#2b2b38] text-zinc-300 text-[11px] transition">
+                      Khôi phục câu gốc
+                    </button>
+                    <button type="button" onclick="wrapSelectedKeywordWithUnderline('teamsCaptionsTextarea')" class="px-2 py-1 rounded bg-[#181820] hover:bg-[#282836] border border-[#2b2b38] text-red-400 hover:text-red-300 font-mono text-[11px] font-bold transition flex items-center gap-1 active:scale-95" title="Bôi đen chữ rồi bấm để gạch chân đỏ (Phím tắt Ctrl+U hoặc Ctrl+B)">
+                      <span>**gạch chân** [Ctrl+U]</span>
+                    </button>
+                  </div>
                   <div class="flex items-center gap-1.5">
                     <button onclick="closeTeamsScriptEditor()" class="px-2.5 py-1 rounded bg-[#181820] hover:bg-[#282836] text-zinc-300 text-xs transition">
                       Hủy
@@ -765,7 +770,12 @@
             <div id="scriptEditorBox" class="hidden space-y-2.5 select-text">
               <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-400">
                 <span>Đang chỉnh sửa câu trả lời (<b class="text-zinc-200">Ctrl+S</b> để lưu • <b class="text-zinc-200">Esc</b> để hủy)</span>
-                <span>Mẹo: Bọc <code class="text-red-400 font-mono">**từ khóa**</code> để tự gạch chân đỏ</span>
+                <div class="flex items-center gap-1.5">
+                  <span>Mẹo: Bôi đen chữ bấm <b class="text-zinc-200">Ctrl+U</b> để gạch chân đỏ</span>
+                  <button type="button" onclick="wrapSelectedKeywordWithUnderline('scriptEditorTextarea')" class="px-2 py-0.5 rounded bg-[#27272a] hover:bg-[#3f3f46] text-red-400 hover:text-red-300 font-mono text-[11px] font-bold border border-[#3f3f46] transition active:scale-95" title="Bôi đen chữ rồi bấm để gạch chân đỏ (Phím tắt Ctrl+U hoặc Ctrl+B)">
+                    **gạch chân**
+                  </button>
+                </div>
               </div>
 
               <textarea
@@ -2300,6 +2310,64 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
         closeNormalScriptEditor();
         syncQuestionCardForChapter(currentChapterIndex);
       }
+    }
+
+    // Wrap or unwrap selected text with ** for red underline highlight (Ctrl+U / Ctrl+B)
+    function wrapSelectedKeywordWithUnderline(target) {
+      const ta = typeof target === 'string' ? document.getElementById(target) : target;
+      if (!ta) return;
+
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const text = ta.value;
+
+      if (start === end) {
+        // Chưa bôi đen -> chèn **** và đặt con trỏ vào giữa
+        const before = text.substring(0, start);
+        const after = text.substring(end);
+        ta.value = before + '****' + after;
+        ta.selectionStart = ta.selectionEnd = start + 2;
+        ta.focus();
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+      }
+
+      const selected = text.substring(start, end);
+
+      // 1. Nếu văn bản bôi đen đã bao bọc sẵn bởi **...** -> tháo bỏ
+      if (selected.startsWith('**') && selected.endsWith('**') && selected.length >= 4) {
+        const unwrapped = selected.slice(2, -2);
+        const before = text.substring(0, start);
+        const after = text.substring(end);
+        ta.value = before + unwrapped + after;
+        ta.selectionStart = start;
+        ta.selectionEnd = start + unwrapped.length;
+        ta.focus();
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+      }
+
+      // 2. Nếu con trỏ bôi đen nằm ngay giữa cặp **...** ở ngoài -> tháo bỏ
+      if (start >= 2 && end + 2 <= text.length && text.substring(start - 2, start) === '**' && text.substring(end, end + 2) === '**') {
+        const before = text.substring(0, start - 2);
+        const after = text.substring(end + 2);
+        ta.value = before + selected + after;
+        ta.selectionStart = start - 2;
+        ta.selectionEnd = start - 2 + selected.length;
+        ta.focus();
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+        return;
+      }
+
+      // 3. Bọc ** vào 2 đầu của văn bản bôi đen
+      const wrapped = `**${selected}**`;
+      const before = text.substring(0, start);
+      const after = text.substring(end);
+      ta.value = before + wrapped + after;
+      ta.selectionStart = start;
+      ta.selectionEnd = start + wrapped.length;
+      ta.focus();
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     // --- Teams Mode Editor ---
@@ -3904,6 +3972,11 @@ function drawNaturalCharacterMouth(ctx, yPos, state, isSpeaking) {
           e.preventDefault();
           if (e.target.id === 'scriptEditorTextarea') saveNormalScriptEditor();
           else saveTeamsScriptEditor();
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyU' || e.code === 'KeyB' || e.key === 'u' || e.key === 'U' || e.key === 'b' || e.key === 'B')) {
+          e.preventDefault();
+          wrapSelectedKeywordWithUnderline(e.target);
           return;
         }
         if (e.code === 'Escape') {
