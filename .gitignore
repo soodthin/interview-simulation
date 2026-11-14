@@ -22,3 +22,8 @@ Thumbs.db
 # Playwright MCP temp files
 .playwright-mcp/
 
+# Distribution & Archives
+dist/
+*.zip
+*.tar.gz
+
